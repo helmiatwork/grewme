@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_04_012034) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_04_014843) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,6 +46,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_012034) do
     t.index ["parent_id", "student_id"], name: "index_parent_students_on_parent_id_and_student_id", unique: true
     t.index ["parent_id"], name: "index_parent_students_on_parent_id"
     t.index ["student_id"], name: "index_parent_students_on_student_id"
+  end
+
+  create_table "permissions", force: :cascade do |t|
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.boolean "granted", default: true, null: false
+    t.string "resource", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "resource", "action"], name: "index_permissions_uniqueness", unique: true
+    t.index ["user_id"], name: "index_permissions_on_user_id"
   end
 
   create_table "refresh_tokens", force: :cascade do |t|
@@ -93,6 +104,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_012034) do
   add_foreign_key "daily_scores", "users", column: "teacher_id"
   add_foreign_key "parent_students", "students"
   add_foreign_key "parent_students", "users", column: "parent_id"
+  add_foreign_key "permissions", "users", on_delete: :cascade
   add_foreign_key "refresh_tokens", "users"
   add_foreign_key "students", "classrooms"
 
