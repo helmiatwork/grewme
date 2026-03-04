@@ -1,0 +1,56 @@
+name: GrewMeParent
+options:
+  bundleIdPrefix: com.grewme
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  DEVELOPMENT_TEAM: "Q28Y384SMC"
+targets:
+  GrewMeParent:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.grewme.parent
+      INFOPLIST_FILE: iosApp/Info.plist
+      FRAMEWORK_SEARCH_PATHS:
+        - "$(SRCROOT)/../composeApp/build/bin/iosArm64/debugFramework"
+        - "$(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/debugFramework"
+      OTHER_LDFLAGS:
+        - "-framework"
+        - "ComposeApp"
+        - "-lsqlite3"
+      LD_RUNPATH_SEARCH_PATHS:
+        - "@executable_path/Frameworks"
+      CODE_SIGN_STYLE: Automatic
+      CODE_SIGN_IDENTITY: "Apple Development"
+      CODE_SIGNING_ALLOWED: "YES"
+      ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    dependencies: []
+    preBuildScripts:
+      - name: "Build Kotlin Framework"
+        script: |
+          cd "$SRCROOT/.."
+          export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+          if [ "$PLATFORM_NAME" = "iphonesimulator" ]; then
+            ./gradlew composeApp:linkDebugFrameworkIosSimulatorArm64 --no-daemon
+          else
+            ./gradlew composeApp:linkDebugFrameworkIosArm64 --no-daemon
+          fi
+        basedOnDependencyAnalysis: false
+    postBuildScripts:
+      - name: "Embed Kotlin Framework"
+        script: |
+          if [ "$PLATFORM_NAME" = "iphonesimulator" ]; then
+            FRAMEWORK_DIR="$SRCROOT/../composeApp/build/bin/iosSimulatorArm64/debugFramework"
+          else
+            FRAMEWORK_DIR="$SRCROOT/../composeApp/build/bin/iosArm64/debugFramework"
+          fi
+          mkdir -p "$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH"
+          cp -R "$FRAMEWORK_DIR/ComposeApp.framework" "$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH/"
+          if [ "$CODE_SIGNING_ALLOWED" = "YES" ]; then
+            codesign --force --sign "$EXPANDED_CODE_SIGN_IDENTITY" --timestamp=none --preserve-metadata=identifier,entitlements "$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH/ComposeApp.framework"
+          fi
+        basedOnDependencyAnalysis: false
