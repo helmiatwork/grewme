@@ -10,7 +10,6 @@ class Avo::Resources::DailyScore < Avo::BaseResource
     field :skill_category, as: :select, enum: ::DailyScore.skill_categories
     field :score, as: :number
     field :notes, as: :textarea, hide_on: :index
-    field :created_at, as: :date_time, sortable: true, readonly: true
-    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
-  end
+     field :created_at, as: :date_time, sortable: true, readonly: true
+   end
 end

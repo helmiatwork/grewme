@@ -8,7 +8,6 @@ class Avo::Resources::Classroom < Avo::BaseResource
     field :school, as: :belongs_to
     field :teacher, as: :belongs_to
     field :classroom_students, as: :has_many
-    field :created_at, as: :date_time, sortable: true, readonly: true
-    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
-  end
+     field :created_at, as: :date_time, sortable: true, readonly: true
+   end
 end

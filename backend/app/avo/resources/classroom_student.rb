@@ -10,7 +10,6 @@ class Avo::Resources::ClassroomStudent < Avo::BaseResource
     field :academic_year, as: :text
     field :enrolled_at, as: :date
     field :left_at, as: :date
-    field :created_at, as: :date_time, sortable: true, readonly: true
-    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
-  end
+     field :created_at, as: :date_time, sortable: true, readonly: true
+   end
 end

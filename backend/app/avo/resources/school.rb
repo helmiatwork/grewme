@@ -16,7 +16,6 @@ class Avo::Resources::School < Avo::BaseResource
     field :website, as: :text, hide_on: :index
     field :classrooms, as: :has_many
     field :teachers, as: :has_many
-    field :created_at, as: :date_time, sortable: true, readonly: true
-    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
-  end
+     field :created_at, as: :date_time, sortable: true, readonly: true
+   end
 end

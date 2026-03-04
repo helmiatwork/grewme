@@ -1,4 +1,5 @@
 class Avo::Resources::Activity < Avo::BaseResource
+  self.model_class = ::PublicActivity::Activity
   self.title = :key
   self.includes = [ :trackable, :owner ]
   self.default_view_type = :table
