@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_04_114842) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_04_121103) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -58,14 +58,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_114842) do
     t.index ["student_id"], name: "index_classroom_students_on_student_id"
   end
 
+  create_table "classroom_teachers", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.string "role", default: "primary", null: false
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["classroom_id", "teacher_id"], name: "index_classroom_teachers_on_classroom_id_and_teacher_id", unique: true
+    t.index ["classroom_id"], name: "index_classroom_teachers_on_classroom_id"
+    t.index ["teacher_id"], name: "index_classroom_teachers_on_teacher_id"
+  end
+
   create_table "classrooms", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.bigint "school_id", null: false
-    t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
     t.index ["school_id"], name: "index_classrooms_on_school_id"
-    t.index ["teacher_id"], name: "index_classrooms_on_teacher_id"
   end
 
   create_table "daily_scores", force: :cascade do |t|
@@ -219,8 +228,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_114842) do
 
   add_foreign_key "classroom_students", "classrooms"
   add_foreign_key "classroom_students", "students"
+  add_foreign_key "classroom_teachers", "classrooms"
+  add_foreign_key "classroom_teachers", "teachers"
   add_foreign_key "classrooms", "schools"
-  add_foreign_key "classrooms", "teachers"
   add_foreign_key "daily_scores", "students"
   add_foreign_key "daily_scores", "teachers"
   add_foreign_key "parent_students", "parents"

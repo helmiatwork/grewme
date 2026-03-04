@@ -4,11 +4,11 @@ class ClassroomPolicy < ApplicationPolicy
   end
 
   def show?
-    permitted?(:show) && (user.admin? || owns_classroom?)
+    permitted?(:show) && (user.admin? || teaches_classroom?)
   end
 
   def overview?
-    permitted?(:overview) && (user.admin? || owns_classroom?)
+    permitted?(:overview) && (user.admin? || teaches_classroom?)
   end
 
   class Scope < ApplicationPolicy::Scope
@@ -16,7 +16,7 @@ class ClassroomPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.has_permission?("classrooms", "index")
-        scope.where(teacher_id: user.id)
+        scope.joins(:classroom_teachers).where(classroom_teachers: { teacher_id: user.id })
       else
         scope.none
       end
@@ -25,7 +25,7 @@ class ClassroomPolicy < ApplicationPolicy
 
   private
 
-  def owns_classroom?
-    user.teacher? && record.teacher_id == user.id
+  def teaches_classroom?
+    user.teacher? && record.classroom_teachers.exists?(teacher_id: user.id)
   end
 end

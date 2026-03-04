@@ -1,0 +1,9 @@
+alice_teaches_alice_class:
+  classroom: alice_class
+  teacher: teacher_alice
+  role: primary
+
+bob_teaches_bob_class:
+  classroom: bob_class
+  teacher: teacher_bob
+  role: primary

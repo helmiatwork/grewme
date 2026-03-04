@@ -23,8 +23,13 @@ parent3 = Parent.create!(name: "Eve Parent", email: "eve@parent.com", password: 
 AdminUser.create!(email: "admin@grewme.app", password: "password123", password_confirmation: "password123")
 
 # Classrooms
-class1a = Classroom.create!(name: "Class 1A", school: school, teacher: teacher1)
-class2b = Classroom.create!(name: "Class 2B", school: school, teacher: teacher2)
+class1a = Classroom.create!(name: "Class 1A", school: school)
+class2b = Classroom.create!(name: "Class 2B", school: school)
+
+# Assign teachers to classrooms (many-to-many)
+ClassroomTeacher.create!(classroom: class1a, teacher: teacher1, role: "primary")
+ClassroomTeacher.create!(classroom: class2b, teacher: teacher2, role: "primary")
+ClassroomTeacher.create!(classroom: class1a, teacher: teacher2, role: "assistant")
 
 # Students (10 total)
 students_1a = %w[Emma Finn Liam Noah Olivia].map do |name|
@@ -48,9 +53,9 @@ ParentStudent.create!(parent: parent3, student: students_2b[0])
 skill_categories = %i[reading math writing logic social]
 30.downto(1) do |days_ago|
   date = days_ago.days.ago.to_date
-  (students_1a + students_2b).each do |student|
-    teacher = student.current_classroom.teacher
-    skill_categories.each do |skill|
+   (students_1a + students_2b).each do |student|
+     teacher = student.current_classroom.primary_teacher
+     skill_categories.each do |skill|
       DailyScore.create!(
         student: student,
         teacher: teacher,
