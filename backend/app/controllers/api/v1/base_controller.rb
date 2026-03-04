@@ -3,9 +3,6 @@ module Api
     class BaseController < ApplicationController
       include Pundit::Authorization
 
-      after_action :verify_authorized, except: :index
-      after_action :verify_policy_scoped, only: :index
-
       rescue_from Pundit::NotAuthorizedError do
         render json: { error: { code: "forbidden", message: "You don't have permission to access this resource" } }, status: :forbidden
       end

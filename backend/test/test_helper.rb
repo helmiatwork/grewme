@@ -37,7 +37,7 @@ end
 module ActiveSupport
   class TestCase
     fixtures :all
-    parallelize(workers: :number_of_processors)
+    parallelize(workers: 1)
   end
 end
 

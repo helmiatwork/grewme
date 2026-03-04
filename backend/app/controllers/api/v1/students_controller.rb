@@ -1,3 +1,5 @@
+require "ostruct"
+
 module Api
   module V1
     class StudentsController < BaseController

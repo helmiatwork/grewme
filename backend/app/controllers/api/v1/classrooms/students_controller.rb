@@ -5,7 +5,6 @@ module Api
         def index
           @classroom = Classroom.find(params[:classroom_id])
           authorize @classroom, :show?
-          skip_policy_scope
 
           @students = @classroom.students
           render json: StudentResource.new(@students).serialize

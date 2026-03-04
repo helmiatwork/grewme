@@ -5,7 +5,6 @@ module Api
         def index
           @student = Student.find(params[:student_id])
           authorize @student, :show?
-          skip_policy_scope
 
           page = (params[:page] || 1).to_i
           per_page = (params[:per_page] || 30).to_i.clamp(1, 100)

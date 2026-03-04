@@ -12,6 +12,7 @@
 backend/log/*
 backend/tmp/*
 backend/storage/*
+backend/coverage/
 backend/config/master.key
 backend/config/credentials/*.key
 backend/.bundle

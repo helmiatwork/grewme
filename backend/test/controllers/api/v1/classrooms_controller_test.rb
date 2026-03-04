@@ -22,9 +22,11 @@ class Api::V1::ClassroomsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "parent cannot list classrooms" do
+  test "parent sees empty classrooms list" do
     auth_get api_v1_classrooms_path, user: users(:parent_carol)
-    assert_response :forbidden
+    assert_response :ok
+    body = JSON.parse(response.body)
+    assert_equal 0, body["classrooms"].length
   end
 
   test "classroom students returns correct students" do

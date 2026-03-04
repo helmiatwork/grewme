@@ -7,7 +7,6 @@ module Api
             raise ApiError::Forbidden, "Only parents can access this endpoint"
           end
           @children = current_user.children.includes(:classroom)
-          skip_policy_scope
           render json: StudentResource.new(@children).serialize
         end
       end
