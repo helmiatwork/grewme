@@ -11,5 +11,6 @@ class Avo::Resources::ClassroomStudent < Avo::BaseResource
     field :enrolled_at, as: :date
     field :left_at, as: :date
     field :created_at, as: :date_time, sortable: true, readonly: true
+    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
   end
 end

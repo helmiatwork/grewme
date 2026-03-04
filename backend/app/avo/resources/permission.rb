@@ -10,5 +10,6 @@ class Avo::Resources::Permission < Avo::BaseResource
     field :action, as: :text
     field :granted, as: :boolean
     field :created_at, as: :date_time, sortable: true, readonly: true
+    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
   end
 end

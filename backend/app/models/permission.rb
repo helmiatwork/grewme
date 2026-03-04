@@ -1,4 +1,7 @@
 class Permission < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   belongs_to :permissionable, polymorphic: true
 
   VALID_RESOURCES = %w[classrooms students daily_scores children].freeze

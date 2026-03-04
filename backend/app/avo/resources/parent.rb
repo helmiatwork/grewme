@@ -12,5 +12,6 @@ class Avo::Resources::Parent < Avo::BaseResource
     field :bio, as: :textarea, hide_on: :index
     field :children, as: :has_many, through: :parent_students
     field :created_at, as: :date_time, sortable: true, readonly: true
+    tool Avo::ResourceTools::ActivityTimeline, only_on: :show
   end
 end

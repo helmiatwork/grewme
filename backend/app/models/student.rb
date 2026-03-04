@@ -1,4 +1,7 @@
 class Student < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   has_many :classroom_students, dependent: :destroy
   has_many :classrooms, through: :classroom_students
   has_many :parent_students, dependent: :destroy

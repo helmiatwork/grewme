@@ -1,4 +1,7 @@
 class School < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   has_many :classrooms, dependent: :destroy
   has_many :teachers, dependent: :nullify
 

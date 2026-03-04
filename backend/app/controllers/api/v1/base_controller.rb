@@ -2,6 +2,7 @@ module Api
   module V1
     class BaseController < ApplicationController
       include Pundit::Authorization
+      include PublicActivity::StoreController
 
       rescue_from Pundit::NotAuthorizedError do
         render json: { error: { code: "forbidden", message: "You don't have permission to access this resource" } }, status: :forbidden

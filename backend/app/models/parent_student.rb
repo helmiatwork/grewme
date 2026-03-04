@@ -1,4 +1,7 @@
 class ParentStudent < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   belongs_to :parent
   belongs_to :student
 

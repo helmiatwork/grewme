@@ -1,4 +1,7 @@
 class Classroom < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   belongs_to :school
   belongs_to :teacher
 

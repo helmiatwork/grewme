@@ -1,4 +1,7 @@
 class Teacher < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   devise :database_authenticatable, :registerable, :recoverable, :validatable
 
   include Permissionable

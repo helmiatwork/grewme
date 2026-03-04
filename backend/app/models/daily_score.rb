@@ -1,4 +1,7 @@
 class DailyScore < ApplicationRecord
+  include PublicActivity::Model
+  tracked
+
   belongs_to :student
   belongs_to :teacher
 
