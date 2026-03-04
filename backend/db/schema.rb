@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_04_020002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_04_114842) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "activities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key"
+    t.bigint "owner_id"
+    t.string "owner_type"
+    t.text "parameters"
+    t.bigint "recipient_id"
+    t.string "recipient_type"
+    t.bigint "trackable_id"
+    t.string "trackable_type"
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_activities_on_created_at"
+    t.index ["key"], name: "index_activities_on_key"
+    t.index ["owner_type", "owner_id"], name: "index_activities_on_owner"
+    t.index ["recipient_type", "recipient_id"], name: "index_activities_on_recipient"
+    t.index ["trackable_type", "trackable_id"], name: "index_activities_on_trackable"
+  end
 
   create_table "admin_users", force: :cascade do |t|
     t.datetime "created_at", null: false

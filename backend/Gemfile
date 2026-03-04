@@ -42,6 +42,9 @@ gem "lograge", "~> 0.14"
 gem "sentry-ruby", "~> 5.22"
 gem "sentry-rails", "~> 5.22"
 
+# Activity tracking
+gem "public_activity", "~> 3.0"
+
 # Utilities
 gem "countries", "~> 7.1"
 gem "ruby_llm", "~> 1.2"

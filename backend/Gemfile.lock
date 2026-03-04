@@ -315,6 +315,11 @@ GEM
     psych (5.3.1)
       date
       stringio
+    public_activity (3.0.2)
+      actionpack (>= 6.1)
+      activerecord (>= 6.1)
+      i18n (>= 0.5.0)
+      railties (>= 6.1)
     public_suffix (7.0.5)
     puma (7.2.0)
       nio4r (~> 2.0)
@@ -548,6 +553,7 @@ DEPENDENCIES
   mocha (~> 2.7)
   paper_trail (~> 16.0)
   pg (~> 1.6)
+  public_activity (~> 3.0)
   puma (>= 6.0)
   pundit (~> 2.5)
   rack-attack (~> 6.8)
@@ -701,6 +707,7 @@ CHECKSUMS
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
   prop_initializer (0.2.0) sha256=bd27704d0df8c59c3baf0df5cf448eba2b140fb9934fb31b2e379b5c842d8820
   psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
+  public_activity (3.0.2) sha256=2a317e07006cb3ec2a83148234508a69fe869667f512ca9c2bc34cb788e1f7a6
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (7.2.0) sha256=bf8ef4ab514a4e6d4554cb4326b2004eba5036ae05cf765cfe51aba9706a72a8
   pundit (2.5.2) sha256=e374152baa24f90b630428293faf4b4c5468fc3cc010165f7d8fcb44ce108bbd
