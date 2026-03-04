@@ -4,7 +4,7 @@ module Api
   module V1
     class ClassroomsController < BaseController
       def index
-        @classrooms = policy_scope(Classroom).includes(:students, :teacher)
+        @classrooms = policy_scope(Classroom).includes(:teacher, :classroom_students)
         render json: ClassroomResource.new(@classrooms).serialize
       end
 

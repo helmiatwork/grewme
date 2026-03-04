@@ -1,0 +1,10 @@
+<% require 'bcrypt' %>
+teacher_alice:
+  name: Alice Teacher
+  email: alice@school.test
+  encrypted_password: <%= BCrypt::Password.create("password123") %>
+
+teacher_bob:
+  name: Bob Teacher
+  email: bob@school.test
+  encrypted_password: <%= BCrypt::Password.create("password123") %>

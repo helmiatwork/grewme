@@ -48,7 +48,11 @@ module Api
         private
 
         def set_target_user
-          @target_user = User.find(params[:user_id])
+          @target_user = if params[:teacher_id]
+            Teacher.find(params[:teacher_id])
+          elsif params[:parent_id]
+            Parent.find(params[:parent_id])
+          end
         end
 
         def set_permission

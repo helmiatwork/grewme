@@ -1,0 +1,4 @@
+<% require 'bcrypt' %>
+admin_one:
+  email: admin@grewme.test
+  encrypted_password: <%= BCrypt::Password.create("password123") %>

@@ -13,7 +13,13 @@ require "rails/test_help"
 
 module AuthTestHelper
   def auth_headers(user)
-    token = JwtService.encode({ user_id: user.id })
+    secret = Rails.application.credentials.devise_jwt_secret_key!
+    payload = user.jwt_payload.merge(
+      "jti" => SecureRandom.uuid,
+      "iat" => Time.current.to_i,
+      "exp" => 15.minutes.from_now.to_i
+    )
+    token = JWT.encode(payload, secret, "HS256")
     { "Authorization" => "Bearer #{token}", "Content-Type" => "application/json" }
   end
 

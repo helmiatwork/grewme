@@ -1,19 +1,26 @@
 puts "Seeding database..."
 
 # School
-school = School.create!(name: "Greenwood Elementary")
+school = School.create!(
+  name: "Greenwood Elementary",
+  address_line1: "123 Oak Street",
+  city: "Portland",
+  state_province: "Oregon",
+  postal_code: "97201",
+  country_code: "US"
+)
 
 # Teachers
-teacher1 = User.create!(name: "Alice Teacher", email: "alice@greenwood.edu", password: "password123", password_confirmation: "password123", role: :teacher)
-teacher2 = User.create!(name: "Bob Teacher", email: "bob@greenwood.edu", password: "password123", password_confirmation: "password123", role: :teacher)
+teacher1 = Teacher.create!(name: "Alice Teacher", email: "alice@greenwood.edu", password: "password123", password_confirmation: "password123", school: school)
+teacher2 = Teacher.create!(name: "Bob Teacher", email: "bob@greenwood.edu", password: "password123", password_confirmation: "password123", school: school)
 
 # Parents
-parent1 = User.create!(name: "Carol Parent", email: "carol@parent.com", password: "password123", password_confirmation: "password123", role: :parent)
-parent2 = User.create!(name: "Dan Parent", email: "dan@parent.com", password: "password123", password_confirmation: "password123", role: :parent)
-parent3 = User.create!(name: "Eve Parent", email: "eve@parent.com", password: "password123", password_confirmation: "password123", role: :parent)
+parent1 = Parent.create!(name: "Carol Parent", email: "carol@parent.com", password: "password123", password_confirmation: "password123")
+parent2 = Parent.create!(name: "Dan Parent", email: "dan@parent.com", password: "password123", password_confirmation: "password123")
+parent3 = Parent.create!(name: "Eve Parent", email: "eve@parent.com", password: "password123", password_confirmation: "password123")
 
-# Admin
-User.create!(name: "Admin User", email: "admin@greenwood.edu", password: "password123", password_confirmation: "password123", role: :admin)
+# Admin user for Avo
+AdminUser.create!(email: "admin@grewme.app", password: "password123", password_confirmation: "password123")
 
 # Classrooms
 class1a = Classroom.create!(name: "Class 1A", school: school, teacher: teacher1)
@@ -21,10 +28,14 @@ class2b = Classroom.create!(name: "Class 2B", school: school, teacher: teacher2)
 
 # Students (10 total)
 students_1a = %w[Emma Finn Liam Noah Olivia].map do |name|
-  Student.create!(name: name, classroom: class1a)
+  student = Student.create!(name: name)
+  student.enroll!(class1a, academic_year: "2025/2026")
+  student
 end
 students_2b = %w[Ava Grace Henry Isla Jack].map do |name|
-  Student.create!(name: name, classroom: class2b)
+  student = Student.create!(name: name)
+  student.enroll!(class2b, academic_year: "2025/2026")
+  student
 end
 
 # Parent-student links
@@ -38,7 +49,7 @@ skill_categories = %i[reading math writing logic social]
 30.downto(1) do |days_ago|
   date = days_ago.days.ago.to_date
   (students_1a + students_2b).each do |student|
-    teacher = student.classroom.teacher
+    teacher = student.current_classroom.teacher
     skill_categories.each do |skill|
       DailyScore.create!(
         student: student,
@@ -52,7 +63,8 @@ skill_categories = %i[reading math writing logic social]
   end
 end
 
-puts "Seeded: #{School.count} school, #{User.count} users, #{Classroom.count} classrooms, #{Student.count} students, #{DailyScore.count} scores"
+puts "Seeded: #{School.count} school, #{Teacher.count} teachers, #{Parent.count} parents, #{Classroom.count} classrooms, #{Student.count} students, #{DailyScore.count} scores"
+puts "Admin user: admin@grewme.app / password123"
 
 # Refresh materialized view
 if ActiveRecord::Base.connection.view_exists?(:student_radar_summaries)

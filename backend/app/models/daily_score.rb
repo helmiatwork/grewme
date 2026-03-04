@@ -1,6 +1,6 @@
 class DailyScore < ApplicationRecord
   belongs_to :student
-  belongs_to :teacher, class_name: "User"
+  belongs_to :teacher
 
   enum :skill_category, { reading: 0, math: 1, writing: 2, logic: 3, social: 4 }
 
@@ -16,7 +16,8 @@ class DailyScore < ApplicationRecord
 
   def invalidate_radar_cache
     Rails.cache.delete("radar:#{student_id}")
-    Rails.cache.delete("classroom_overview:#{student.classroom_id}") if student
+    classroom = student&.current_classroom
+    Rails.cache.delete("classroom_overview:#{classroom.id}") if classroom
   end
 
   def schedule_radar_refresh

@@ -1,0 +1,20 @@
+emma_in_alice_class:
+  student: student_emma
+  classroom: alice_class
+  status: 0
+  academic_year: "2025/2026"
+  enrolled_at: "2025-07-01"
+
+finn_in_alice_class:
+  student: student_finn
+  classroom: alice_class
+  status: 0
+  academic_year: "2025/2026"
+  enrolled_at: "2025-07-01"
+
+grace_in_bob_class:
+  student: student_grace
+  classroom: bob_class
+  status: 0
+  academic_year: "2025/2026"
+  enrolled_at: "2025-07-01"

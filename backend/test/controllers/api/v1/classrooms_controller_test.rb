@@ -2,7 +2,7 @@ require "test_helper"
 
 class Api::V1::ClassroomsControllerTest < ActionDispatch::IntegrationTest
   test "teacher sees only their classrooms" do
-    auth_get api_v1_classrooms_path, user: users(:teacher_alice)
+    auth_get api_v1_classrooms_path, user: teachers(:teacher_alice)
     assert_response :ok
     body = JSON.parse(response.body)
     classrooms = body["classrooms"]
@@ -11,26 +11,26 @@ class Api::V1::ClassroomsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "teacher can see own classroom detail" do
-    auth_get api_v1_classroom_path(classrooms(:alice_class)), user: users(:teacher_alice)
+    auth_get api_v1_classroom_path(classrooms(:alice_class)), user: teachers(:teacher_alice)
     assert_response :ok
     body = JSON.parse(response.body)
     assert_equal "Class 1A", body["classroom"]["name"]
   end
 
   test "teacher cannot see other teacher classroom" do
-    auth_get api_v1_classroom_path(classrooms(:bob_class)), user: users(:teacher_alice)
+    auth_get api_v1_classroom_path(classrooms(:bob_class)), user: teachers(:teacher_alice)
     assert_response :forbidden
   end
 
   test "parent sees empty classrooms list" do
-    auth_get api_v1_classrooms_path, user: users(:parent_carol)
+    auth_get api_v1_classrooms_path, user: parents(:parent_carol)
     assert_response :ok
     body = JSON.parse(response.body)
     assert_equal 0, body["classrooms"].length
   end
 
   test "classroom students returns correct students" do
-    auth_get api_v1_classroom_students_path(classrooms(:alice_class)), user: users(:teacher_alice)
+    auth_get api_v1_classroom_students_path(classrooms(:alice_class)), user: teachers(:teacher_alice)
     assert_response :ok
     body = JSON.parse(response.body)
     student_names = body["students"].map { |s| s["name"] }

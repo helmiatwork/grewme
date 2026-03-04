@@ -1,7 +1,8 @@
 class CreateRefreshTokens < ActiveRecord::Migration[8.1]
   def change
     create_table :refresh_tokens do |t|
-      t.references :user, null: false, foreign_key: true
+      t.string :authenticatable_type, null: false
+      t.bigint :authenticatable_id, null: false
       t.string :token_digest, null: false
       t.datetime :expires_at, null: false
       t.datetime :revoked_at
@@ -10,7 +11,9 @@ class CreateRefreshTokens < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
+
     add_index :refresh_tokens, :token_digest, unique: true
-    add_index :refresh_tokens, [ :user_id, :revoked_at ]
+    add_index :refresh_tokens, [ :authenticatable_type, :authenticatable_id ], name: "index_refresh_tokens_on_authenticatable"
+    add_index :refresh_tokens, [ :authenticatable_type, :authenticatable_id, :revoked_at ], name: "index_refresh_tokens_on_auth_revoked"
   end
 end

@@ -16,7 +16,7 @@ class StudentPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.teacher?
-        scope.joins(:classroom).where(classrooms: { teacher_id: user.id })
+        scope.joins(classroom_students: :classroom).merge(ClassroomStudent.current).where(classrooms: { teacher_id: user.id })
       elsif user.parent?
         scope.joins(:parent_students).where(parent_students: { parent_id: user.id })
       else
@@ -28,7 +28,7 @@ class StudentPolicy < ApplicationPolicy
   private
 
   def teaches_student?
-    user.teacher? && record.classroom.teacher_id == user.id
+    user.teacher? && record.current_classroom&.teacher_id == user.id
   end
 
   def parents_student?

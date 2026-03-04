@@ -1,7 +1,7 @@
 SELECT
   s.id AS student_id,
   s.name AS student_name,
-  s.classroom_id,
+  cs.classroom_id,
   AVG(CASE WHEN ds.skill_category = 0 THEN ds.score END) AS avg_reading,
   AVG(CASE WHEN ds.skill_category = 1 THEN ds.score END) AS avg_math,
   AVG(CASE WHEN ds.skill_category = 2 THEN ds.score END) AS avg_writing,
@@ -11,5 +11,6 @@ SELECT
   MIN(ds.date) AS first_score_date,
   MAX(ds.date) AS last_score_date
 FROM students s
+LEFT JOIN classroom_students cs ON cs.student_id = s.id AND cs.status = 0
 LEFT JOIN daily_scores ds ON ds.student_id = s.id
-GROUP BY s.id, s.name, s.classroom_id
+GROUP BY s.id, s.name, cs.classroom_id

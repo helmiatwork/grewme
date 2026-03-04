@@ -2,24 +2,24 @@ require "test_helper"
 
 class DailyScoreTest < ActiveSupport::TestCase
   test "validates date presence" do
-    score = DailyScore.new(student: students(:student_emma), teacher: users(:teacher_alice), skill_category: :reading, score: 80, date: nil)
+    score = DailyScore.new(student: students(:student_emma), teacher: teachers(:teacher_alice), skill_category: :reading, score: 80, date: nil)
     assert_not score.valid?
     assert_includes score.errors[:date], "can't be blank"
   end
 
   test "validates skill_category presence" do
-    score = DailyScore.new(student: students(:student_emma), teacher: users(:teacher_alice), date: Date.new(2026, 3, 10), score: 80, skill_category: nil)
+    score = DailyScore.new(student: students(:student_emma), teacher: teachers(:teacher_alice), date: Date.new(2026, 3, 10), score: 80, skill_category: nil)
     assert_not score.valid?
     assert_includes score.errors[:skill_category], "can't be blank"
   end
 
   test "validates score presence" do
-    score = DailyScore.new(student: students(:student_emma), teacher: users(:teacher_alice), date: Date.new(2026, 3, 10), skill_category: :reading, score: nil)
+    score = DailyScore.new(student: students(:student_emma), teacher: teachers(:teacher_alice), date: Date.new(2026, 3, 10), skill_category: :reading, score: nil)
     assert_not score.valid?
   end
 
   test "score must be between 0 and 100" do
-    base = { student: students(:student_finn), teacher: users(:teacher_alice), date: Date.new(2026, 3, 10), skill_category: :reading }
+    base = { student: students(:student_finn), teacher: teachers(:teacher_alice), date: Date.new(2026, 3, 10), skill_category: :reading }
 
     score_neg = DailyScore.new(base.merge(score: -1))
     assert_not score_neg.valid?
@@ -35,7 +35,7 @@ class DailyScoreTest < ActiveSupport::TestCase
   end
 
   test "score must be integer" do
-    score = DailyScore.new(student: students(:student_finn), teacher: users(:teacher_alice), date: Date.new(2026, 3, 10), skill_category: :reading, score: 85.5)
+    score = DailyScore.new(student: students(:student_finn), teacher: teachers(:teacher_alice), date: Date.new(2026, 3, 10), skill_category: :reading, score: 85.5)
     assert_not score.valid?
   end
 
@@ -59,6 +59,6 @@ class DailyScoreTest < ActiveSupport::TestCase
   test "belongs to student and teacher" do
     score = daily_scores(:emma_reading_day1)
     assert_equal students(:student_emma), score.student
-    assert_equal users(:teacher_alice), score.teacher
+    assert_equal teachers(:teacher_alice), score.teacher
   end
 end

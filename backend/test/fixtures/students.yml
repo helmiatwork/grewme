@@ -1,14 +1,11 @@
 student_emma:
   name: Emma
-  classroom: alice_class
   avatar: ""
 
 student_finn:
   name: Finn
-  classroom: alice_class
   avatar: ""
 
 student_grace:
   name: Grace
-  classroom: bob_class
   avatar: ""

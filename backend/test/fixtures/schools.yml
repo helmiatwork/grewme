@@ -1,2 +1,7 @@
 greenwood:
   name: Greenwood Elementary
+  address_line1: "123 Oak Street"
+  city: Portland
+  state_province: Oregon
+  postal_code: "97201"
+  country_code: US

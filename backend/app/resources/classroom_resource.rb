@@ -5,6 +5,6 @@ class ClassroomResource
   attributes :id, :name
 
   attribute :student_count do |classroom|
-    classroom.students.size
+    classroom.classroom_students.select { |cs| cs.active? }.size
   end
 end

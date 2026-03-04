@@ -1,0 +1,5 @@
+<% require 'bcrypt' %>
+parent_carol:
+  name: Carol Parent
+  email: carol@parent.test
+  encrypted_password: <%= BCrypt::Password.create("password123") %>

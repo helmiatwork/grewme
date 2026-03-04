@@ -2,5 +2,5 @@ class PermissionResource
   include Alba::Resource
 
   root_key :permission
-  attributes :id, :user_id, :resource, :action, :granted
+  attributes :id, :permissionable_type, :permissionable_id, :resource, :action, :granted
 end
