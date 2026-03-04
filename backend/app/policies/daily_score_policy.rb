@@ -1,10 +1,10 @@
 class DailyScorePolicy < ApplicationPolicy
   def create?
-    user.teacher? || user.admin?
+    permitted?(:create)
   end
 
   def update?
-    user.admin? || (user.teacher? && record.teacher_id == user.id)
+    permitted?(:update) && (user.admin? || owns_score?)
   end
 
   class Scope < ApplicationPolicy::Scope
@@ -19,5 +19,11 @@ class DailyScorePolicy < ApplicationPolicy
         scope.none
       end
     end
+  end
+
+  private
+
+  def owns_score?
+    user.teacher? && record.teacher_id == user.id
   end
 end

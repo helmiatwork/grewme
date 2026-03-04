@@ -26,6 +26,17 @@ class ApplicationPolicy
     false
   end
 
+  private
+
+  def permitted?(action)
+    user.has_permission?(resource_name, action)
+  end
+
+  def resource_name
+    klass = record.is_a?(Class) ? record : record.class
+    klass.model_name.plural
+  end
+
   class Scope
     attr_reader :user, :scope
 

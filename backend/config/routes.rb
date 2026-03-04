@@ -26,6 +26,13 @@ Rails.application.routes.draw do
       namespace :parents do
         resources :children, only: [ :index ]
       end
+
+      # Admin endpoints
+      namespace :admin do
+        resources :users, only: [] do
+          resources :permissions, only: [ :index, :create, :update, :destroy ]
+        end
+      end
     end
   end
 

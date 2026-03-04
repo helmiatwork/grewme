@@ -1,21 +1,21 @@
 class ClassroomPolicy < ApplicationPolicy
   def index?
-    user.teacher? || user.admin?
+    permitted?(:index)
   end
 
   def show?
-    user.admin? || owns_classroom?
+    permitted?(:show) && (user.admin? || owns_classroom?)
   end
 
   def overview?
-    show?
+    permitted?(:overview) && (user.admin? || owns_classroom?)
   end
 
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin?
         scope.all
-      elsif user.teacher?
+      elsif user.has_permission?("classrooms", "index")
         scope.where(teacher_id: user.id)
       else
         scope.none

@@ -1,14 +1,14 @@
 class StudentPolicy < ApplicationPolicy
   def show?
-    user.admin? || teaches_student? || parents_student?
+    permitted?(:show) && (user.admin? || teaches_student? || parents_student?)
   end
 
   def radar?
-    show?
+    permitted?(:radar) && (user.admin? || teaches_student? || parents_student?)
   end
 
   def progress?
-    show?
+    permitted?(:progress) && (user.admin? || teaches_student? || parents_student?)
   end
 
   class Scope < ApplicationPolicy::Scope
