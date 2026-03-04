@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+*.swp
+*~
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Rails backend
+backend/log/*
+backend/tmp/*
+backend/storage/*
+backend/config/master.key
+backend/config/credentials/*.key
+backend/.bundle
+backend/vendor/bundle
+
+# KMP / Android / Gradle
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+mobile-app-teacher/.gradle/
+mobile-app-teacher/build/
+mobile-app-teacher/composeApp/build/
+mobile-app-parent/.gradle/
+mobile-app-parent/build/
+mobile-app-parent/composeApp/build/
+
+# iOS
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+DerivedData/
+Pods/
+
+# Secrets
+.env
+.env.*

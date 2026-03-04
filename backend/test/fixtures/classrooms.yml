@@ -1,0 +1,9 @@
+alice_class:
+  name: "Class 1A"
+  school: greenwood
+  teacher: teacher_alice
+
+bob_class:
+  name: "Class 2B"
+  school: greenwood
+  teacher: teacher_bob
