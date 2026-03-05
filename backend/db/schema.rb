@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_04_141426) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_05_200002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -89,6 +89,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_141426) do
     t.index ["student_id", "date", "skill_category"], name: "idx_daily_scores_unique", unique: true
     t.index ["student_id"], name: "index_daily_scores_on_student_id"
     t.index ["teacher_id"], name: "index_daily_scores_on_teacher_id"
+  end
+
+  create_table "feed_post_comments", force: :cascade do |t|
+    t.text "body", null: false
+    t.bigint "commenter_id", null: false
+    t.string "commenter_type", null: false
+    t.datetime "created_at", null: false
+    t.bigint "feed_post_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feed_post_id", "created_at"], name: "index_feed_post_comments_on_feed_post_id_and_created_at"
+    t.index ["feed_post_id"], name: "index_feed_post_comments_on_feed_post_id"
+  end
+
+  create_table "feed_post_likes", force: :cascade do |t|
+    t.datetime "created_at", precision: nil, null: false
+    t.bigint "feed_post_id", null: false
+    t.bigint "liker_id", null: false
+    t.string "liker_type", null: false
+    t.index ["feed_post_id", "liker_type", "liker_id"], name: "idx_feed_post_likes_unique", unique: true
+    t.index ["feed_post_id"], name: "index_feed_post_likes_on_feed_post_id"
+    t.index ["liker_type", "liker_id"], name: "index_feed_post_likes_on_liker_type_and_liker_id"
+  end
+
+  create_table "feed_posts", force: :cascade do |t|
+    t.text "body", null: false
+    t.bigint "classroom_id", null: false
+    t.integer "comments_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.integer "likes_count", default: 0, null: false
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["classroom_id", "created_at"], name: "index_feed_posts_on_classroom_id_and_created_at"
+    t.index ["classroom_id"], name: "index_feed_posts_on_classroom_id"
+    t.index ["teacher_id"], name: "index_feed_posts_on_teacher_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
@@ -249,6 +283,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_141426) do
   add_foreign_key "classrooms", "schools"
   add_foreign_key "daily_scores", "students"
   add_foreign_key "daily_scores", "teachers"
+  add_foreign_key "feed_post_comments", "feed_posts"
+  add_foreign_key "feed_post_likes", "feed_posts"
+  add_foreign_key "feed_posts", "classrooms"
+  add_foreign_key "feed_posts", "teachers"
   add_foreign_key "parent_students", "parents"
   add_foreign_key "parent_students", "students"
   add_foreign_key "teachers", "schools"
