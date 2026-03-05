@@ -75,17 +75,27 @@ export const handle: Handle = async ({ event, resolve }) => {
       event.locals.user = null;
       event.locals.accessToken = null;
     } else {
-      const dashboard = user.type === 'Teacher' ? '/teacher/dashboard' : '/parent/dashboard';
+      const dashboard = user.type === 'Teacher'
+        ? '/teacher/dashboard'
+        : user.type === 'SchoolManager'
+          ? '/school/dashboard'
+          : '/parent/dashboard';
       throw redirect(303, dashboard);
     }
   }
 
   // Role-based route guards
+  const getDashboard = (type: string) =>
+    type === 'Teacher' ? '/teacher/dashboard' : type === 'SchoolManager' ? '/school/dashboard' : '/parent/dashboard';
+
   if (user && url.pathname.startsWith('/teacher') && user.type !== 'Teacher') {
-    throw redirect(303, '/parent/dashboard');
+    throw redirect(303, getDashboard(user.type));
   }
   if (user && url.pathname.startsWith('/parent') && user.type !== 'Parent') {
-    throw redirect(303, '/teacher/dashboard');
+    throw redirect(303, getDashboard(user.type));
+  }
+  if (user && url.pathname.startsWith('/school') && user.type !== 'SchoolManager') {
+    throw redirect(303, getDashboard(user.type));
   }
 
   return resolve(event);

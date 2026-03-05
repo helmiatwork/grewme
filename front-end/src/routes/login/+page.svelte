@@ -60,7 +60,7 @@
           <label class="block text-sm font-medium text-text">I am a...</label>
           <div class="flex gap-3">
             <label class="flex-1">
-              <input type="radio" name="role" value="teacher" checked={form?.role !== 'parent'} class="peer sr-only" />
+              <input type="radio" name="role" value="teacher" checked={!form?.role || form?.role === 'teacher'} class="peer sr-only" />
               <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 cursor-pointer
                 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary
                 transition-colors text-sm font-medium">
@@ -73,6 +73,14 @@
                 peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary
                 transition-colors text-sm font-medium">
                 Parent
+              </div>
+            </label>
+            <label class="flex-1">
+              <input type="radio" name="role" value="school_manager" checked={form?.role === 'school_manager'} class="peer sr-only" />
+              <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 cursor-pointer
+                peer-checked:border-amber-600 peer-checked:bg-amber-50 peer-checked:text-amber-700
+                transition-colors text-sm font-medium">
+                School
               </div>
             </label>
           </div>

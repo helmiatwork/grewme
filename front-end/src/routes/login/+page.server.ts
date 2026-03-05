@@ -40,7 +40,11 @@ export const actions: Actions = {
       return fail(500, { error: 'Something went wrong. Please try again.', email, role });
     }
 
-    const dashboard = role === 'teacher' ? '/teacher/dashboard' : '/parent/dashboard';
+    const dashboard = role === 'teacher'
+      ? '/teacher/dashboard'
+      : role === 'school_manager'
+        ? '/school/dashboard'
+        : '/parent/dashboard';
     throw redirect(303, dashboard);
   }
 };

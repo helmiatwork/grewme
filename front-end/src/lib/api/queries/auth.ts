@@ -16,6 +16,11 @@ export const LOGIN_MUTATION = `
           email
           phone
         }
+        ... on SchoolManager {
+          id
+          name
+          email
+        }
       }
       errors {
         message
@@ -92,6 +97,12 @@ export const ME_QUERY = `
         name
         email
         phone
+        avatarUrl
+      }
+      ... on SchoolManager {
+        id
+        name
+        email
         avatarUrl
       }
     }

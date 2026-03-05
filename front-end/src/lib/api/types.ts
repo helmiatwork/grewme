@@ -38,7 +38,27 @@ export interface Parent {
   avatarUrl?: string | null;
 }
 
-export type User = Teacher | Parent;
+export interface SchoolManager {
+  id: string;
+  name: string;
+  email: string;
+  role: 'school_manager';
+  phone?: string | null;
+  bio?: string | null;
+  birthdate?: string | null;
+  gender?: string | null;
+  qualification?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  stateProvince?: string | null;
+  postalCode?: string | null;
+  countryCode?: string | null;
+  avatarUrl?: string | null;
+  school?: { id: string; name: string };
+}
+
+export type User = Teacher | Parent | SchoolManager;
 
 export interface UserError {
   message: string;
@@ -215,6 +235,6 @@ export interface ClassroomEvent {
 // === Session user (decoded from JWT, stored in locals) ===
 export interface SessionUser {
   id: string;
-  type: 'Teacher' | 'Parent';
+  type: 'Teacher' | 'Parent' | 'SchoolManager';
   email: string;
 }
