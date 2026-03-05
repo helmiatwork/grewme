@@ -171,6 +171,44 @@ module Types
       current_user.children
     end
 
+    # === Feed ===
+
+    field :feed_posts, Types::FeedPostType.connection_type, null: false, description: "Feed posts for parent's classrooms" do
+      argument :classroom_ids, [ ID ], required: false
+    end
+
+    def feed_posts(classroom_ids: nil)
+      authenticate!
+
+      if current_user.parent?
+        child_classroom_ids = current_user.children
+          .joins(:classroom_students)
+          .where(classroom_students: { status: :active })
+          .pluck("classroom_students.classroom_id")
+          .uniq
+
+        ids = classroom_ids ? (classroom_ids.map(&:to_i) & child_classroom_ids) : child_classroom_ids
+      elsif current_user.teacher?
+        ids = classroom_ids || current_user.classroom_ids
+      else
+        ids = []
+      end
+
+      FeedPost.where(classroom_id: ids).order(created_at: :desc).includes(:teacher, :classroom)
+    end
+
+    field :feed_post, Types::FeedPostType, null: false, description: "Single feed post" do
+      argument :id, ID, required: true
+    end
+
+    def feed_post(id:)
+      post = FeedPost.find(id)
+      if context[:current_user]
+        raise Pundit::NotAuthorizedError unless FeedPostPolicy.new(current_user, post).show?
+      end
+      post
+    end
+
     # === Admin ===
 
     field :user_permissions, Types::UserPermissionsType, null: false, description: "Get user permissions (admin only)" do
