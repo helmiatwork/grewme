@@ -216,8 +216,35 @@ FeedPostComment.create!(feed_post: posts[18], commenter: mike, body: "Felix is s
 FeedPostComment.create!(feed_post: posts[18], commenter: alice, body: "Try Khan Academy's division games — they make it fun! I'll also give Felix extra practice sheets.")
 FeedPostComment.create!(feed_post: posts[19], commenter: nina, body: "Oscar already wants to read ahead! 😄")
 
+# Calendar events — spread across this month and next
+today = Date.today
+this_month_start = today.beginning_of_month
+next_month_start = (today + 1.month).beginning_of_month
+
+# Teacher-created events
+ClassroomEvent.create!(classroom: class1a, creator: alice, title: "Parent-Teacher Conference", description: "Individual meetings to discuss student progress", event_date: this_month_start + 14, start_time: Time.zone.parse("14:00"), end_time: Time.zone.parse("17:00"))
+ClassroomEvent.create!(classroom: class1a, creator: alice, title: "Reading Day", description: "Students bring their favorite book to share", event_date: this_month_start + 20, start_time: Time.zone.parse("09:00"), end_time: Time.zone.parse("11:00"))
+ClassroomEvent.create!(classroom: class1a, creator: alice, title: "Math Quiz", event_date: this_month_start + 22, start_time: Time.zone.parse("10:00"), end_time: Time.zone.parse("10:45"))
+ClassroomEvent.create!(classroom: class3a, creator: alice, title: "Science Fair", description: "Students present their science projects to parents and judges", event_date: next_month_start + 5, start_time: Time.zone.parse("09:00"), end_time: Time.zone.parse("14:00"))
+ClassroomEvent.create!(classroom: class3a, creator: alice, title: "History Presentations", event_date: this_month_start + 18, start_time: Time.zone.parse("13:00"), end_time: Time.zone.parse("15:00"))
+ClassroomEvent.create!(classroom: class3b, creator: alice, title: "Poetry Recital", description: "Students perform their original poems", event_date: this_month_start + 25, start_time: Time.zone.parse("10:00"), end_time: Time.zone.parse("11:30"))
+ClassroomEvent.create!(classroom: class3b, creator: alice, title: "Art Exhibition", event_date: next_month_start + 10, start_time: Time.zone.parse("14:00"), end_time: Time.zone.parse("16:00"))
+ClassroomEvent.create!(classroom: class4a, creator: alice, title: "Long Division Workshop", description: "Extra practice session for students who need help", event_date: this_month_start + 16, start_time: Time.zone.parse("14:00"), end_time: Time.zone.parse("15:30"))
+ClassroomEvent.create!(classroom: class4a, creator: alice, title: "Charlotte's Web Book Club", event_date: this_month_start + 28, start_time: Time.zone.parse("13:00"), end_time: Time.zone.parse("14:00"))
+ClassroomEvent.create!(classroom: class1b, creator: bob, title: "Field Trip to Science Museum", description: "Permission slips required. Bring packed lunch.", event_date: next_month_start + 8, start_time: Time.zone.parse("08:30"), end_time: Time.zone.parse("15:00"))
+ClassroomEvent.create!(classroom: class1b, creator: bob, title: "Phonics Assessment", event_date: this_month_start + 19, start_time: Time.zone.parse("09:00"), end_time: Time.zone.parse("10:00"))
+ClassroomEvent.create!(classroom: class2a, creator: charlie, title: "Multiplication Bee", description: "Classroom competition for multiplication tables", event_date: this_month_start + 21, start_time: Time.zone.parse("10:00"), end_time: Time.zone.parse("11:00"))
+ClassroomEvent.create!(classroom: class2b, creator: diana, title: "Solar System Project Due", event_date: this_month_start + 24)
+ClassroomEvent.create!(classroom: class2b, creator: diana, title: "Spelling Bee Finals", description: "Class champion will be announced!", event_date: this_month_start + 26, start_time: Time.zone.parse("13:00"), end_time: Time.zone.parse("14:00"))
+
+# Parent-created events
+ClassroomEvent.create!(classroom: class1a, creator: carol, title: "Bake Sale Fundraiser", description: "Parents organizing a bake sale to fund class supplies", event_date: next_month_start + 12, start_time: Time.zone.parse("11:00"), end_time: Time.zone.parse("14:00"))
+ClassroomEvent.create!(classroom: class3a, creator: julia, title: "Class Picnic", description: "End-of-month family picnic at the park", event_date: next_month_start + 20, start_time: Time.zone.parse("10:00"), end_time: Time.zone.parse("14:00"))
+ClassroomEvent.create!(classroom: class4a, creator: mike, title: "Study Group", description: "Parents organizing a weekend study group for math", event_date: this_month_start + 23, start_time: Time.zone.parse("10:00"), end_time: Time.zone.parse("12:00"))
+
 puts "Seeded: #{School.count} school, #{Teacher.count} teachers, #{Parent.count} parents, #{Classroom.count} classrooms, #{Student.count} students, #{DailyScore.count} scores"
 puts "Seeded: #{FeedPost.count} feed posts, #{FeedPostLike.count} likes, #{FeedPostComment.count} comments"
+puts "Seeded: #{ClassroomEvent.count} calendar events"
 puts "Admin user: admin@grewme.app / password123"
 puts ""
 puts "Teacher logins:"

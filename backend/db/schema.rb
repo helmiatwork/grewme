@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_05_200004) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_05_200005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200004) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "classroom_events", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "creator_id", null: false
+    t.string "creator_type", null: false
+    t.text "description"
+    t.time "end_time"
+    t.date "event_date", null: false
+    t.time "start_time"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["classroom_id", "event_date"], name: "index_classroom_events_on_classroom_id_and_event_date"
+    t.index ["classroom_id"], name: "index_classroom_events_on_classroom_id"
+    t.index ["creator_type", "creator_id"], name: "index_classroom_events_on_creator_type_and_creator_id"
   end
 
   create_table "classroom_students", force: :cascade do |t|
@@ -316,6 +332,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200004) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "classroom_events", "classrooms"
   add_foreign_key "classroom_students", "classrooms"
   add_foreign_key "classroom_students", "students"
   add_foreign_key "classroom_teachers", "classrooms"

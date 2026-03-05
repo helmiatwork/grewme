@@ -15,6 +15,7 @@ class Teacher < ApplicationRecord
   has_many :refresh_tokens, as: :authenticatable, dependent: :destroy
   has_many :permissions, as: :permissionable, dependent: :destroy
   has_many :feed_posts, dependent: :destroy
+  has_many :classroom_events, as: :creator, dependent: :destroy
 
   has_one_attached :avatar_image
 

@@ -22,6 +22,10 @@ module Types
     field :comment_on_feed_post, mutation: Mutations::CommentOnFeedPost
     field :delete_feed_comment, mutation: Mutations::DeleteFeedComment
 
+    # Calendar
+    field :create_classroom_event, mutation: Mutations::CreateClassroomEvent
+    field :delete_classroom_event, mutation: Mutations::DeleteClassroomEvent
+
     # Admin Permissions
     field :grant_permission, mutation: Mutations::Admin::GrantPermission
     field :revoke_permission, mutation: Mutations::Admin::RevokePermission

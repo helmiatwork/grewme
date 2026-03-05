@@ -216,6 +216,34 @@ module Types
       post
     end
 
+    # === Calendar ===
+
+    field :classroom_events, [ Types::ClassroomEventType ], null: false, description: "Events for classrooms in a given month" do
+      argument :classroom_ids, [ ID ], required: false
+      argument :month, GraphQL::Types::ISO8601Date, required: true, description: "Any date in the target month"
+    end
+
+    def classroom_events(month:, classroom_ids: nil)
+      authenticate!
+
+      if current_user.teacher?
+        ids = classroom_ids || current_user.classroom_ids
+      elsif current_user.parent?
+        child_classroom_ids = current_user.children
+          .joins(:classroom_students)
+          .where(classroom_students: { status: :active })
+          .pluck("classroom_students.classroom_id")
+          .uniq
+        ids = classroom_ids ? (classroom_ids.map(&:to_i) & child_classroom_ids) : child_classroom_ids
+      else
+        ids = []
+      end
+
+      ClassroomEvent.for_classroom_ids(ids).for_month(Date.parse(month.to_s))
+        .order(event_date: :asc, start_time: :asc)
+        .includes(:classroom, :creator)
+    end
+
     # === Admin ===
 
     field :user_permissions, Types::UserPermissionsType, null: false, description: "Get user permissions (admin only)" do
