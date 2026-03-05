@@ -5,6 +5,7 @@
 
   const navItems = [
     { label: 'My Children', href: '/parent/dashboard', icon: '👨‍👧‍👦' },
+    { label: 'Calendar', href: '/parent/calendar', icon: '📅' },
     { label: 'Profile', href: '/parent/profile', icon: '👤' }
   ];
 </script>
