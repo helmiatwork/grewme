@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Action Cable WebSocket
+  mount ActionCable.server => "/cable"
+
   # Avo admin panel
   mount_avo
 

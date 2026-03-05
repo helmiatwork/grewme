@@ -250,6 +250,26 @@ module Types
         .includes(:classroom, :creator)
     end
 
+    # === Notifications ===
+
+    field :notifications, Types::NotificationType.connection_type, null: false, description: "Current user's notifications"
+
+    def notifications
+      authenticate!
+      raise GraphQL::ExecutionError, "Only parents can view notifications" unless current_user.parent?
+
+      current_user.notifications.recent.includes(:feed_post)
+    end
+
+    field :unread_notification_count, Integer, null: false, description: "Count of unread notifications"
+
+    def unread_notification_count
+      authenticate!
+      return 0 unless current_user.parent?
+
+      current_user.notifications.unread.count
+    end
+
     # === School ===
 
     field :school_overview, Types::SchoolOverviewType, null: false, description: "School overview stats (school_manager only)"

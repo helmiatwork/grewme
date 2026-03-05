@@ -9,12 +9,14 @@
   let selectedFiles: File[] = $state([]);
   let uploading = $state(false);
   let uploadError = $state('');
-  let selectedClassroomId = $state('');
+  let selectedClassroomId = $state('all');
   let selectedStudentIds: string[] = $state([]);
 
-  // Get students for the selected classroom
+  const isAllClasses = $derived(selectedClassroomId === 'all');
+
+  // Get students for the selected classroom (only when specific class selected)
   const classroomStudents = $derived(
-    data.classrooms.find((c) => c.id === selectedClassroomId)?.students ?? []
+    isAllClasses ? [] : (data.classrooms.find((c) => c.id === selectedClassroomId)?.students ?? [])
   );
 
   // Reset student selection when classroom changes
@@ -24,7 +26,7 @@
   });
 
   function openModal() {
-    selectedClassroomId = '';
+    selectedClassroomId = 'all';
     selectedStudentIds = [];
     selectedFiles = [];
     uploadError = '';
@@ -51,8 +53,8 @@
     const formData = new FormData(e.target as HTMLFormElement);
     const body = formData.get('body') as string;
 
-    if (!selectedClassroomId || !body?.trim()) {
-      uploadError = 'Classroom and message are required';
+    if (!body?.trim()) {
+      uploadError = 'Message is required';
       uploading = false;
       return;
     }
@@ -63,18 +65,22 @@
         signedBlobIds = await uploadFiles(selectedFiles);
       }
 
+      const classroomIds = isAllClasses
+        ? data.classrooms.map((c) => c.id)
+        : [selectedClassroomId];
+
       const res = await fetch('/api/graphql', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: `mutation CreateFeedPost($classroomId: ID!, $body: String!, $signedBlobIds: [String!], $studentIds: [ID!]) {
-            createFeedPost(classroomId: $classroomId, body: $body, signedBlobIds: $signedBlobIds, studentIds: $studentIds) {
-              feedPost { id }
+          query: `mutation CreateFeedPost($classroomIds: [ID!]!, $body: String!, $signedBlobIds: [String!], $studentIds: [ID!]) {
+            createFeedPost(classroomIds: $classroomIds, body: $body, signedBlobIds: $signedBlobIds, studentIds: $studentIds) {
+              feedPosts { id }
               errors { message path }
             }
           }`,
           variables: {
-            classroomId: selectedClassroomId,
+            classroomIds,
             body: body.trim(),
             signedBlobIds,
             studentIds: selectedStudentIds.length > 0 ? selectedStudentIds : null
@@ -164,14 +170,17 @@
             disabled={uploading}
             class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">Select classroom...</option>
+            <option value="all">All Classes</option>
             {#each data.classrooms as classroom}
               <option value={classroom.id}>{classroom.name}</option>
             {/each}
           </select>
+          {#if isAllClasses}
+            <p class="text-xs text-text-muted mt-1">All parents across your classes will see this post</p>
+          {/if}
         </div>
 
-        {#if classroomStudents.length > 0}
+        {#if !isAllClasses && classroomStudents.length > 0}
           <div>
             <label class="block text-sm font-medium text-text mb-1">
               Tag students <span class="text-text-muted font-normal">(optional)</span>

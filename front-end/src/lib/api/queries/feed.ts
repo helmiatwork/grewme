@@ -47,9 +47,9 @@ export const FEED_POST_QUERY = `
 `;
 
 export const CREATE_FEED_POST_MUTATION = `
-  mutation CreateFeedPost($classroomId: ID!, $body: String!, $signedBlobIds: [String!], $studentIds: [ID!]) {
-    createFeedPost(classroomId: $classroomId, body: $body, signedBlobIds: $signedBlobIds, studentIds: $studentIds) {
-      feedPost { id }
+  mutation CreateFeedPost($classroomIds: [ID!]!, $body: String!, $signedBlobIds: [String!], $studentIds: [ID!]) {
+    createFeedPost(classroomIds: $classroomIds, body: $body, signedBlobIds: $signedBlobIds, studentIds: $studentIds) {
+      feedPosts { id }
       errors { message path }
     }
   }

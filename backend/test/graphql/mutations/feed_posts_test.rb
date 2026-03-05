@@ -1,32 +1,76 @@
 require "test_helper"
 
 class FeedPostMutationsTest < ActiveSupport::TestCase
-  test "teacher creates feed post" do
+  test "teacher creates feed post to single classroom" do
     result = execute_query(
-      mutation: 'mutation($classroomId: ID!, $body: String!) {
-        createFeedPost(classroomId: $classroomId, body: $body) {
-          feedPost { id body }
+      mutation: 'mutation($classroomIds: [ID!]!, $body: String!) {
+        createFeedPost(classroomIds: $classroomIds, body: $body) {
+          feedPosts { id body }
           errors { message }
         }
       }',
-      variables: { classroomId: classrooms(:alice_class).id.to_s, body: "Great day!" },
+      variables: { classroomIds: [ classrooms(:alice_class).id.to_s ], body: "Great day!" },
       user: teachers(:teacher_alice)
     )
 
-    post = result.dig("data", "createFeedPost", "feedPost")
-    assert_not_nil post
-    assert_equal "Great day!", post["body"]
+    posts = result.dig("data", "createFeedPost", "feedPosts")
+    assert_not_nil posts
+    assert_equal 1, posts.length
+    assert_equal "Great day!", posts.first["body"]
+  end
+
+  test "teacher creates feed post to multiple classrooms" do
+    # Give teacher_alice access to bob_class for this test
+    ClassroomTeacher.create!(classroom: classrooms(:bob_class), teacher: teachers(:teacher_alice), role: "assistant")
+
+    result = execute_query(
+      mutation: 'mutation($classroomIds: [ID!]!, $body: String!) {
+        createFeedPost(classroomIds: $classroomIds, body: $body) {
+          feedPosts { id body }
+          errors { message }
+        }
+      }',
+      variables: {
+        classroomIds: [ classrooms(:alice_class).id.to_s, classrooms(:bob_class).id.to_s ],
+        body: "Announcement for all!"
+      },
+      user: teachers(:teacher_alice)
+    )
+
+    posts = result.dig("data", "createFeedPost", "feedPosts")
+    assert_not_nil posts
+    assert_equal 2, posts.length
+    assert posts.all? { |p| p["body"] == "Announcement for all!" }
+  end
+
+  test "creates notifications for parents when posting" do
+    assert_difference "Notification.count" do
+      execute_query(
+        mutation: 'mutation($classroomIds: [ID!]!, $body: String!) {
+          createFeedPost(classroomIds: $classroomIds, body: $body) {
+            feedPosts { id }
+            errors { message }
+          }
+        }',
+        variables: { classroomIds: [ classrooms(:alice_class).id.to_s ], body: "Check this out!" },
+        user: teachers(:teacher_alice)
+      )
+    end
+
+    notification = Notification.last
+    assert_equal "Parent", notification.recipient_type
+    assert_includes notification.title, classrooms(:alice_class).name
   end
 
   test "parent cannot create feed post" do
     result = execute_query(
-      mutation: 'mutation($classroomId: ID!, $body: String!) {
-        createFeedPost(classroomId: $classroomId, body: $body) {
-          feedPost { id }
+      mutation: 'mutation($classroomIds: [ID!]!, $body: String!) {
+        createFeedPost(classroomIds: $classroomIds, body: $body) {
+          feedPosts { id }
           errors { message }
         }
       }',
-      variables: { classroomId: classrooms(:alice_class).id.to_s, body: "Hello" },
+      variables: { classroomIds: [ classrooms(:alice_class).id.to_s ], body: "Hello" },
       user: parents(:parent_carol)
     )
 

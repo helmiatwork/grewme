@@ -17,6 +17,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@types/d3-scale": "^4.0.9",
 		"@types/d3-shape": "^3.1.8",
+		"@types/rails__actioncable": "^8.0.3",
 		"@types/spark-md5": "^3.0.5",
 		"svelte": "^5.51.0",
 		"svelte-check": "^4.4.2",
@@ -24,6 +25,7 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@rails/actioncable": "^8.1.200",
 		"@tailwindcss/vite": "^4.2.1",
 		"d3-scale": "^4.0.2",
 		"d3-shape": "^3.2.0",

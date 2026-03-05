@@ -22,6 +22,9 @@ module Types
     field :comment_on_feed_post, mutation: Mutations::CommentOnFeedPost
     field :delete_feed_comment, mutation: Mutations::DeleteFeedComment
 
+    # Notifications
+    field :mark_notification_read, mutation: Mutations::MarkNotificationRead
+
     # Calendar
     field :create_classroom_event, mutation: Mutations::CreateClassroomEvent
     field :delete_classroom_event, mutation: Mutations::DeleteClassroomEvent
