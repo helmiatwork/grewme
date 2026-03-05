@@ -255,63 +255,9 @@
           </div>
         {/if}
 
-        <!-- WhatsApp-style message input bar -->
+        <!-- Message input with inline icons -->
         <div class="flex items-end gap-2">
-          <!-- Icon buttons -->
-          <div class="flex items-center gap-0.5 pb-1.5">
-            <!-- Attach file (paperclip) -->
-            <button
-              type="button"
-              disabled={uploading || selectedFiles.length >= 4}
-              onclick={() => fileInput.click()}
-              class="p-1.5 rounded-full text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              title="Attach file"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
-            </button>
-            <!-- Camera -->
-            <button
-              type="button"
-              disabled={uploading || selectedFiles.length >= 4}
-              onclick={() => cameraInput.click()}
-              class="p-1.5 rounded-full text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              title="Take photo"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-              </svg>
-            </button>
-            <!-- Emoji -->
-            <div class="relative">
-              <button
-                type="button"
-                disabled={uploading}
-                onclick={() => showEmojiPicker = !showEmojiPicker}
-                class="p-1.5 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed {showEmojiPicker ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-primary hover:bg-primary/10'}"
-                title="Emoji"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
-                </svg>
-              </button>
-              {#if showEmojiPicker}
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div class="fixed inset-0 z-[60]" onclick={() => showEmojiPicker = false}></div>
-                <div class="absolute bottom-full left-0 mb-2 z-[70]">
-                    <emoji-picker
-                    class="light"
-                    use:bindEmojiPicker
-                  ></emoji-picker>
-                </div>
-              {/if}
-            </div>
-          </div>
-
-          <!-- Text input -->
-          <div class="flex-1">
+          <div class="relative flex-1">
             <textarea
               bind:this={textareaEl}
               name="body"
@@ -320,8 +266,60 @@
               rows={3}
               disabled={uploading}
               placeholder="Type a message..."
-              class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              class="w-full border border-slate-200 rounded-2xl px-4 pt-2.5 pb-9 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             ></textarea>
+            <!-- Icons inside textarea, bottom-right -->
+            <div class="absolute bottom-2 right-2 flex items-center gap-0.5">
+              <!-- Attach file -->
+              <button
+                type="button"
+                disabled={uploading || selectedFiles.length >= 4}
+                onclick={() => fileInput.click()}
+                class="p-1 rounded-full text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Attach file"
+              >
+                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              </button>
+              <!-- Camera -->
+              <button
+                type="button"
+                disabled={uploading || selectedFiles.length >= 4}
+                onclick={() => cameraInput.click()}
+                class="p-1 rounded-full text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Take photo"
+              >
+                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                </svg>
+              </button>
+              <!-- Emoji -->
+              <div class="relative">
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onclick={() => showEmojiPicker = !showEmojiPicker}
+                  class="p-1 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed {showEmojiPicker ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-primary hover:bg-primary/10'}"
+                  title="Emoji"
+                >
+                  <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+                  </svg>
+                </button>
+                {#if showEmojiPicker}
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <div class="fixed inset-0 z-[60]" onclick={() => showEmojiPicker = false}></div>
+                  <div class="absolute bottom-full right-0 mb-2 z-[70]">
+                    <emoji-picker
+                      class="light"
+                      use:bindEmojiPicker
+                    ></emoji-picker>
+                  </div>
+                {/if}
+              </div>
+            </div>
           </div>
 
           <!-- Send button -->
