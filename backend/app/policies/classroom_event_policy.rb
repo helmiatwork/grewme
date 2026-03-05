@@ -1,5 +1,5 @@
 class ClassroomEventPolicy < ApplicationPolicy
-  # Both teachers and parents can see events for classrooms they belong to
+  # Both teachers, parents, and school managers can see events for classrooms they belong to
   def show?
     classroom_member?
   end
@@ -16,7 +16,9 @@ class ClassroomEventPolicy < ApplicationPolicy
   private
 
   def classroom_member?
-    if user.teacher?
+    if user.school_manager?
+      Classroom.where(id: record.classroom_id, school_id: user.school_id).exists?
+    elsif user.teacher?
       user.classrooms.exists?(id: record.classroom_id)
     elsif user.parent?
       user.children

@@ -33,6 +33,10 @@ class Parent < ApplicationRecord
     false
   end
 
+  def school_manager?
+    false
+  end
+
   def jwt_payload
     { "sub" => id, "type" => "Parent" }
   end

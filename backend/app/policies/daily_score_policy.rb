@@ -11,6 +11,10 @@ class DailyScorePolicy < ApplicationPolicy
     def resolve
       if user.admin?
         scope.all
+      elsif user.school_manager?
+        scope.joins(student: { classroom_students: :classroom })
+          .merge(ClassroomStudent.current)
+          .where(classrooms: { school_id: user.school_id })
       elsif user.teacher?
         scope.where(teacher_id: user.id)
       elsif user.parent?

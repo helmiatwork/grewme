@@ -37,6 +37,10 @@ class Teacher < ApplicationRecord
     false
   end
 
+  def school_manager?
+    false
+  end
+
   def jwt_payload
     { "sub" => id, "type" => "Teacher" }
   end
