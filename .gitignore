@@ -40,6 +40,9 @@ mobile-app-parent/composeApp/build/
 DerivedData/
 Pods/
 
+# Worktrees
+.worktrees/
+
 # Secrets
 .env
 .env.*
