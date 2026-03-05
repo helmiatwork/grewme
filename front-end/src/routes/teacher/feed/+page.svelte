@@ -1,12 +1,14 @@
 <script lang="ts">
   import { Button, Alert } from '$lib/components/ui';
-  import { FeedCard, FilePicker } from '$lib/components/feed';
+  import { FeedCard } from '$lib/components/feed';
   import { uploadFiles } from '$lib/api/upload';
 
   let { data } = $props();
 
   let showModal = $state(false);
   let selectedFiles: File[] = $state([]);
+  let fileInput: HTMLInputElement = $state()!;
+  let cameraInput: HTMLInputElement = $state()!;
   let uploading = $state(false);
   let uploadError = $state('');
   let selectedClassroomId = $state('all');
@@ -203,30 +205,127 @@
           </div>
         {/if}
 
-        <div>
-          <label for="modal-body" class="block text-sm font-medium text-text mb-1">Message</label>
-          <textarea
-            name="body"
-            id="modal-body"
-            required
-            rows={4}
+        <!-- File previews (above input bar, like WhatsApp) -->
+        {#if selectedFiles.length > 0}
+          <div class="flex flex-wrap gap-2">
+            {#each selectedFiles as file, i}
+              <div class="relative group w-16 h-16 rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                {#if file.type.startsWith('image/')}
+                  <img src={URL.createObjectURL(file)} alt={file.name} class="w-full h-full object-cover" />
+                {:else}
+                  <div class="flex flex-col items-center justify-center h-full p-1">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-[9px] text-slate-500 truncate w-full text-center mt-0.5">{file.name.split('.').pop()}</span>
+                  </div>
+                {/if}
+                <button
+                  type="button"
+                  onclick={() => { selectedFiles = selectedFiles.filter((_, idx) => idx !== i); }}
+                  class="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >&times;</button>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        <!-- WhatsApp-style message input bar -->
+        <div class="flex items-end gap-2">
+          <!-- Icon buttons -->
+          <div class="flex items-center gap-0.5 pb-1.5">
+            <!-- Attach file (paperclip) -->
+            <button
+              type="button"
+              disabled={uploading || selectedFiles.length >= 4}
+              onclick={() => fileInput.click()}
+              class="p-1.5 rounded-full text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Attach file"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+            </button>
+            <!-- Camera -->
+            <button
+              type="button"
+              disabled={uploading || selectedFiles.length >= 4}
+              onclick={() => cameraInput.click()}
+              class="p-1.5 rounded-full text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Take photo"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Text input -->
+          <div class="flex-1">
+            <textarea
+              name="body"
+              id="modal-body"
+              required
+              rows={3}
+              disabled={uploading}
+              placeholder="Type a message..."
+              class="w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+            ></textarea>
+          </div>
+
+          <!-- Send button -->
+          <button
+            type="submit"
             disabled={uploading}
-            placeholder="Share an update with parents..."
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
-          ></textarea>
+            class="p-2.5 mb-1.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            title="Send"
+          >
+            {#if uploading}
+              <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            {:else}
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            {/if}
+          </button>
         </div>
 
-        <FilePicker
-          files={selectedFiles}
-          onchange={(f) => selectedFiles = f}
-          disabled={uploading}
+        <!-- Hidden file inputs -->
+        <input
+          bind:this={fileInput}
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          class="hidden"
+          onchange={(e) => {
+            const input = e.target as HTMLInputElement;
+            if (input.files) {
+              selectedFiles = [...selectedFiles, ...Array.from(input.files)].slice(0, 4);
+              input.value = '';
+            }
+          }}
+        />
+        <input
+          bind:this={cameraInput}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          class="hidden"
+          onchange={(e) => {
+            const input = e.target as HTMLInputElement;
+            if (input.files) {
+              selectedFiles = [...selectedFiles, ...Array.from(input.files)].slice(0, 4);
+              input.value = '';
+            }
+          }}
         />
 
-        <div class="flex gap-3 justify-end">
+        <div class="flex justify-end">
           <Button variant="ghost" type="button" onclick={closeModal} disabled={uploading}>Cancel</Button>
-          <Button type="submit" disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Post Update'}
-          </Button>
         </div>
       </form>
     </div>
