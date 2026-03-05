@@ -5,7 +5,8 @@ module Types
     field :id, ID, null: false
     field :title, String, null: false
     field :body, String, null: false
-    field :feed_post, Types::FeedPostType, null: false
+    field :notifiable_type, String, null: false
+    field :notifiable_id, ID, null: false
     field :read, Boolean, null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 

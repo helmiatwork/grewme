@@ -5,5 +5,5 @@ export const load: LayoutServerLoad = async ({ locals }) => {
   if (!locals.user || locals.user.type !== 'Teacher') {
     throw redirect(303, '/login');
   }
-  return { user: locals.user };
+  return { user: locals.user, accessToken: locals.accessToken };
 };

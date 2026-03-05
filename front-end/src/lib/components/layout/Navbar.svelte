@@ -41,7 +41,7 @@
 <header class="bg-surface border-b border-slate-100 px-6 py-3 flex items-center justify-between">
   <div></div>
   <div class="flex items-center gap-4">
-    {#if user.type === 'Parent'}
+    {#if user.type === 'Parent' || user.type === 'Teacher'}
       <!-- Notification Bell -->
       <div class="relative">
         <button
@@ -74,7 +74,11 @@
                 {#each notifs.items as notif (notif.id)}
                   <button
                     class="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
-                    onclick={() => { markAsRead(notif.id); window.location.href = '/parent/dashboard'; }}
+                    onclick={() => {
+                      markAsRead(notif.id);
+                      const dest = user.type === 'Teacher' ? '/teacher/calendar' : '/parent/dashboard';
+                      window.location.href = dest;
+                    }}
                   >
                     <p class="text-sm font-medium text-text">{notif.title}</p>
                     <p class="text-xs text-text-muted mt-0.5 line-clamp-2">{notif.body}</p>

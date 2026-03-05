@@ -66,7 +66,7 @@ module Mutations
           tagged_children = parent.children.where(id: student_ids).pluck(:name)
           notification = Notification.create!(
             recipient: parent,
-            feed_post: post,
+            notifiable: post,
             title: "New post about #{tagged_children.to_sentence}",
             body: "#{teacher_name} posted in #{classroom_name}: #{post.body.truncate(100)}"
           )
@@ -81,7 +81,7 @@ module Mutations
         parents.find_each do |parent|
           notification = Notification.create!(
             recipient: parent,
-            feed_post: post,
+            notifiable: post,
             title: "New post in #{classroom_name}",
             body: "#{teacher_name}: #{post.body.truncate(100)}"
           )
@@ -90,14 +90,15 @@ module Mutations
       end
     end
 
-    def broadcast_notification(parent, notification)
-      NotificationsChannel.broadcast_to(parent, {
+    def broadcast_notification(recipient, notification)
+      NotificationsChannel.broadcast_to(recipient, {
         type: "new_notification",
         notification: {
           id: notification.id,
           title: notification.title,
           body: notification.body,
-          feed_post_id: notification.feed_post_id,
+          notifiable_type: notification.notifiable_type,
+          notifiable_id: notification.notifiable_id,
           created_at: notification.created_at.iso8601
         }
       })

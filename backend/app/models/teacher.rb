@@ -16,6 +16,7 @@ class Teacher < ApplicationRecord
   has_many :permissions, as: :permissionable, dependent: :destroy
   has_many :feed_posts, dependent: :destroy
   has_many :classroom_events, as: :creator, dependent: :destroy
+  has_many :notifications, as: :recipient, dependent: :destroy
 
   has_one_attached :avatar_image
 

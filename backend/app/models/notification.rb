@@ -2,7 +2,7 @@
 
 class Notification < ApplicationRecord
   belongs_to :recipient, polymorphic: true
-  belongs_to :feed_post
+  belongs_to :notifiable, polymorphic: true
 
   validates :title, presence: true
   validates :body, presence: true

@@ -204,13 +204,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
   create_table "notifications", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
-    t.bigint "feed_post_id", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "notifiable_type", null: false
     t.datetime "read_at"
     t.bigint "recipient_id", null: false
     t.string "recipient_type", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["feed_post_id"], name: "index_notifications_on_feed_post_id"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
     t.index ["recipient_type", "recipient_id", "read_at"], name: "idx_on_recipient_type_recipient_id_read_at_50191a301d"
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient"
   end
@@ -386,7 +387,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
   add_foreign_key "feed_post_students", "students"
   add_foreign_key "feed_posts", "classrooms"
   add_foreign_key "feed_posts", "teachers"
-  add_foreign_key "notifications", "feed_posts"
   add_foreign_key "parent_students", "parents"
   add_foreign_key "parent_students", "students"
   add_foreign_key "school_managers", "schools"

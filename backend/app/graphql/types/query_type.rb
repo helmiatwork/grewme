@@ -256,16 +256,18 @@ module Types
 
     def notifications
       authenticate!
-      raise GraphQL::ExecutionError, "Only parents can view notifications" unless current_user.parent?
+      unless current_user.parent? || current_user.teacher?
+        raise GraphQL::ExecutionError, "Not available for this role"
+      end
 
-      current_user.notifications.recent.includes(:feed_post)
+      current_user.notifications.recent.includes(:notifiable)
     end
 
     field :unread_notification_count, Integer, null: false, description: "Count of unread notifications"
 
     def unread_notification_count
       authenticate!
-      return 0 unless current_user.parent?
+      return 0 unless current_user.parent? || current_user.teacher?
 
       current_user.notifications.unread.count
     end
