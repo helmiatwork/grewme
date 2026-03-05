@@ -53,9 +53,9 @@ ParentStudent.create!(parent: parent3, student: students_2b[0])
 skill_categories = %i[reading math writing logic social]
 30.downto(1) do |days_ago|
   date = days_ago.days.ago.to_date
-   (students_1a + students_2b).each do |student|
-     teacher = student.current_classroom.primary_teacher
-     skill_categories.each do |skill|
+  (students_1a + students_2b).each do |student|
+    teacher = student.current_classroom.primary_teacher
+    skill_categories.each do |skill|
       DailyScore.create!(
         student: student,
         teacher: teacher,
@@ -68,7 +68,25 @@ skill_categories = %i[reading math writing logic social]
   end
 end
 
+# Feed posts
+post1 = FeedPost.create!(teacher: teacher1, classroom: class1a, body: "Today we practiced reading comprehension with a fun story about space explorers! The kids were so engaged. 🚀📚")
+post2 = FeedPost.create!(teacher: teacher1, classroom: class1a, body: "Math quiz results are in! Everyone improved from last week. Keep up the great work! 🎉")
+FeedPost.create!(teacher: teacher2, classroom: class2b, body: "We started our new science project today. The students are building model volcanoes! 🌋")
+FeedPost.create!(teacher: teacher1, classroom: class1a, body: "Reminder: Parent-teacher conference next Friday. Looking forward to meeting everyone!")
+
+# Feed post likes
+FeedPostLike.create!(feed_post: post1, liker: parent1)
+FeedPostLike.create!(feed_post: post1, liker: parent2)
+FeedPostLike.create!(feed_post: post2, liker: parent1)
+
+# Feed post comments
+FeedPostComment.create!(feed_post: post1, commenter: parent1, body: "Emma loved the space story! She kept talking about it at dinner 😊")
+FeedPostComment.create!(feed_post: post1, commenter: parent2, body: "Liam too! Can we get the book title?")
+FeedPostComment.create!(feed_post: post1, commenter: teacher1, body: "The book is 'Mousetronaut' by Mark Kelly! Great for bedtime reading.")
+FeedPostComment.create!(feed_post: post2, commenter: parent1, body: "So proud of the kids!")
+
 puts "Seeded: #{School.count} school, #{Teacher.count} teachers, #{Parent.count} parents, #{Classroom.count} classrooms, #{Student.count} students, #{DailyScore.count} scores"
+puts "Seeded: #{FeedPost.count} feed posts, #{FeedPostLike.count} likes, #{FeedPostComment.count} comments"
 puts "Admin user: admin@grewme.app / password123"
 
 # Refresh materialized view
