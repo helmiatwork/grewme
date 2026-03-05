@@ -137,6 +137,30 @@ export interface Connection<T> {
   totalCount?: number;
 }
 
+// === Feed ===
+export interface FeedPost {
+  id: string;
+  body: string;
+  teacher: { name: string };
+  classroom: { id: string; name: string };
+  mediaUrls: string[];
+  likesCount: number;
+  commentsCount: number;
+  likedByMe: boolean;
+  comments: FeedPostComment[];
+  createdAt: string;
+}
+
+export interface FeedPostComment {
+  id: string;
+  body: string;
+  commenterName: string;
+  commenterType: string;
+  commenterId: string;
+  isMine: boolean;
+  createdAt: string;
+}
+
 // === Session user (decoded from JWT, stored in locals) ===
 export interface SessionUser {
   id: string;

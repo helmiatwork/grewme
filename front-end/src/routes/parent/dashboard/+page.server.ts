@@ -2,7 +2,8 @@ import type { PageServerLoad } from './$types';
 import { graphql } from '$lib/api/client';
 import { MY_CHILDREN_QUERY } from '$lib/api/queries/parents';
 import { STUDENT_RADAR_QUERY } from '$lib/api/queries/students';
-import type { Student, RadarData, RadarSkills } from '$lib/api/types';
+import { FEED_POSTS_QUERY } from '$lib/api/queries/feed';
+import type { Student, RadarData, RadarSkills, FeedPost, Connection } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const childrenData = await graphql<{ myChildren: Student[] }>(
@@ -27,5 +28,18 @@ export const load: PageServerLoad = async ({ locals }) => {
     })
   );
 
-  return { children: childrenWithRadar };
+  // Load feed posts
+  let feedPosts: FeedPost[] = [];
+  try {
+    const feedData = await graphql<{ feedPosts: Connection<FeedPost> }>(
+      FEED_POSTS_QUERY,
+      { first: 20 },
+      locals.accessToken!
+    );
+    feedPosts = feedData.feedPosts.nodes;
+  } catch {
+    // Feed is non-critical, don't fail the page
+  }
+
+  return { children: childrenWithRadar, feedPosts };
 };
