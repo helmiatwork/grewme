@@ -4,7 +4,7 @@ module Mutations
   class Login < BaseMutation
     argument :email, String, required: true
     argument :password, String, required: true
-    argument :role, String, required: true, description: "teacher or parent"
+    argument :role, String, required: true, description: "teacher, parent, or school_manager"
 
     field :access_token, String
     field :refresh_token, String
@@ -13,7 +13,11 @@ module Mutations
     field :errors, [ Types::UserErrorType ], null: false
 
     def resolve(email:, password:, role:)
-      klass = (role == "teacher") ? Teacher : Parent
+      klass = case role
+      when "teacher" then Teacher
+      when "school_manager" then SchoolManager
+      else Parent
+      end
       user = klass.find_by(email: email)
 
       unless user&.valid_password?(password)

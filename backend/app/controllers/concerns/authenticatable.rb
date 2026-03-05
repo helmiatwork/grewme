@@ -58,7 +58,7 @@ module Authenticatable
 
     if sub && type
       klass = type.safe_constantize
-      return nil unless klass && [ Teacher, Parent ].include?(klass)
+      return nil unless klass && [ Teacher, Parent, SchoolManager ].include?(klass)
       klass.find_by(id: sub)
     end
   end
