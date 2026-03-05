@@ -21,7 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   let accessToken: string | null = getAccessToken(cookies) ?? null;
   let user = accessToken ? decodeJwtPayload(accessToken) : null;
 
-  // Try refresh if access token is expired
+  // Try refresh if access token is expired or missing
   if (accessToken && isTokenExpired(accessToken)) {
     const refreshToken = getRefreshToken(cookies);
     const role = getRole(cookies);
@@ -68,9 +68,16 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   // Redirect authenticated users away from login/register
+  // But allow access to /login if there's a ?force param (for clearing stale sessions)
   if (user && (url.pathname === '/login' || url.pathname === '/register')) {
-    const dashboard = user.type === 'Teacher' ? '/teacher/dashboard' : '/parent/dashboard';
-    throw redirect(303, dashboard);
+    if (url.searchParams.has('force')) {
+      clearAuthCookies(cookies);
+      event.locals.user = null;
+      event.locals.accessToken = null;
+    } else {
+      const dashboard = user.type === 'Teacher' ? '/teacher/dashboard' : '/parent/dashboard';
+      throw redirect(303, dashboard);
+    }
   }
 
   // Role-based route guards
