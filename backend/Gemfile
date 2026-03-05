@@ -7,6 +7,7 @@ gem "puma", ">= 6.0"
 gem "bootsnap", require: false
 gem "tzinfo-data", platforms: %i[windows jruby]
 gem "image_processing", "~> 1.14"
+gem "aws-sdk-s3", require: false
 
 # Solid adapters (PostgreSQL-backed cache, queue, cable)
 gem "solid_cache"
