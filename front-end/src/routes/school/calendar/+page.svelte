@@ -78,6 +78,7 @@
   }
 
   function goPrevMonth() {
+    if (viewYear === todayDate.getFullYear() && viewMonth === todayDate.getMonth()) return;
     selectedDay = null;
     if (viewMonth === 0) { viewMonth = 11; viewYear -= 1; }
     else { viewMonth -= 1; }
@@ -100,6 +101,10 @@
       viewMonth === todayDate.getMonth() &&
       viewYear === todayDate.getFullYear();
   }
+
+  const isCurrentMonth = $derived(
+    viewYear === todayDate.getFullYear() && viewMonth === todayDate.getMonth()
+  );
 
   // ── Formatting ──────────────────────────────────────────────────────────────
   function formatEventDate(dateStr: string): string {
@@ -224,7 +229,7 @@
               {MONTH_NAMES[viewMonth]} {viewYear}
             </h2>
             <div class="flex gap-1">
-              <Button variant="ghost" size="sm" onclick={goPrevMonth}>← Prev</Button>
+              <Button variant="ghost" size="sm" onclick={goPrevMonth} disabled={isCurrentMonth}>← Prev</Button>
               <Button variant="ghost" size="sm" onclick={goToday}>Today</Button>
               <Button variant="ghost" size="sm" onclick={goNextMonth}>Next →</Button>
               <Button size="sm" onclick={openModal}>+ Add Event</Button>
