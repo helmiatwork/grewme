@@ -1,9 +1,11 @@
 class School < ApplicationRecord
   include PublicActivity::Model
+
   tracked
 
   has_many :classrooms, dependent: :destroy
   has_many :teachers, dependent: :nullify
+  has_many :school_managers, dependent: :destroy
 
   validates :name, presence: true
   validates :country_code, inclusion: { in: ->(_) { ISO3166::Country.codes }, message: "is not a valid ISO 3166-1 alpha-2 code" },
