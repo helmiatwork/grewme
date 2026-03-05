@@ -19,6 +19,6 @@ Devise.setup do |config|
   # JWT secret used by our custom JwtIssuable concern (not Devise's built-in JWT strategy)
   config.jwt do |jwt|
     jwt.secret = Rails.application.credentials.devise_jwt_secret_key!
-    jwt.expiration_time = 15.minutes.to_i
+    jwt.expiration_time = 10.minutes.to_i
   end
 end

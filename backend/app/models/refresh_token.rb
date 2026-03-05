@@ -28,6 +28,6 @@ class RefreshToken < ApplicationRecord
   def generate_token
     self.raw_token = SecureRandom.urlsafe_base64(32)
     self.token_digest = Digest::SHA256.hexdigest(raw_token)
-    self.expires_at ||= 7.days.from_now
+    self.expires_at ||= 30.days.from_now
   end
 end

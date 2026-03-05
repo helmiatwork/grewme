@@ -21,7 +21,7 @@ export function setAuthCookies(
 ): void {
   cookies.set(ACCESS_COOKIE, accessToken, {
     ...COOKIE_OPTIONS,
-    maxAge: expiresIn
+    maxAge: expiresIn // 10 min — matches JWT expiration
   });
   cookies.set(REFRESH_COOKIE, refreshToken, {
     ...COOKIE_OPTIONS,
