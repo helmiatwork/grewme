@@ -1,5 +1,6 @@
 class Classroom < ApplicationRecord
   include PublicActivity::Model
+
   tracked
 
   belongs_to :school
@@ -8,6 +9,7 @@ class Classroom < ApplicationRecord
   has_many :teachers, through: :classroom_teachers
   has_many :classroom_students, dependent: :destroy
   has_many :students, -> { merge(ClassroomStudent.current) }, through: :classroom_students
+  has_many :feed_posts, dependent: :destroy
 
   validates :name, presence: true
 

@@ -1,5 +1,6 @@
 class Teacher < ApplicationRecord
   include PublicActivity::Model
+
   tracked
 
   devise :database_authenticatable, :registerable, :recoverable, :validatable
@@ -13,6 +14,7 @@ class Teacher < ApplicationRecord
   has_many :daily_scores, foreign_key: :teacher_id, dependent: :destroy, inverse_of: :teacher
   has_many :refresh_tokens, as: :authenticatable, dependent: :destroy
   has_many :permissions, as: :permissionable, dependent: :destroy
+  has_many :feed_posts, dependent: :destroy
 
   validates :name, presence: true
 
