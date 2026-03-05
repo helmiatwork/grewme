@@ -250,6 +250,35 @@ module Types
         .includes(:classroom, :creator)
     end
 
+    # === School ===
+
+    field :school_overview, Types::SchoolOverviewType, null: false, description: "School overview stats (school_manager only)"
+
+    def school_overview
+      authenticate!
+      raise GraphQL::ExecutionError, "Only school managers can access this" unless current_user.school_manager?
+
+      school = current_user.school
+      OpenStruct.new(
+        school_name: school.name,
+        classroom_count: school.classrooms.count,
+        student_count: Student.joins(classroom_students: :classroom)
+          .merge(ClassroomStudent.current)
+          .where(classrooms: { school_id: school.id })
+          .distinct.count,
+        teacher_count: school.teachers.count
+      )
+    end
+
+    field :school_teachers, [ Types::TeacherType ], null: false, description: "All teachers in the school (school_manager only)"
+
+    def school_teachers
+      authenticate!
+      raise GraphQL::ExecutionError, "Only school managers can access this" unless current_user.school_manager?
+
+      current_user.school.teachers.includes(:classrooms)
+    end
+
     # === Admin ===
 
     field :user_permissions, Types::UserPermissionsType, null: false, description: "Get user permissions (admin only)" do

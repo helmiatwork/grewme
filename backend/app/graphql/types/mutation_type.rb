@@ -32,6 +32,11 @@ module Types
     field :toggle_permission, mutation: Mutations::Admin::TogglePermission
     field :delete_permission, mutation: Mutations::Admin::DeletePermission
 
+    # School Management
+    field :assign_teacher_to_classroom, mutation: Mutations::AssignTeacherToClassroom
+    field :remove_teacher_from_classroom, mutation: Mutations::RemoveTeacherFromClassroom
+    field :transfer_student, mutation: Mutations::TransferStudent
+
     # Profile
     field :update_profile, mutation: Mutations::UpdateProfile
     field :change_password, mutation: Mutations::ChangePassword
