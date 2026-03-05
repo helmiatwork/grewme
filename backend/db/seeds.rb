@@ -33,6 +33,9 @@ nina = Parent.create!(name: "Nina Parent", email: "nina@parent.com", password: "
 # Admin user for Avo
 AdminUser.create!(email: "admin@grewme.app", password: "password123", password_confirmation: "password123")
 
+# School Manager
+SchoolManager.create!(name: "Pat Principal", email: "pat@greenwood.edu", password: "password123", password_confirmation: "password123", school: school)
+
 # 7 Classrooms — Alice gets 4, others get 1 each
 class1a = Classroom.create!(name: "Class 1A", school: school)
 class1b = Classroom.create!(name: "Class 1B", school: school)
@@ -246,6 +249,7 @@ puts "Seeded: #{School.count} school, #{Teacher.count} teachers, #{Parent.count}
 puts "Seeded: #{FeedPost.count} feed posts, #{FeedPostLike.count} likes, #{FeedPostComment.count} comments"
 puts "Seeded: #{ClassroomEvent.count} calendar events"
 puts "Admin user: admin@grewme.app / password123"
+puts "School Manager: pat@greenwood.edu / password123 (Greenwood Elementary — full school access)"
 puts ""
 puts "Teacher logins:"
 puts "  alice@greenwood.edu / password123 (Class 1A, 3A, 3B, 4A — 4 classes, 32 students)"
