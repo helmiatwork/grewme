@@ -181,7 +181,10 @@ module Types
     def feed_posts(classroom_ids: nil, student_ids: nil)
       authenticate!
 
-      if current_user.parent?
+      if current_user.school_manager?
+        school_classroom_ids = current_user.school_classroom_ids
+        ids = classroom_ids ? (classroom_ids.map(&:to_i) & school_classroom_ids) : school_classroom_ids
+      elsif current_user.parent?
         child_classroom_ids = current_user.children
           .joins(:classroom_students)
           .where(classroom_students: { status: :active })
@@ -235,6 +238,9 @@ module Types
           .pluck("classroom_students.classroom_id")
           .uniq
         ids = classroom_ids ? (classroom_ids.map(&:to_i) & child_classroom_ids) : child_classroom_ids
+      elsif current_user.school_manager?
+        school_classroom_ids = current_user.school_classroom_ids
+        ids = classroom_ids ? (classroom_ids.map(&:to_i) & school_classroom_ids) : school_classroom_ids
       else
         ids = []
       end
