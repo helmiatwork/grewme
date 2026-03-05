@@ -2,6 +2,10 @@
 
 module Types
   class MutationType < Types::BaseObject
-    # Mutations will be registered here as they are created
+    # Auth
+    field :login, mutation: Mutations::Login
+    field :register, mutation: Mutations::Register
+    field :refresh_token, mutation: Mutations::RefreshToken
+    field :logout, mutation: Mutations::Logout
   end
 end
