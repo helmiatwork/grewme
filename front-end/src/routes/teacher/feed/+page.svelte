@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { Button, Alert } from '$lib/components/ui';
   import { FeedCard } from '$lib/components/feed';
   import { uploadFiles } from '$lib/api/upload';
+
+  onMount(() => import('emoji-picker-element'));
 
   let { data } = $props();
 
@@ -9,6 +12,8 @@
   let selectedFiles: File[] = $state([]);
   let fileInput: HTMLInputElement = $state()!;
   let cameraInput: HTMLInputElement = $state()!;
+  let textareaEl: HTMLTextAreaElement = $state()!;
+  let showEmojiPicker = $state(false);
   let uploading = $state(false);
   let uploadError = $state('');
   let selectedClassroomId = $state('all');
@@ -37,6 +42,26 @@
 
   function closeModal() {
     showModal = false;
+    showEmojiPicker = false;
+  }
+
+  function bindEmojiPicker(node: HTMLElement) {
+    function handler(e: Event) {
+      const detail = (e as CustomEvent).detail;
+      const emoji: string = detail?.unicode;
+      if (!emoji || !textareaEl) return;
+      const start = textareaEl.selectionStart;
+      const end = textareaEl.selectionEnd;
+      const value = textareaEl.value;
+      textareaEl.value = value.slice(0, start) + emoji + value.slice(end);
+      textareaEl.selectionStart = textareaEl.selectionEnd = start + emoji.length;
+      textareaEl.focus();
+      showEmojiPicker = false;
+    }
+    node.addEventListener('emoji-click', handler);
+    return {
+      destroy() { node.removeEventListener('emoji-click', handler); }
+    };
   }
 
   function toggleStudent(studentId: string) {
@@ -259,11 +284,36 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
               </svg>
             </button>
+            <!-- Emoji -->
+            <div class="relative">
+              <button
+                type="button"
+                disabled={uploading}
+                onclick={() => showEmojiPicker = !showEmojiPicker}
+                class="p-1.5 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed {showEmojiPicker ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-primary hover:bg-primary/10'}"
+                title="Emoji"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+                </svg>
+              </button>
+              {#if showEmojiPicker}
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <div class="fixed inset-0 z-[60]" onclick={() => showEmojiPicker = false}></div>
+                <div class="absolute bottom-full left-0 mb-2 z-[70]">
+                    <emoji-picker
+                    class="light"
+                    use:bindEmojiPicker
+                  ></emoji-picker>
+                </div>
+              {/if}
+            </div>
           </div>
 
           <!-- Text input -->
           <div class="flex-1">
             <textarea
+              bind:this={textareaEl}
               name="body"
               id="modal-body"
               required
