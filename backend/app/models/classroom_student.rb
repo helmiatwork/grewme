@@ -1,11 +1,12 @@
 class ClassroomStudent < ApplicationRecord
   include PublicActivity::Model
+
   tracked
 
   belongs_to :student
   belongs_to :classroom
 
-  enum :status, { active: 0, inactive: 1 }
+  enum :status, { active: 0, inactive: 1, transferred: 2 }
 
   validates :academic_year, presence: true
   validates :enrolled_at, presence: true

@@ -1,0 +1,6 @@
+<% require 'bcrypt' %>
+manager_pat:
+  name: Pat Principal
+  email: pat@greenwood.test
+  encrypted_password: <%= BCrypt::Password.create("password123") %>
+  school: greenwood
