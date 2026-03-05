@@ -5,6 +5,6 @@ module Types
     field :user_id, ID, null: false
     field :role, String, null: false
     field :overrides, [ Types::PermissionType ], null: false
-    field :effective, GraphQL::Types::JSON, null: false
+    field :effective, [ Types::EffectivePermissionType ], null: false
   end
 end

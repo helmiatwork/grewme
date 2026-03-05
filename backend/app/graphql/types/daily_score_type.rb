@@ -8,5 +8,7 @@ module Types
     field :score, Integer, null: false
     field :notes, String
     field :student_id, ID, null: false
+    field :student, Types::StudentType, null: false
+    field :teacher, Types::TeacherType, null: false
   end
 end

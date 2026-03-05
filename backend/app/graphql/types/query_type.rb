@@ -186,11 +186,21 @@ module Types
       raise GraphQL::ExecutionError, "Invalid user type" unless klass && [ Teacher, Parent ].include?(klass)
       target_user = klass.find(user_id)
 
+      overrides = target_user.permissions
+      override_keys = overrides.map { |p| [ p.resource, p.action ] }.to_set
+
+      effective = target_user.effective_permissions.flat_map do |resource, actions|
+        actions.map do |action, granted|
+          source = override_keys.include?([ resource, action ]) ? "override" : "role_default"
+          OpenStruct.new(resource: resource, action: action, granted: granted, source: source)
+        end
+      end
+
       OpenStruct.new(
         user_id: target_user.id,
         role: target_user.role,
-        overrides: target_user.permissions,
-        effective: target_user.effective_permissions
+        overrides: overrides,
+        effective: effective
       )
     end
   end

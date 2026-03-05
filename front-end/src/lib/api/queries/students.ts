@@ -41,7 +41,7 @@ export const STUDENT_PROGRESS_QUERY = `
 `;
 
 export const STUDENT_DAILY_SCORES_QUERY = `
-  query StudentDailyScores($studentId: ID!, $skillCategory: SkillCategory, $first: Int, $after: String) {
+  query StudentDailyScores($studentId: ID!, $skillCategory: SkillCategoryEnum, $first: Int, $after: String) {
     studentDailyScores(studentId: $studentId, skillCategory: $skillCategory, first: $first, after: $after) {
       nodes {
         id

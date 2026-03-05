@@ -4,6 +4,7 @@ module Types
   class ClassroomType < Types::BaseObject
     field :id, ID, null: false
     field :name, String, null: false
+    field :school, Types::SchoolType, null: false
     field :student_count, Integer, null: false
     field :students, [ Types::StudentType ], null: false
 

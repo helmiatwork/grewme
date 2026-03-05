@@ -1,19 +1,9 @@
 <script lang="ts">
-  import { Radar } from 'svelte-chartjs';
-  import {
-    Chart as ChartJS,
-    RadialLinearScale,
-    PointElement,
-    LineElement,
-    Filler,
-    Tooltip,
-    Legend
-  } from 'chart.js';
-  import type { RadarSkills } from '$lib/api/types';
+  import { LayerCake, Svg } from 'layercake';
+  import RadarArea from './_radar/RadarArea.svelte';
+  import AxisRadial from './_radar/AxisRadial.svelte';
+  import type { RadarSkills, SkillCategory } from '$lib/api/types';
   import { SKILL_LABELS, SKILL_COLORS } from '$lib/utils/constants';
-  import type { SkillCategory } from '$lib/api/types';
-
-  ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
   interface Props {
     skills: RadarSkills;
@@ -24,73 +14,40 @@
   let { skills, label = 'Skills', size = 'md' }: Props = $props();
 
   const sizeClasses: Record<string, string> = {
-    sm: 'w-48 h-48',
-    md: 'w-80 h-80',
-    lg: 'w-96 h-96'
+    sm: 'h-48 w-48',
+    md: 'h-80 w-80',
+    lg: 'h-96 w-96'
   };
 
-  const skillKeys = ['reading', 'math', 'writing', 'logic', 'social'] as const;
-  const labels = skillKeys.map((k) => SKILL_LABELS[k.toUpperCase() as SkillCategory]);
-  const colors = skillKeys.map((k) => SKILL_COLORS[k.toUpperCase() as SkillCategory]);
+  const skillKeys = ['READING', 'MATH', 'WRITING', 'LOGIC', 'SOCIAL'] as const;
+  const xKey = skillKeys.map((k) => k.toLowerCase()) as unknown as string[];
+  const axisLabels = skillKeys.map((k) => SKILL_LABELS[k as SkillCategory]);
+  const axisColors = skillKeys.map((k) => SKILL_COLORS[k as SkillCategory]);
 
-  const chartData = $derived({
-    labels,
-    datasets: [
-      {
-        label,
-        data: skillKeys.map((k) => skills[k] ?? 0),
-        backgroundColor: 'rgba(59, 130, 246, 0.15)',
-        borderColor: '#3B82F6',
-        borderWidth: 2,
-        pointBackgroundColor: colors,
-        pointBorderColor: colors,
-        pointRadius: 5,
-        pointHoverRadius: 7
-      }
-    ]
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const options: any = {
-    responsive: true,
-    maintainAspectRatio: true,
-    scales: {
-      r: {
-        beginAtZero: true,
-        max: 100,
-        min: 0,
-        ticks: {
-          stepSize: 20,
-          display: true,
-          backdropColor: 'transparent',
-          font: { size: 10 }
-        },
-        grid: {
-          color: 'rgba(148, 163, 184, 0.2)'
-        },
-        angleLines: {
-          color: 'rgba(148, 163, 184, 0.2)'
-        },
-        pointLabels: {
-          font: { size: 13, weight: '600' as const },
-          color: (ctx: { index: number }) => colors[ctx.index]
-        }
-      }
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (ctx: { raw: unknown }) => `${ctx.raw}/100`
-        }
-      }
-    },
-    animation: {
-      duration: 800
+  // Layer Cake expects data as array of objects with the xKey fields
+  const data = $derived([
+    {
+      name: label,
+      reading: skills.reading ?? 0,
+      math: skills.math ?? 0,
+      writing: skills.writing ?? 0,
+      logic: skills.logic ?? 0,
+      social: skills.social ?? 0
     }
-  };
+  ]);
 </script>
 
 <div class="{sizeClasses[size]} mx-auto">
-  <Radar data={chartData} {options} />
+  <LayerCake
+    padding={{ top: 30, right: 10, bottom: 10, left: 10 }}
+    x={xKey}
+    xDomain={[0, 100]}
+    xRange={({ height }: { height: number }) => [0, height / 2]}
+    {data}
+  >
+    <Svg>
+      <AxisRadial colors={axisColors} labels={axisLabels} />
+      <RadarArea />
+    </Svg>
+  </LayerCake>
 </div>
