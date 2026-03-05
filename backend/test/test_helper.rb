@@ -10,6 +10,7 @@ end
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require_relative "support/graphql_test_helper"
 
 module AuthTestHelper
   def auth_headers(user)
@@ -43,6 +44,8 @@ end
 module ActiveSupport
   class TestCase
     fixtures :all
+    include GraphqlTestHelper
+
     parallelize(workers: 1)
   end
 end
