@@ -12,29 +12,17 @@ interface UploadResult {
 
 /**
  * Compute MD5 checksum of a file as base64 (required by Active Storage).
- * Uses SubtleCrypto where available, falls back to manual computation.
+ * Web Crypto API doesn't support MD5, so we use spark-md5.
  */
 async function computeChecksum(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
-  // SubtleCrypto doesn't support MD5 in all browsers, use a simple approach
-  // We'll use the spark-md5 approach inline or just send the file and let Rails handle it
-  // Actually, Active Storage requires MD5. Let's compute it properly.
-  const bytes = new Uint8Array(buffer);
-  
-  // Simple MD5 implementation for browser - we need to use a different approach
-  // The Web Crypto API doesn't support MD5. We'll compute it server-side instead.
-  // For now, use a workaround: compute via the server or use a library.
-  
-  // Actually, the simplest approach: use the FileReader + crypto polyfill
-  // But for production, we should use spark-md5. For now, let's use a basic approach.
-  // We'll install spark-md5.
   const { default: SparkMD5 } = await import('spark-md5');
   const spark = new SparkMD5.ArrayBuffer();
   spark.append(buffer);
   const hexHash = spark.end();
-  
-  // Convert hex to base64
-  const hashBytes = new Uint8Array(hexHash.match(/.{2}/g)!.map((byte: string) => parseInt(byte, 16)));
+  const hashBytes = new Uint8Array(
+    hexHash.match(/.{2}/g)!.map((byte: string) => parseInt(byte, 16))
+  );
   return btoa(String.fromCharCode(...hashBytes));
 }
 
@@ -63,8 +51,17 @@ export async function uploadFile(file: File): Promise<UploadResult> {
   });
 
   const json = await res.json();
-  const upload: DirectUpload = json.data.createDirectUpload.directUpload;
-  const errors = json.data.createDirectUpload.errors;
+
+  // BFF proxy returns { errors: [...] } without data on auth/server errors
+  if (json.errors?.length > 0) {
+    throw new Error(json.errors[0].message);
+  }
+
+  if (!json.data?.createDirectUpload?.directUpload) {
+    throw new Error('Upload failed: unexpected server response');
+  }
+
+  const { directUpload: upload, errors } = json.data.createDirectUpload;
 
   if (errors?.length > 0) {
     throw new Error(errors[0].message);
