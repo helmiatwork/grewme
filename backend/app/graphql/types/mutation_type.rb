@@ -8,6 +8,9 @@ module Types
     field :refresh_token, mutation: Mutations::RefreshToken
     field :logout, mutation: Mutations::Logout
 
+    # Uploads
+    field :create_direct_upload, mutation: Mutations::CreateDirectUpload
+
     # Daily Scores
     field :create_daily_score, mutation: Mutations::CreateDailyScore
     field :update_daily_score, mutation: Mutations::UpdateDailyScore

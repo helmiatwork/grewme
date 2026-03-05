@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+echo "Setting up Minio for development..."
+
+# Wait for Minio to be ready
+echo "Waiting for Minio..."
+until curl -sf http://localhost:9000/minio/health/live > /dev/null 2>&1; do
+  sleep 1
+done
+echo "Minio is ready"
+
+# Configure mc alias
+mc alias set local http://localhost:9000 minioadmin minioadmin 2>/dev/null || true
+
+# Create bucket if not exists
+mc mb local/grewme-dev --ignore-existing
+echo "Bucket grewme-dev ready"
+
+# Set anonymous download policy (for serving uploaded media)
+mc anonymous set download local/grewme-dev
+echo "Anonymous download policy set"
+
+echo "Minio setup complete!"
+echo "  Console: http://localhost:9001 (minioadmin/minioadmin)"
+echo "  API:     http://localhost:9000"
+echo "  Bucket:  grewme-dev"

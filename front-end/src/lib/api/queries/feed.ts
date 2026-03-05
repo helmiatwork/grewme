@@ -81,3 +81,12 @@ export const DELETE_FEED_COMMENT_MUTATION = `
     deleteFeedComment(id: $id) { success }
   }
 `;
+
+export const CREATE_DIRECT_UPLOAD_MUTATION = `
+  mutation CreateDirectUpload($filename: String!, $byteSize: Int!, $contentType: String!, $checksum: String!) {
+    createDirectUpload(filename: $filename, byteSize: $byteSize, contentType: $contentType, checksum: $checksum) {
+      directUpload { url headers signedBlobId }
+      errors { message path }
+    }
+  }
+`;
