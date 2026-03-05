@@ -5,20 +5,29 @@ module Mutations
     argument :classroom_id, ID, required: true
     argument :body, String, required: true
     argument :signed_blob_ids, [ String ], required: false
+    argument :student_ids, [ ID ], required: false
 
     field :feed_post, Types::FeedPostType
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(classroom_id:, body:, signed_blob_ids: [])
+    def resolve(classroom_id:, body:, signed_blob_ids: [], student_ids: [])
       authenticate!
       raise Pundit::NotAuthorizedError unless current_user.teacher?
 
-      post = FeedPost.new(teacher: current_user, classroom_id: classroom_id, body: body)
+      classroom = Classroom.find(classroom_id)
+      post = FeedPost.new(teacher: current_user, classroom: classroom, body: body)
       raise Pundit::NotAuthorizedError unless FeedPostPolicy.new(current_user, post).create?
 
       if post.save
         if signed_blob_ids.present?
           post.media.attach(signed_blob_ids.map { |id| ActiveStorage::Blob.find_signed!(id) })
+        end
+        if student_ids.present?
+          students = classroom.students
+            .joins(:classroom_students)
+            .where(classroom_students: { status: :active })
+            .where(id: student_ids)
+          post.tagged_students = students
         end
         { feed_post: post, errors: [] }
       else

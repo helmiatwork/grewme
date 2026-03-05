@@ -11,8 +11,9 @@
   const filteredPosts = $derived(
     selectedChildId
       ? data.feedPosts.filter((p) => {
-          const child = data.children.find((c) => c.id === selectedChildId);
-          return child != null;
+          // Show posts that either tag this child specifically, or have no tags (classroom-wide)
+          if (!p.taggedStudents || p.taggedStudents.length === 0) return true;
+          return p.taggedStudents.some((s: { id: string }) => s.id === selectedChildId);
         })
       : data.feedPosts
   );

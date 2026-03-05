@@ -7,11 +7,16 @@ module Types
     field :teacher, Types::TeacherType, null: false
     field :classroom, Types::ClassroomType, null: false
     field :media_urls, [ String ], null: false
+    field :tagged_students, [ Types::StudentType ], null: false
     field :likes_count, Integer, null: false
     field :comments_count, Integer, null: false
     field :liked_by_me, Boolean, null: false
     field :comments, [ Types::FeedPostCommentType ], null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+
+    def tagged_students
+      object.tagged_students
+    end
 
     def media_urls
       object.media.map do |attachment|

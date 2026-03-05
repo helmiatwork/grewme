@@ -1,11 +1,12 @@
 export const FEED_POSTS_QUERY = `
-  query FeedPosts($classroomIds: [ID!], $first: Int, $after: String) {
-    feedPosts(classroomIds: $classroomIds, first: $first, after: $after) {
+  query FeedPosts($classroomIds: [ID!], $studentIds: [ID!], $first: Int, $after: String) {
+    feedPosts(classroomIds: $classroomIds, studentIds: $studentIds, first: $first, after: $after) {
       nodes {
         id
         body
         teacher { name }
         classroom { id name }
+        taggedStudents { id name }
         mediaUrls
         likesCount
         commentsCount
@@ -27,6 +28,7 @@ export const FEED_POST_QUERY = `
       body
       teacher { name }
       classroom { id name }
+      taggedStudents { id name }
       mediaUrls
       likesCount
       commentsCount
@@ -45,8 +47,8 @@ export const FEED_POST_QUERY = `
 `;
 
 export const CREATE_FEED_POST_MUTATION = `
-  mutation CreateFeedPost($classroomId: ID!, $body: String!, $signedBlobIds: [String!]) {
-    createFeedPost(classroomId: $classroomId, body: $body, signedBlobIds: $signedBlobIds) {
+  mutation CreateFeedPost($classroomId: ID!, $body: String!, $signedBlobIds: [String!], $studentIds: [ID!]) {
+    createFeedPost(classroomId: $classroomId, body: $body, signedBlobIds: $signedBlobIds, studentIds: $studentIds) {
       feedPost { id }
       errors { message path }
     }

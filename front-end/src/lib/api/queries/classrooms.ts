@@ -7,6 +7,10 @@ export const CLASSROOMS_QUERY = `
         id
         name
       }
+      students {
+        id
+        name
+      }
     }
   }
 `;

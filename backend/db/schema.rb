@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_05_200003) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_05_200004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -138,6 +138,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200003) do
     t.index ["feed_post_id", "liker_type", "liker_id"], name: "idx_feed_post_likes_unique", unique: true
     t.index ["feed_post_id"], name: "index_feed_post_likes_on_feed_post_id"
     t.index ["liker_type", "liker_id"], name: "index_feed_post_likes_on_liker_type_and_liker_id"
+  end
+
+  create_table "feed_post_students", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "feed_post_id", null: false
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feed_post_id", "student_id"], name: "index_feed_post_students_on_feed_post_id_and_student_id", unique: true
+    t.index ["feed_post_id"], name: "index_feed_post_students_on_feed_post_id"
+    t.index ["student_id"], name: "index_feed_post_students_on_student_id"
   end
 
   create_table "feed_posts", force: :cascade do |t|
@@ -315,6 +325,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200003) do
   add_foreign_key "daily_scores", "teachers"
   add_foreign_key "feed_post_comments", "feed_posts"
   add_foreign_key "feed_post_likes", "feed_posts"
+  add_foreign_key "feed_post_students", "feed_posts"
+  add_foreign_key "feed_post_students", "students"
   add_foreign_key "feed_posts", "classrooms"
   add_foreign_key "feed_posts", "teachers"
   add_foreign_key "parent_students", "parents"

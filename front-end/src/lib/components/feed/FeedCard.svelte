@@ -27,6 +27,12 @@
       <div class="flex items-center gap-2 text-xs text-text-muted">
         <span>{formatDate(post.createdAt)}</span>
         <Badge>{post.classroom.name}</Badge>
+        {#if post.taggedStudents?.length > 0}
+          <span class="text-primary">·</span>
+          {#each post.taggedStudents as student}
+            <span class="text-primary font-medium">@{student.name}</span>
+          {/each}
+        {/if}
       </div>
     </div>
   </div>

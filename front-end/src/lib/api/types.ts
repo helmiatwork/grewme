@@ -144,6 +144,7 @@ export interface FeedPost {
   teacher: { name: string };
   classroom: { id: string; name: string };
   mediaUrls: string[];
+  taggedStudents: { id: string; name: string }[];
   likesCount: number;
   commentsCount: number;
   likedByMe: boolean;

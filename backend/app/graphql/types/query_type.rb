@@ -175,9 +175,10 @@ module Types
 
     field :feed_posts, Types::FeedPostType.connection_type, null: false, description: "Feed posts for parent's classrooms" do
       argument :classroom_ids, [ ID ], required: false
+      argument :student_ids, [ ID ], required: false
     end
 
-    def feed_posts(classroom_ids: nil)
+    def feed_posts(classroom_ids: nil, student_ids: nil)
       authenticate!
 
       if current_user.parent?
@@ -194,7 +195,13 @@ module Types
         ids = []
       end
 
-      FeedPost.where(classroom_id: ids).order(created_at: :desc).includes(:teacher, :classroom)
+      scope = FeedPost.where(classroom_id: ids).order(created_at: :desc).includes(:teacher, :classroom, :tagged_students)
+
+      if student_ids.present?
+        scope = scope.joins(:feed_post_students).where(feed_post_students: { student_id: student_ids }).distinct
+      end
+
+      scope
     end
 
     field :feed_post, Types::FeedPostType, null: false, description: "Single feed post" do
