@@ -1,11 +1,3 @@
-import { CREATE_DIRECT_UPLOAD_MUTATION } from './queries/feed';
-
-interface DirectUpload {
-  url: string;
-  headers: string;
-  signedBlobId: string;
-}
-
 interface UploadResult {
   signedBlobId: string;
 }
@@ -27,61 +19,31 @@ async function computeChecksum(file: File): Promise<string> {
 }
 
 /**
- * Upload a single file via Active Storage direct upload:
- * 1. Call createDirectUpload mutation to get presigned URL
- * 2. PUT the file to S3/Minio using the presigned URL
- * 3. Return the signed blob ID
+ * Upload a single file via BFF proxy:
+ * 1. Compute MD5 checksum
+ * 2. Send file + checksum to /api/upload (SvelteKit server)
+ * 3. Server handles GraphQL mutation + S3 PUT (no CORS issues)
+ * 4. Return signed blob ID
  */
 export async function uploadFile(file: File): Promise<UploadResult> {
   const checksum = await computeChecksum(file);
 
-  // Step 1: Get presigned URL via BFF proxy
-  const res = await fetch('/api/graphql', {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('checksum', checksum);
+
+  const res = await fetch('/api/upload', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: CREATE_DIRECT_UPLOAD_MUTATION,
-      variables: {
-        filename: file.name,
-        byteSize: file.size,
-        contentType: file.type || 'application/octet-stream',
-        checksum
-      }
-    })
+    body: formData
   });
 
   const json = await res.json();
 
-  // BFF proxy returns { errors: [...] } without data on auth/server errors
-  if (json.errors?.length > 0) {
-    throw new Error(json.errors[0].message);
+  if (!res.ok || json.error) {
+    throw new Error(json.error || `Upload failed: ${res.status}`);
   }
 
-  if (!json.data?.createDirectUpload?.directUpload) {
-    throw new Error('Upload failed: unexpected server response');
-  }
-
-  const { directUpload: upload, errors } = json.data.createDirectUpload;
-
-  if (errors?.length > 0) {
-    throw new Error(errors[0].message);
-  }
-
-  // Step 2: PUT file to S3 using presigned URL
-  const headers: Record<string, string> = JSON.parse(upload.headers);
-  headers['Content-Type'] = file.type || 'application/octet-stream';
-
-  const putRes = await fetch(upload.url, {
-    method: 'PUT',
-    headers,
-    body: file
-  });
-
-  if (!putRes.ok) {
-    throw new Error(`Upload failed: ${putRes.status}`);
-  }
-
-  return { signedBlobId: upload.signedBlobId };
+  return { signedBlobId: json.signedBlobId };
 }
 
 /**
