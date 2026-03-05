@@ -24,13 +24,14 @@ gem "pundit", "~> 2.5"
 
 # API & serialization
 gem "alba", "~> 3.9"
+gem "graphql", "~> 2.5"
 gem "rack-cors"
 gem "rack-attack", "~> 6.8"
 
 # Database & migrations
 gem "scenic", "~> 1.8"
 gem "strong_migrations", "~> 2.5"
-gem "paper_trail", "~> 16.0"
+gem "paper_trail", "~> 17.0"
 
 # Security
 gem "secure_headers", "~> 7.0"
