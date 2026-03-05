@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { Card, Button, Alert } from '$lib/components/ui';
+  import { Button, Alert } from '$lib/components/ui';
   import { FeedCard, FilePicker } from '$lib/components/feed';
   import { uploadFiles } from '$lib/api/upload';
 
   let { data } = $props();
 
+  let showModal = $state(false);
   let selectedFiles: File[] = $state([]);
   let uploading = $state(false);
   let uploadError = $state('');
@@ -21,6 +22,18 @@
     selectedClassroomId;
     selectedStudentIds = [];
   });
+
+  function openModal() {
+    selectedClassroomId = '';
+    selectedStudentIds = [];
+    selectedFiles = [];
+    uploadError = '';
+    showModal = true;
+  }
+
+  function closeModal() {
+    showModal = false;
+  }
 
   function toggleStudent(studentId: string) {
     if (selectedStudentIds.includes(studentId)) {
@@ -90,26 +103,66 @@
 </svelte:head>
 
 <div class="max-w-2xl mx-auto">
-  <h1 class="text-2xl font-bold text-text mb-6">Class Feed</h1>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-text">Class Feed</h1>
+    <Button onclick={openModal}>+ New Post</Button>
+  </div>
 
-  <!-- Create Post Form -->
-  <Card class="mb-8">
-    {#snippet children()}
-      <h2 class="text-lg font-semibold text-text mb-4">Create Post</h2>
+  <!-- Recent Posts -->
+  {#if data.feedPosts.length === 0}
+    <div class="text-center py-12 text-text-muted">
+      <p>No posts yet. Create your first update!</p>
+    </div>
+  {:else}
+    <div class="space-y-4">
+      {#each data.feedPosts as post (post.id)}
+        <FeedCard {post} />
+      {/each}
+    </div>
+  {/if}
+</div>
+
+<!-- ── Create Post Modal ──────────────────────────────────────────────────── -->
+{#if showModal}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    onkeydown={(e) => { if (e.key === 'Escape') closeModal(); }}
+  >
+    <!-- Backdrop -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="absolute inset-0" onclick={closeModal}></div>
+
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-text">Create Post</h2>
+        <button
+          type="button"
+          onclick={closeModal}
+          class="p-1 rounded-lg text-text-muted hover:text-text hover:bg-slate-100 transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
       {#if uploadError}
-        <Alert variant="error">{uploadError}</Alert>
+        <div class="mb-4">
+          <Alert variant="error">{uploadError}</Alert>
+        </div>
       {/if}
 
       <form onsubmit={handleSubmit} class="space-y-4">
         <div>
-          <label for="classroomId" class="block text-sm font-medium text-text mb-1">Classroom</label>
+          <label for="modal-classroomId" class="block text-sm font-medium text-text mb-1">Classroom</label>
           <select
-            id="classroomId"
+            id="modal-classroomId"
             bind:value={selectedClassroomId}
             required
             disabled={uploading}
-            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
             <option value="">Select classroom...</option>
             {#each data.classrooms as classroom}
@@ -142,10 +195,10 @@
         {/if}
 
         <div>
-          <label for="body" class="block text-sm font-medium text-text mb-1">Message</label>
+          <label for="modal-body" class="block text-sm font-medium text-text mb-1">Message</label>
           <textarea
             name="body"
-            id="body"
+            id="modal-body"
             required
             rows={4}
             disabled={uploading}
@@ -160,29 +213,13 @@
           disabled={uploading}
         />
 
-        <Button type="submit" disabled={uploading}>
-          {#if uploading}
-            Uploading...
-          {:else}
-            Post Update
-          {/if}
-        </Button>
+        <div class="flex gap-3 justify-end">
+          <Button variant="ghost" type="button" onclick={closeModal} disabled={uploading}>Cancel</Button>
+          <Button type="submit" disabled={uploading}>
+            {uploading ? 'Uploading...' : 'Post Update'}
+          </Button>
+        </div>
       </form>
-    {/snippet}
-  </Card>
-
-  <!-- Recent Posts -->
-  <h2 class="text-lg font-semibold text-text mb-4">Recent Posts</h2>
-
-  {#if data.feedPosts.length === 0}
-    <div class="text-center py-12 text-text-muted">
-      <p>No posts yet. Create your first update above!</p>
     </div>
-  {:else}
-    <div class="space-y-4">
-      {#each data.feedPosts as post (post.id)}
-        <FeedCard {post} />
-      {/each}
-    </div>
-  {/if}
-</div>
+  </div>
+{/if}
