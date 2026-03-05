@@ -79,7 +79,7 @@ export function isTokenExpired(token: string): boolean {
     const parts = token.split('.');
     if (parts.length !== 3) return true;
     const payload = JSON.parse(atob(parts[1]));
-    return payload.exp * 1000 < Date.now() - 30_000;
+    return payload.exp * 1000 < Date.now() + 30_000;
   } catch {
     return true;
   }

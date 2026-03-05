@@ -3,7 +3,7 @@
 module Mutations
   class RefreshToken < BaseMutation
     argument :refresh_token, String, required: true
-    argument :role, String, required: true, description: "teacher or parent"
+    argument :role, String, required: true, description: "teacher, parent, or school_manager"
 
     field :access_token, String
     field :refresh_token, String
@@ -11,7 +11,11 @@ module Mutations
     field :errors, [ Types::UserErrorType ], null: false
 
     def resolve(refresh_token:, role:)
-      type = (role == "teacher") ? "Teacher" : "Parent"
+      type = case role
+      when "teacher" then "Teacher"
+      when "school_manager" then "SchoolManager"
+      else "Parent"
+      end
       token_digest = Digest::SHA256.hexdigest(refresh_token)
       token_record = ::RefreshToken.find_by(token_digest: token_digest, authenticatable_type: type)
 

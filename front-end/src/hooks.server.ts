@@ -21,8 +21,12 @@ export const handle: Handle = async ({ event, resolve }) => {
   let accessToken: string | null = getAccessToken(cookies) ?? null;
   let user = accessToken ? decodeJwtPayload(accessToken) : null;
 
-  // Try refresh if access token is expired or missing
-  if (accessToken && isTokenExpired(accessToken)) {
+  // Try refresh if access token is expired OR missing (cookie may have been
+  // deleted by the browser after maxAge). The refresh token cookie lasts 30
+  // days, so we can silently re-issue a new access token.
+  const needsRefresh = !accessToken || isTokenExpired(accessToken);
+
+  if (needsRefresh) {
     const refreshToken = getRefreshToken(cookies);
     const role = getRole(cookies);
 
@@ -52,9 +56,8 @@ export const handle: Handle = async ({ event, resolve }) => {
         accessToken = null;
         user = null;
       }
-    } else {
-      clearAuthCookies(cookies);
-      accessToken = null;
+    } else if (!accessToken) {
+      // No access token AND no refresh token — truly unauthenticated
       user = null;
     }
   }
