@@ -1,5 +1,6 @@
 class Parent < ApplicationRecord
   include PublicActivity::Model
+
   tracked
 
   devise :database_authenticatable, :registerable, :recoverable, :validatable
@@ -10,6 +11,8 @@ class Parent < ApplicationRecord
   has_many :children, through: :parent_students, source: :student
   has_many :refresh_tokens, as: :authenticatable, dependent: :destroy
   has_many :permissions, as: :permissionable, dependent: :destroy
+
+  has_one_attached :avatar_image
 
   validates :name, presence: true
 

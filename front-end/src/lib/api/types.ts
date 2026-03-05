@@ -4,14 +4,38 @@ export interface Teacher {
   name: string;
   email: string;
   role: 'teacher';
+  phone?: string | null;
+  bio?: string | null;
+  birthdate?: string | null;
+  gender?: string | null;
+  religion?: string | null;
+  qualification?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  stateProvince?: string | null;
+  postalCode?: string | null;
+  countryCode?: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface Parent {
   id: string;
   name: string;
   email: string;
-  phone: string | null;
   role: 'parent';
+  phone?: string | null;
+  bio?: string | null;
+  birthdate?: string | null;
+  gender?: string | null;
+  qualification?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  stateProvince?: string | null;
+  postalCode?: string | null;
+  countryCode?: string | null;
+  avatarUrl?: string | null;
 }
 
 export type User = Teacher | Parent;
@@ -160,6 +184,17 @@ export interface FeedPostComment {
   commenterId: string;
   isMine: boolean;
   createdAt: string;
+}
+
+// === Profile ===
+export interface UpdateProfilePayload {
+  user: User | null;
+  errors: UserError[];
+}
+
+export interface ChangePasswordPayload {
+  success: boolean;
+  errors: UserError[];
 }
 
 // === Session user (decoded from JWT, stored in locals) ===

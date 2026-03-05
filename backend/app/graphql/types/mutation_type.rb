@@ -27,5 +27,9 @@ module Types
     field :revoke_permission, mutation: Mutations::Admin::RevokePermission
     field :toggle_permission, mutation: Mutations::Admin::TogglePermission
     field :delete_permission, mutation: Mutations::Admin::DeletePermission
+
+    # Profile
+    field :update_profile, mutation: Mutations::UpdateProfile
+    field :change_password, mutation: Mutations::ChangePassword
   end
 end

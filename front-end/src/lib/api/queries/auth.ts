@@ -85,12 +85,14 @@ export const ME_QUERY = `
         id
         name
         email
+        avatarUrl
       }
       ... on Parent {
         id
         name
         email
         phone
+        avatarUrl
       }
     }
   }

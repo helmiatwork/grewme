@@ -4,7 +4,8 @@
   let { data, children } = $props();
 
   const navItems = [
-    { label: 'My Children', href: '/parent/dashboard', icon: '👨‍👧‍👦' }
+    { label: 'My Children', href: '/parent/dashboard', icon: '👨‍👧‍👦' },
+    { label: 'Profile', href: '/parent/profile', icon: '👤' }
   ];
 </script>
 
