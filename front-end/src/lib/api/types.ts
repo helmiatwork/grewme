@@ -197,6 +197,21 @@ export interface ChangePasswordPayload {
   errors: UserError[];
 }
 
+// === Calendar ===
+export interface ClassroomEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  eventDate: string;
+  startTime: string | null;
+  endTime: string | null;
+  classroom: { id: string; name: string };
+  creatorName: string;
+  creatorType: string;
+  isMine: boolean;
+  createdAt: string;
+}
+
 // === Session user (decoded from JWT, stored in locals) ===
 export interface SessionUser {
   id: string;
