@@ -80,7 +80,6 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
-    alba (3.10.0)
     argon2-kdf (0.3.1)
       fiddle
     ast (2.4.3)
@@ -537,7 +536,6 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  alba (~> 3.9)
   avo (~> 3.16)
   blind_index (~> 2.3)
   bootsnap
@@ -599,7 +597,6 @@ CHECKSUMS
   activestorage (8.1.2) sha256=8a63a48c3999caeee26a59441f813f94681fc35cc41aba7ce1f836add04fba76
   activesupport (8.1.2) sha256=88842578ccd0d40f658289b0e8c842acfe9af751afee2e0744a7873f50b6fdae
   addressable (2.8.9) sha256=cc154fcbe689711808a43601dee7b980238ce54368d23e127421753e46895485
-  alba (3.10.0) sha256=52769d2328da35c4f1bbcfe96b3931b9c8595667307a902573868b1cf6d65d79
   argon2-kdf (0.3.1) sha256=347361c9ecaba8b8f5853042097ddcb7679a0a8e5205a1435f8e3ba3ffee9ca1
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   avo (3.30.0) sha256=e4d63fef7c439b20ec6a7112c1533bf2f593cfd14a5be4609d8f473272d13cff

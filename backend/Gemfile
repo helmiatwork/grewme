@@ -23,7 +23,6 @@ gem "devise-jwt", "~> 0.12"
 gem "pundit", "~> 2.5"
 
 # API & serialization
-gem "alba", "~> 3.9"
 gem "graphql", "~> 2.5"
 gem "rack-cors"
 gem "rack-attack", "~> 6.8"
