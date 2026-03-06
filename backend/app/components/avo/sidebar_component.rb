@@ -1,0 +1,27 @@
+# frozen_string_literal: true
+
+# Override Avo's sidebar component so ViewComponent resolves our
+# custom .html.erb template (grouped, collapsible menu) from
+# app/components/avo/ instead of the gem's default.
+class Avo::SidebarComponent < Avo::BaseComponent
+  prop :sidebar_open, default: false
+  prop :for_mobile, default: false
+
+  def dashboards
+    return [] unless Avo.plugin_manager.installed?("avo-dashboards")
+
+    Avo::Dashboards.dashboard_manager.dashboards_for_navigation
+  end
+
+  def resources
+    Avo.resource_manager.resources_for_navigation helpers._current_user
+  end
+
+  def tools
+    Avo.tool_manager.tools_for_navigation
+  end
+
+  def stimulus_target
+    @for_mobile ? "mobileSidebar" : "sidebar"
+  end
+end
