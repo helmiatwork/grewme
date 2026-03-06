@@ -22,7 +22,7 @@ class GroupMessage < ApplicationRecord
   def attachments_data
     attachments.map do |a|
       {
-        url: Rails.application.routes.url_helpers.rails_blob_url(a, host: "localhost:3004"),
+        url: Rails.application.routes.url_helpers.rails_blob_url(a),
         filename: a.filename.to_s,
         contentType: a.content_type
       }

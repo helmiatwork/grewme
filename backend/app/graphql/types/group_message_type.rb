@@ -18,7 +18,7 @@ module Types
     def attachments
       object.attachments.map do |a|
         OpenStruct.new(
-          url: Rails.application.routes.url_helpers.rails_blob_url(a, host: "localhost:3004"),
+          url: Rails.application.routes.url_helpers.rails_blob_url(a),
           filename: a.filename.to_s,
           content_type: a.content_type
         )

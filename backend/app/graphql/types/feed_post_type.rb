@@ -21,14 +21,14 @@ module Types
 
     def media_urls
       object.media.map do |attachment|
-        Rails.application.routes.url_helpers.rails_blob_url(attachment, host: ENV.fetch("APP_HOST", "http://localhost:3004"))
+        Rails.application.routes.url_helpers.rails_blob_url(attachment)
       end
     end
 
     def media_attachments
       object.media.map do |attachment|
         {
-          url: Rails.application.routes.url_helpers.rails_blob_url(attachment, host: ENV.fetch("APP_HOST", "http://localhost:3004")),
+          url: Rails.application.routes.url_helpers.rails_blob_url(attachment),
           filename: attachment.filename.to_s,
           content_type: attachment.content_type
         }
