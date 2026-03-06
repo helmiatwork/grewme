@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_005837) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_011524) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -205,6 +205,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_005837) do
     t.datetime "updated_at", null: false
     t.text "value"
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
+  end
+
+  create_table "group_conversations", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["classroom_id"], name: "index_group_conversations_on_classroom_id", unique: true
+  end
+
+  create_table "group_messages", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.bigint "group_conversation_id", null: false
+    t.bigint "sender_id", null: false
+    t.string "sender_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_conversation_id", "created_at"], name: "index_group_messages_on_group_conversation_id_and_created_at"
+    t.index ["group_conversation_id"], name: "index_group_messages_on_group_conversation_id"
+    t.index ["sender_type", "sender_id"], name: "index_group_messages_on_sender"
   end
 
   create_table "jwt_denylist", force: :cascade do |t|
@@ -415,6 +434,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_005837) do
   add_foreign_key "feed_post_students", "students"
   add_foreign_key "feed_posts", "classrooms"
   add_foreign_key "feed_posts", "teachers"
+  add_foreign_key "group_conversations", "classrooms"
+  add_foreign_key "group_messages", "group_conversations"
   add_foreign_key "messages", "conversations"
   add_foreign_key "parent_students", "parents"
   add_foreign_key "parent_students", "students"

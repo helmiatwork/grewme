@@ -259,6 +259,51 @@ module Types
       conv
     end
 
+    field :group_conversations, [ Types::GroupConversationType ], null: false, description: "List group conversations for current user"
+
+    def group_conversations
+      authenticate!
+
+      if current_user.teacher?
+        classroom_ids = current_user.classroom_ids
+      elsif current_user.parent?
+        classroom_ids = current_user.children
+          .joins(:classroom_students)
+          .where(classroom_students: { status: :active })
+          .pluck("classroom_students.classroom_id")
+          .uniq
+      else
+        raise GraphQL::ExecutionError, "Not available for this role"
+      end
+
+      GroupConversation.where(classroom_id: classroom_ids)
+        .includes(:classroom, group_messages: :sender)
+        .order(updated_at: :desc)
+    end
+
+    field :group_conversation, Types::GroupConversationType, null: false, description: "Get a single group conversation" do
+      argument :id, ID, required: true
+    end
+
+    def group_conversation(id:)
+      authenticate!
+      gc = GroupConversation.find(id)
+
+      authorized = if current_user.teacher?
+        gc.classroom.classroom_teachers.exists?(teacher_id: current_user.id)
+      elsif current_user.parent?
+        current_user.children
+          .joins(:classroom_students)
+          .where(classroom_students: { classroom_id: gc.classroom_id, status: :active })
+          .exists?
+      else
+        false
+      end
+
+      raise Pundit::NotAuthorizedError unless authorized
+      gc
+    end
+
     # === Calendar ===
 
     field :classroom_events, [ Types::ClassroomEventType ], null: false, description: "Events for classrooms in a given month" do

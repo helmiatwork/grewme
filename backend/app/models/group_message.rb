@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class Message < ApplicationRecord
-  belongs_to :conversation
+class GroupMessage < ApplicationRecord
+  belongs_to :group_conversation
   belongs_to :sender, polymorphic: true
   has_many_attached :attachments
 
@@ -9,7 +9,7 @@ class Message < ApplicationRecord
 
   scope :chronological, -> { order(created_at: :asc) }
 
-  after_create_commit :broadcast_to_conversation
+  after_create_commit :broadcast_to_group
 
   def sender_name
     sender.name
@@ -31,11 +31,11 @@ class Message < ApplicationRecord
 
   private
 
-  def broadcast_to_conversation
-    ChatChannel.broadcast_to(
-      conversation,
+  def broadcast_to_group
+    GroupChatChannel.broadcast_to(
+      group_conversation,
       {
-        type: "new_message",
+        type: "new_group_message",
         message: {
           id: id,
           body: body,

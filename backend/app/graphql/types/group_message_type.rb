@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class MessageType < Types::BaseObject
+  class GroupMessageType < Types::BaseObject
     field :id, ID, null: false
     field :body, String, null: false
     field :sender_name, String, null: false

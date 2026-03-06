@@ -4,11 +4,12 @@ module Mutations
   class SendMessage < BaseMutation
     argument :conversation_id, ID, required: true
     argument :body, String, required: true
+    argument :signed_blob_ids, [ String ], required: false
 
     field :message, Types::MessageType, null: true
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(conversation_id:, body:)
+    def resolve(conversation_id:, body:, signed_blob_ids: nil)
       authenticate!
 
       conversation = Conversation.find(conversation_id)
@@ -20,6 +21,10 @@ module Mutations
       )
 
       if message.save
+        if signed_blob_ids.present?
+          blobs = signed_blob_ids.map { |id| ActiveStorage::Blob.find_signed!(id) }
+          message.attachments.attach(blobs)
+        end
         { message: message, errors: [] }
       else
         {

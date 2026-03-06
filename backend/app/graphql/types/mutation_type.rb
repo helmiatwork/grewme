@@ -34,6 +34,7 @@ module Types
     field :create_conversation, mutation: Mutations::CreateConversation
     field :send_message, mutation: Mutations::SendMessage
     field :mark_messages_read, mutation: Mutations::MarkMessagesRead
+    field :send_group_message, mutation: Mutations::SendGroupMessage
 
     # Admin Permissions
     field :grant_permission, mutation: Mutations::Admin::GrantPermission
