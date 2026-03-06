@@ -9,95 +9,41 @@
   } do %>
   <div class="flex flex-col w-full h-full">
     <div class="flex-1 flex flex-col justify-between overflow-auto h-full pt-3 mac-styled-scrollbar">
-      <div class="space-y-4 mb-4">
+      <div class="space-y-1 mb-4">
         <%= render Avo::Sidebar::LinkComponent.new label: 'Get started', path: helpers.avo.root_path, active: :exclusive if Rails.env.development? && Avo.configuration.home_path.nil? %>
-        <% # Build a lookup: model_class_name -> resource instance %>
         <% res_map = resources.index_by { |r| r.model_class.name } %>
-        <%# Helper: render a sidebar link for a model class %>
         <% link_for = ->(model_name) {
           r = res_map[model_name]
           r ? render(Avo::Sidebar::LinkComponent.new(label: r.navigation_label, path: helpers.resources_path(resource: r))) : nil
         } %>
-        <!-- School -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'School', icon: helpers.svg("heroicons/outline/building-office-2", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("School") %>
-            <%= link_for.("Classroom") %>
-            <%= link_for.("ClassroomTeacher") %>
-            <%= link_for.("ClassroomStudent") %>
-            <%= link_for.("ClassroomEvent") %>
+        <% groups = [
+          { key: "school",     label: "School",     icon: "heroicons/outline/building-office-2",       items: %w[School Classroom ClassroomTeacher ClassroomStudent ClassroomEvent] },
+          { key: "users",      label: "Users",      icon: "heroicons/outline/users",                   items: %w[Teacher Parent SchoolManager Student ParentStudent] },
+          { key: "curriculum", label: "Curriculum", icon: "heroicons/outline/academic-cap",             items: %w[Subject Topic LearningObjective AcademicYear GradeCurriculum GradeCurriculumItem] },
+          { key: "exams",      label: "Exams",      icon: "heroicons/outline/clipboard-document-check", items: %w[Exam ExamQuestion ClassroomExam ExamSubmission ExamAnswer RubricCriteria RubricScore ObjectiveMastery] },
+          { key: "feed",       label: "Feed",       icon: "heroicons/outline/newspaper",               items: %w[FeedPost FeedPostStudent FeedPostLike FeedPostComment] },
+          { key: "messaging",  label: "Messaging",  icon: "heroicons/outline/chat-bubble-left-right",  items: %w[Conversation Message GroupConversation GroupMessage Notification] },
+          { key: "system",     label: "System",     icon: "heroicons/outline/cog-6-tooth",             items: %w[DailyScore Permission PushDevice RefreshToken PublicActivity::Activity] },
+        ] %>
+        <% groups.each do |g| %>
+          <div class="sidebar-group" data-group-key="<%= g[:key] %>">
+            <div class="sidebar-group-heading flex justify-between items-center cursor-pointer px-4 pr-3 py-1.5 text-gray-500 hover:text-gray-700 select-none"
+                 onclick="window.avoToggleGroup('<%= g[:key] %>')">
+              <div class="flex items-center text-xs uppercase font-semibold leading-none space-x-1">
+                <span class="min-w-[20px]"><%= helpers.svg(g[:icon], class: 'h-4') %></span>
+                <span><%= g[:label] %></span>
+              </div>
+              <svg class="sidebar-chevron h-4 w-4 transition-transform duration-150" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="sidebar-group-items w-full space-y-0.5">
+              <% g[:items].each do |model_name| %>
+                <%= link_for.(model_name) %>
+              <% end %>
+            </div>
           </div>
-        </div>
-        <!-- Users -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'Users', icon: helpers.svg("heroicons/outline/users", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("Teacher") %>
-            <%= link_for.("Parent") %>
-            <%= link_for.("SchoolManager") %>
-            <%= link_for.("Student") %>
-            <%= link_for.("ParentStudent") %>
-          </div>
-        </div>
-        <!-- Curriculum -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'Curriculum', icon: helpers.svg("heroicons/outline/academic-cap", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("Subject") %>
-            <%= link_for.("Topic") %>
-            <%= link_for.("LearningObjective") %>
-            <%= link_for.("AcademicYear") %>
-            <%= link_for.("GradeCurriculum") %>
-            <%= link_for.("GradeCurriculumItem") %>
-          </div>
-        </div>
-        <!-- Exams -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'Exams', icon: helpers.svg("heroicons/outline/clipboard-document-check", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("Exam") %>
-            <%= link_for.("ExamQuestion") %>
-            <%= link_for.("ClassroomExam") %>
-            <%= link_for.("ExamSubmission") %>
-            <%= link_for.("ExamAnswer") %>
-            <%= link_for.("RubricCriteria") %>
-            <%= link_for.("RubricScore") %>
-            <%= link_for.("ObjectiveMastery") %>
-          </div>
-        </div>
-        <!-- Feed -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'Feed', icon: helpers.svg("heroicons/outline/newspaper", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("FeedPost") %>
-            <%= link_for.("FeedPostStudent") %>
-            <%= link_for.("FeedPostLike") %>
-            <%= link_for.("FeedPostComment") %>
-          </div>
-        </div>
-        <!-- Messaging -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'Messaging', icon: helpers.svg("heroicons/outline/chat-bubble-left-right", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("Conversation") %>
-            <%= link_for.("Message") %>
-            <%= link_for.("GroupConversation") %>
-            <%= link_for.("GroupMessage") %>
-            <%= link_for.("Notification") %>
-          </div>
-        </div>
-        <!-- System -->
-        <div>
-          <%= render Avo::Sidebar::HeadingComponent.new label: 'System', icon: helpers.svg("heroicons/outline/cog-6-tooth", class: 'h-4') %>
-          <div class="w-full space-y-1">
-            <%= link_for.("DailyScore") %>
-            <%= link_for.("Permission") %>
-            <%= link_for.("PushDevice") %>
-            <%= link_for.("RefreshToken") %>
-            <%= link_for.("PublicActivity::Activity") %>
-          </div>
-        </div>
+        <% end %>
         <%= render partial: "/avo/partials/sidebar_extra" %>
       </div>
     </div>

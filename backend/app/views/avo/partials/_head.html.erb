@@ -4,7 +4,6 @@
     filter: invert(0.92) hue-rotate(180deg);
     background: #111;
   }
-  /* Un-invert images, videos, SVG icons so they look normal */
   html.dark-mode img,
   html.dark-mode video,
   html.dark-mode svg,
@@ -14,7 +13,7 @@
     filter: invert(1) hue-rotate(180deg);
   }
 
-  /* Toggle button */
+  /* Dark mode toggle button */
   .dark-mode-toggle {
     position: fixed;
     top: 12px;
@@ -34,15 +33,33 @@
     background: rgba(255,255,255,1);
     transform: scale(1.1);
   }
+
+  /* Collapsible sidebar groups */
+  .sidebar-group-items {
+    overflow: hidden;
+    transition: max-height 0.2s ease, opacity 0.2s ease;
+    max-height: 500px;
+    opacity: 1;
+  }
+  .sidebar-group.collapsed .sidebar-group-items {
+    max-height: 0;
+    opacity: 0;
+  }
+  .sidebar-chevron {
+    transition: transform 0.2s ease;
+  }
+  .sidebar-group.collapsed .sidebar-chevron {
+    transform: rotate(-90deg);
+  }
 </style>
 <script>
   (function() {
-    // Apply immediately to prevent flash of light mode
+    /* ── Dark mode ── */
     if (localStorage.getItem('avo_dark_mode') === 'true') {
       document.documentElement.classList.add('dark-mode');
     }
 
-    function ensureToggle() {
+    function ensureDarkToggle() {
       if (document.querySelector('.dark-mode-toggle')) return;
       var btn = document.createElement('button');
       btn.className = 'dark-mode-toggle';
@@ -56,14 +73,47 @@
       document.body.appendChild(btn);
     }
 
-    function syncState() {
+    function syncDark() {
       var on = localStorage.getItem('avo_dark_mode') === 'true';
       document.documentElement.classList.toggle('dark-mode', on);
       var btn = document.querySelector('.dark-mode-toggle');
       if (btn) btn.textContent = on ? '\u2600' : '\u263E';
     }
 
-    document.addEventListener('DOMContentLoaded', ensureToggle);
-    document.addEventListener('turbo:load', function() { syncState(); ensureToggle(); });
+    /* ── Collapsible sidebar groups ── */
+    var STORAGE_KEY = 'avo_sidebar_collapsed';
+
+    function getCollapsed() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+    }
+
+    window.avoToggleGroup = function(key) {
+      var el = document.querySelector('[data-group-key="' + key + '"]');
+      if (!el) return;
+      el.classList.toggle('collapsed');
+      var state = getCollapsed();
+      state[key] = el.classList.contains('collapsed');
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    };
+
+    function applySidebarState() {
+      var state = getCollapsed();
+      Object.keys(state).forEach(function(key) {
+        if (!state[key]) return;
+        var el = document.querySelector('[data-group-key="' + key + '"]');
+        if (el) el.classList.add('collapsed');
+      });
+    }
+
+    /* ── Init ── */
+    document.addEventListener('DOMContentLoaded', function() {
+      ensureDarkToggle();
+      applySidebarState();
+    });
+    document.addEventListener('turbo:load', function() {
+      syncDark();
+      ensureDarkToggle();
+      applySidebarState();
+    });
   })();
 </script>
