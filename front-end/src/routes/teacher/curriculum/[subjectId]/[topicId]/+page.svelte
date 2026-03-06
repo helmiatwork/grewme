@@ -44,10 +44,10 @@
   }
 
   const examTypeLabels: Record<string, string> = {
-    score_based: 'Score',
-    multiple_choice: 'MCQ',
-    rubric_based: 'Rubric',
-    pass_fail: 'Pass/Fail'
+    SCORE_BASED: 'Score',
+    MULTIPLE_CHOICE: 'MCQ',
+    RUBRIC: 'Rubric',
+    PASS_FAIL: 'Pass/Fail'
   };
 </script>
 

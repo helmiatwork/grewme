@@ -7,17 +7,17 @@
   let filterType = $state('');
 
   const examTypeLabels: Record<string, string> = {
-    score_based: 'Score Based',
-    multiple_choice: 'Multiple Choice',
-    rubric_based: 'Rubric Based',
-    pass_fail: 'Pass/Fail'
+    SCORE_BASED: 'Score Based',
+    MULTIPLE_CHOICE: 'Multiple Choice',
+    RUBRIC: 'Rubric',
+    PASS_FAIL: 'Pass/Fail'
   };
 
   const examTypeBadgeClass: Record<string, string> = {
-    score_based: 'bg-blue-100 text-blue-700',
-    multiple_choice: 'bg-green-100 text-green-700',
-    rubric_based: 'bg-purple-100 text-purple-700',
-    pass_fail: 'bg-amber-100 text-amber-700'
+    SCORE_BASED: 'bg-blue-100 text-blue-700',
+    MULTIPLE_CHOICE: 'bg-green-100 text-green-700',
+    RUBRIC: 'bg-purple-100 text-purple-700',
+    PASS_FAIL: 'bg-amber-100 text-amber-700'
   };
 
   const subjects = $derived(
@@ -66,10 +66,10 @@
       class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
     >
       <option value="">All Types</option>
-      <option value="score_based">Score Based</option>
-      <option value="multiple_choice">Multiple Choice</option>
-      <option value="rubric_based">Rubric Based</option>
-      <option value="pass_fail">Pass/Fail</option>
+      <option value="SCORE_BASED">Score Based</option>
+      <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+      <option value="RUBRIC">Rubric</option>
+      <option value="PASS_FAIL">Pass/Fail</option>
     </select>
   </div>
 

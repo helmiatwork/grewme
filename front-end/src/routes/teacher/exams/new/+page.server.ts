@@ -77,7 +77,7 @@ export const actions: Actions = {
     if (!examType) return fail(400, { error: 'Exam type is required' });
     if (!topicId) return fail(400, { error: 'Topic is required' });
 
-    // Parse questions (multiple_choice / score_based)
+    // Parse questions (MULTIPLE_CHOICE / SCORE_BASED)
     const questionsRaw = formData.get('questions') as string | null;
     let questions: Array<{
       questionText: string;

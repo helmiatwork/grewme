@@ -21,7 +21,7 @@
     if (submission?.examAnswers) {
       const init: Record<string, number> = {};
       for (const answer of submission.examAnswers) {
-        init[answer.examQuestion.id] = answer.score ?? 0;
+        init[answer.examQuestion.id] = answer.pointsAwarded ?? 0;
       }
       questionScores = init;
     }
@@ -39,7 +39,7 @@
 
   // Computed total
   const totalScore = $derived(() => {
-    if (exam?.examType === 'rubric_based') {
+    if (exam?.examType === 'RUBRIC') {
       return Object.values(rubricScores).reduce((sum, rs) => sum + (rs.score || 0), 0);
     }
     return Object.values(questionScores).reduce((sum, s) => sum + (s || 0), 0);
@@ -99,18 +99,18 @@
     }}
   >
     <!-- Hidden serialized scores -->
-    {#if exam?.examType !== 'rubric_based' && exam?.examType !== 'pass_fail'}
+    {#if exam?.examType !== 'RUBRIC' && exam?.examType !== 'PASS_FAIL'}
       <input type="hidden" name="questionScores" value={questionScoresJson} />
     {/if}
-    {#if exam?.examType === 'rubric_based'}
+    {#if exam?.examType === 'RUBRIC'}
       <input type="hidden" name="rubricScores" value={rubricScoresJson} />
     {/if}
-    {#if exam?.examType === 'pass_fail'}
+    {#if exam?.examType === 'PASS_FAIL'}
       <input type="hidden" name="passed" value={passed === null ? '' : String(passed)} />
     {/if}
 
     <!-- Score Based: questions with score input -->
-    {#if exam?.examType === 'score_based'}
+    {#if exam?.examType === 'SCORE_BASED'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6 space-y-4">
         <h2 class="text-lg font-semibold text-text">Questions</h2>
         {#each exam.examQuestions ?? [] as question, i}
@@ -120,9 +120,9 @@
               <p class="text-text font-medium">{i + 1}. {question.questionText}</p>
               <span class="text-xs text-text-muted shrink-0">max {question.points} pts</span>
             </div>
-            {#if answer?.answerText}
+            {#if answer?.selectedAnswer}
               <div class="bg-slate-50 rounded-lg px-3 py-2 text-sm text-text mb-3">
-                {answer.answerText}
+                {answer.selectedAnswer}
               </div>
             {/if}
             <div class="flex items-center gap-3">
@@ -148,7 +148,7 @@
     {/if}
 
     <!-- Multiple Choice: auto-graded with override -->
-    {#if exam?.examType === 'multiple_choice'}
+    {#if exam?.examType === 'MULTIPLE_CHOICE'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6 space-y-4">
         <h2 class="text-lg font-semibold text-text">Questions (Auto-Graded)</h2>
         {#each exam.examQuestions ?? [] as question, i}
@@ -161,7 +161,7 @@
             <div class="grid grid-cols-2 gap-2 text-sm mb-3">
               <div>
                 <span class="text-text-muted">Student's answer:</span>
-                <span class="ml-1 font-medium text-text">{answer?.selectedOption ?? '—'}</span>
+                <span class="ml-1 font-medium text-text">{answer?.selectedAnswer ?? '—'}</span>
               </div>
               <div>
                 <span class="text-text-muted">Correct:</span>
@@ -183,7 +183,7 @@
                 type="number"
                 min="0"
                 max={question.points}
-                value={questionScores[question.id] ?? (answer?.score ?? (answer?.correct ? question.points : 0))}
+                value={questionScores[question.id] ?? (answer?.pointsAwarded ?? (answer?.correct ? question.points : 0))}
                 oninput={(e) => {
                   questionScores[question.id] = Math.min(
                     question.points,
@@ -200,7 +200,7 @@
     {/if}
 
     <!-- Rubric Based: score per criterion with comment -->
-    {#if exam?.examType === 'rubric_based'}
+    {#if exam?.examType === 'RUBRIC'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6 space-y-4">
         <h2 class="text-lg font-semibold text-text">Rubric Criteria</h2>
         {#each exam.rubricCriteria ?? [] as criterion, i}
@@ -257,7 +257,7 @@
     {/if}
 
     <!-- Pass/Fail -->
-    {#if exam?.examType === 'pass_fail'}
+    {#if exam?.examType === 'PASS_FAIL'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
         <h2 class="text-lg font-semibold text-text mb-4">Result</h2>
         <div class="flex gap-3">
@@ -284,7 +284,7 @@
     {/if}
 
     <!-- Total Score Summary -->
-    {#if exam?.examType !== 'pass_fail'}
+    {#if exam?.examType !== 'PASS_FAIL'}
       <div class="bg-primary/5 rounded-xl border border-primary/10 px-6 py-4 mb-6 flex items-center justify-between">
         <span class="font-medium text-text">Total Score</span>
         <span class="text-xl font-bold text-primary">{totalScore()}</span>

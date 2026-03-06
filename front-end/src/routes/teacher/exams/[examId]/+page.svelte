@@ -19,32 +19,35 @@
   const exam = $derived(data.exam);
 
   const examTypeLabels: Record<string, string> = {
-    score_based: 'Score Based',
-    multiple_choice: 'Multiple Choice',
-    rubric_based: 'Rubric Based',
-    pass_fail: 'Pass/Fail'
+    SCORE_BASED: 'Score Based',
+    MULTIPLE_CHOICE: 'Multiple Choice',
+    RUBRIC: 'Rubric',
+    PASS_FAIL: 'Pass/Fail'
   };
 
   const examTypeBadgeClass: Record<string, string> = {
-    score_based: 'bg-blue-100 text-blue-700',
-    multiple_choice: 'bg-green-100 text-green-700',
-    rubric_based: 'bg-purple-100 text-purple-700',
-    pass_fail: 'bg-amber-100 text-amber-700'
+    SCORE_BASED: 'bg-blue-100 text-blue-700',
+    MULTIPLE_CHOICE: 'bg-green-100 text-green-700',
+    RUBRIC: 'bg-purple-100 text-purple-700',
+    PASS_FAIL: 'bg-amber-100 text-amber-700'
   };
 
   const statusBadgeClass: Record<string, string> = {
-    draft: 'bg-slate-100 text-slate-600',
-    scheduled: 'bg-blue-100 text-blue-700',
-    active: 'bg-green-100 text-green-700',
-    closed: 'bg-red-100 text-red-700',
-    archived: 'bg-slate-200 text-slate-500'
+    DRAFT: 'bg-slate-100 text-slate-600',
+    ACTIVE: 'bg-green-100 text-green-700',
+    CLOSED: 'bg-red-100 text-red-700'
   };
 
   const submissionStatusBadgeClass: Record<string, string> = {
-    in_progress: 'bg-yellow-100 text-yellow-700',
-    submitted: 'bg-blue-100 text-blue-700',
-    graded: 'bg-green-100 text-green-700'
+    NOT_STARTED: 'bg-slate-100 text-slate-600',
+    IN_PROGRESS: 'bg-yellow-100 text-yellow-700',
+    SUBMITTED: 'bg-blue-100 text-blue-700',
+    GRADED: 'bg-green-100 text-green-700'
   };
+
+  function formatStatus(status: string) {
+    return status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+  }
 
   // Classrooms already assigned
   const assignedClassroomIds = $derived(
@@ -116,7 +119,7 @@
 
   <!-- Tab: Questions / Criteria -->
   {#if activeTab === 'questions'}
-    {#if exam?.examType === 'rubric_based'}
+    {#if exam?.examType === 'RUBRIC'}
       {#if exam.rubricCriteria?.length === 0}
         <p class="text-sm text-text-muted">No rubric criteria defined.</p>
       {:else}
@@ -134,7 +137,7 @@
           {/each}
         </div>
       {/if}
-    {:else if exam?.examType === 'pass_fail'}
+    {:else if exam?.examType === 'PASS_FAIL'}
       <p class="text-sm text-text-muted">Pass/Fail exam — no questions required.</p>
     {:else}
       {#if exam?.examQuestions?.length === 0}
@@ -297,7 +300,7 @@
                     <span
                       class="text-xs font-medium px-2 py-0.5 rounded-full {submissionStatusBadgeClass[sub.status] ?? 'bg-slate-100 text-slate-600'}"
                     >
-                      {sub.status.replace('_', ' ')}
+                      {formatStatus(sub.status)}
                     </span>
                   </div>
                 </a>

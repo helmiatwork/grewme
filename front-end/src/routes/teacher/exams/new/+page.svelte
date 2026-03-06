@@ -5,9 +5,9 @@
   let { data, form } = $props();
 
   let submitting = $state(false);
-  let examType = $state('score_based');
+  let examType = $state('SCORE_BASED');
 
-  // Questions for score_based / multiple_choice
+  // Questions for SCORE_BASED / MULTIPLE_CHOICE
   interface Question {
     questionText: string;
     questionType: string;
@@ -24,8 +24,8 @@
       ...questions,
       {
         questionText: '',
-        questionType: examType === 'multiple_choice' ? 'multiple_choice' : 'open_ended',
-        options: examType === 'multiple_choice' ? ['', ''] : [],
+        questionType: examType === 'MULTIPLE_CHOICE' ? 'multiple_choice' : 'open_ended',
+        options: examType === 'MULTIPLE_CHOICE' ? ['', ''] : [],
         correctAnswer: '',
         points: 1,
         position: questions.length + 1
@@ -57,7 +57,7 @@
     );
   }
 
-  // Rubric criteria for rubric_based
+  // Rubric criteria for RUBRIC
   interface Criterion {
     name: string;
     description: string;
@@ -123,10 +123,10 @@
     }}
   >
     <!-- Hidden JSON fields -->
-    {#if examType === 'score_based' || examType === 'multiple_choice'}
+    {#if examType === 'SCORE_BASED' || examType === 'MULTIPLE_CHOICE'}
       <input type="hidden" name="questions" value={questionsJson} />
     {/if}
-    {#if examType === 'rubric_based'}
+    {#if examType === 'RUBRIC'}
       <input type="hidden" name="rubricCriteria" value={criteriaJson} />
     {/if}
 
@@ -158,10 +158,10 @@
           onchange={(e) => handleTypeChange((e.target as HTMLSelectElement).value)}
           class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
-          <option value="score_based">Score Based</option>
-          <option value="multiple_choice">Multiple Choice</option>
-          <option value="rubric_based">Rubric Based</option>
-          <option value="pass_fail">Pass/Fail</option>
+          <option value="SCORE_BASED">Score Based</option>
+          <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+          <option value="RUBRIC">Rubric</option>
+          <option value="PASS_FAIL">Pass/Fail</option>
         </select>
       </div>
 
@@ -184,7 +184,7 @@
         </select>
       </div>
 
-      {#if examType === 'score_based'}
+      {#if examType === 'SCORE_BASED'}
         <div>
           <label for="maxScore" class="block text-sm font-medium text-text mb-1">Max Score</label>
           <Input id="maxScore" name="maxScore" type="number" min="0" placeholder="100" />
@@ -200,7 +200,7 @@
     </div>
 
     <!-- Dynamic sections -->
-    {#if examType === 'multiple_choice' || examType === 'score_based'}
+    {#if examType === 'MULTIPLE_CHOICE' || examType === 'SCORE_BASED'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-text">Questions</h2>
@@ -229,7 +229,7 @@
                 class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               ></textarea>
             </div>
-            {#if examType === 'multiple_choice'}
+            {#if examType === 'MULTIPLE_CHOICE'}
               <div>
                 <label class="block text-xs font-medium text-text-muted mb-2">Options</label>
                 {#each question.options as opt, oi}
@@ -287,7 +287,7 @@
       </div>
     {/if}
 
-    {#if examType === 'rubric_based'}
+    {#if examType === 'RUBRIC'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-text">Rubric Criteria</h2>

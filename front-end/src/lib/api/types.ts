@@ -274,9 +274,9 @@ export interface LearningObjective {
 }
 
 // === Exams ===
-export type ExamType = 'score_based' | 'multiple_choice' | 'rubric_based' | 'pass_fail';
-export type ClassroomExamStatus = 'draft' | 'scheduled' | 'active' | 'closed' | 'archived';
-export type ExamSubmissionStatus = 'in_progress' | 'submitted' | 'graded';
+export type ExamType = 'SCORE_BASED' | 'MULTIPLE_CHOICE' | 'RUBRIC' | 'PASS_FAIL';
+export type ClassroomExamStatus = 'DRAFT' | 'ACTIVE' | 'CLOSED';
+export type ExamSubmissionStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'SUBMITTED' | 'GRADED';
 
 export interface ExamQuestion {
   id: string;
@@ -325,10 +325,9 @@ export interface ClassroomExam {
 export interface ExamAnswer {
   id: string;
   examQuestion: ExamQuestion;
-  answerText: string | null;
-  selectedOption: string | null;
-  score: number | null;
+  selectedAnswer: string | null;
   correct: boolean | null;
+  pointsAwarded: number;
 }
 
 export interface RubricScore {

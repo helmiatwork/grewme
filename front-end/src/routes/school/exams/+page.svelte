@@ -5,14 +5,21 @@
   let filterType = $state('');
 
   const examTypeBadge: Record<string, string> = {
-    score_based: 'bg-blue-100 text-blue-700',
-    multiple_choice: 'bg-green-100 text-green-700',
-    rubric_based: 'bg-purple-100 text-purple-700',
-    pass_fail: 'bg-amber-100 text-amber-700'
+    SCORE_BASED: 'bg-blue-100 text-blue-700',
+    MULTIPLE_CHOICE: 'bg-green-100 text-green-700',
+    RUBRIC: 'bg-purple-100 text-purple-700',
+    PASS_FAIL: 'bg-amber-100 text-amber-700'
+  };
+
+  const examTypeLabels: Record<string, string> = {
+    SCORE_BASED: 'Score Based',
+    MULTIPLE_CHOICE: 'Multiple Choice',
+    RUBRIC: 'Rubric',
+    PASS_FAIL: 'Pass/Fail'
   };
 
   function examTypeLabel(type: string) {
-    return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    return examTypeLabels[type] ?? type;
   }
 
   const filteredExams = $derived(
@@ -23,7 +30,7 @@
     })
   );
 
-  const examTypes = ['score_based', 'multiple_choice', 'rubric_based', 'pass_fail'];
+  const examTypes = ['SCORE_BASED', 'MULTIPLE_CHOICE', 'RUBRIC', 'PASS_FAIL'];
 </script>
 
 <svelte:head>

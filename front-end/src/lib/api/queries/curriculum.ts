@@ -100,7 +100,6 @@ export const EXAM_QUERY = `
       examQuestions {
         id
         questionText
-        questionType
         options
         correctAnswer
         points
@@ -136,7 +135,7 @@ export const EXAM_QUERY = `
 `;
 
 export const CLASSROOM_EXAMS_QUERY = `
-  query ClassroomExams($classroomId: ID!, $status: ClassroomExamStatus) {
+  query ClassroomExams($classroomId: ID!, $status: ClassroomExamStatusEnum) {
     classroomExams(classroomId: $classroomId, status: $status) {
       id
       exam {
@@ -204,10 +203,9 @@ export const EXAM_SUBMISSION_QUERY = `
       examAnswers {
         id
         examQuestion { id questionText points }
-        answerText
-        selectedOption
-        score
+        selectedAnswer
         correct
+        pointsAwarded
       }
       rubricScores {
         id
