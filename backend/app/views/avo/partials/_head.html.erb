@@ -1,0 +1,69 @@
+<style>
+  /* Dark mode via CSS filter — zero coupling to Avo internals */
+  html.dark-mode {
+    filter: invert(0.92) hue-rotate(180deg);
+    background: #111;
+  }
+  /* Un-invert images, videos, SVG icons so they look normal */
+  html.dark-mode img,
+  html.dark-mode video,
+  html.dark-mode svg,
+  html.dark-mode [style*="background-image"],
+  html.dark-mode canvas,
+  html.dark-mode .dark-mode-toggle {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  /* Toggle button */
+  .dark-mode-toggle {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 9999;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    transition: all 0.15s;
+    backdrop-filter: blur(4px);
+  }
+  .dark-mode-toggle:hover {
+    background: rgba(255,255,255,1);
+    transform: scale(1.1);
+  }
+</style>
+<script>
+  (function() {
+    // Apply immediately to prevent flash of light mode
+    if (localStorage.getItem('avo_dark_mode') === 'true') {
+      document.documentElement.classList.add('dark-mode');
+    }
+
+    function ensureToggle() {
+      if (document.querySelector('.dark-mode-toggle')) return;
+      var btn = document.createElement('button');
+      btn.className = 'dark-mode-toggle';
+      btn.title = 'Toggle dark mode';
+      btn.textContent = document.documentElement.classList.contains('dark-mode') ? '\u2600' : '\u263E';
+      btn.addEventListener('click', function() {
+        var on = document.documentElement.classList.toggle('dark-mode');
+        localStorage.setItem('avo_dark_mode', on);
+        btn.textContent = on ? '\u2600' : '\u263E';
+      });
+      document.body.appendChild(btn);
+    }
+
+    function syncState() {
+      var on = localStorage.getItem('avo_dark_mode') === 'true';
+      document.documentElement.classList.toggle('dark-mode', on);
+      var btn = document.querySelector('.dark-mode-toggle');
+      if (btn) btn.textContent = on ? '\u2600' : '\u263E';
+    }
+
+    document.addEventListener('DOMContentLoaded', ensureToggle);
+    document.addEventListener('turbo:load', function() { syncState(); ensureToggle(); });
+  })();
+</script>

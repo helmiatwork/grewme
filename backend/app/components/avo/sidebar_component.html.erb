@@ -1,0 +1,116 @@
+<%= content_tag :div,
+  class: class_names(
+    "avo-sidebar fixed z-[60] t-0 application-sidebar w-64 flex-1 border-r lg:border-none bg-none xh-dvh h-[calc(100dvh-4rem)] bg-application lg:bg-transparent",
+    "print:hidden": Avo.configuration.hide_layout_when_printing,
+    "hidden": !@sidebar_open,
+  ),
+  data: {
+    sidebar_target: stimulus_target
+  } do %>
+  <div class="flex flex-col w-full h-full">
+    <div class="flex-1 flex flex-col justify-between overflow-auto h-full pt-3 mac-styled-scrollbar">
+      <div class="space-y-4 mb-4">
+        <%= render Avo::Sidebar::LinkComponent.new label: 'Get started', path: helpers.avo.root_path, active: :exclusive if Rails.env.development? && Avo.configuration.home_path.nil? %>
+        <% # Build a lookup: model_class_name -> resource instance %>
+        <% res_map = resources.index_by { |r| r.model_class.name } %>
+        <%# Helper: render a sidebar link for a model class %>
+        <% link_for = ->(model_name) {
+          r = res_map[model_name]
+          r ? render(Avo::Sidebar::LinkComponent.new(label: r.navigation_label, path: helpers.resources_path(resource: r))) : nil
+        } %>
+        <!-- School -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'School', icon: helpers.svg("heroicons/outline/building-office-2", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("School") %>
+            <%= link_for.("Classroom") %>
+            <%= link_for.("ClassroomTeacher") %>
+            <%= link_for.("ClassroomStudent") %>
+            <%= link_for.("ClassroomEvent") %>
+          </div>
+        </div>
+        <!-- Users -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'Users', icon: helpers.svg("heroicons/outline/users", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("Teacher") %>
+            <%= link_for.("Parent") %>
+            <%= link_for.("SchoolManager") %>
+            <%= link_for.("Student") %>
+            <%= link_for.("ParentStudent") %>
+          </div>
+        </div>
+        <!-- Curriculum -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'Curriculum', icon: helpers.svg("heroicons/outline/academic-cap", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("Subject") %>
+            <%= link_for.("Topic") %>
+            <%= link_for.("LearningObjective") %>
+            <%= link_for.("AcademicYear") %>
+            <%= link_for.("GradeCurriculum") %>
+            <%= link_for.("GradeCurriculumItem") %>
+          </div>
+        </div>
+        <!-- Exams -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'Exams', icon: helpers.svg("heroicons/outline/clipboard-document-check", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("Exam") %>
+            <%= link_for.("ExamQuestion") %>
+            <%= link_for.("ClassroomExam") %>
+            <%= link_for.("ExamSubmission") %>
+            <%= link_for.("ExamAnswer") %>
+            <%= link_for.("RubricCriteria") %>
+            <%= link_for.("RubricScore") %>
+            <%= link_for.("ObjectiveMastery") %>
+          </div>
+        </div>
+        <!-- Feed -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'Feed', icon: helpers.svg("heroicons/outline/newspaper", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("FeedPost") %>
+            <%= link_for.("FeedPostStudent") %>
+            <%= link_for.("FeedPostLike") %>
+            <%= link_for.("FeedPostComment") %>
+          </div>
+        </div>
+        <!-- Messaging -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'Messaging', icon: helpers.svg("heroicons/outline/chat-bubble-left-right", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("Conversation") %>
+            <%= link_for.("Message") %>
+            <%= link_for.("GroupConversation") %>
+            <%= link_for.("GroupMessage") %>
+            <%= link_for.("Notification") %>
+          </div>
+        </div>
+        <!-- System -->
+        <div>
+          <%= render Avo::Sidebar::HeadingComponent.new label: 'System', icon: helpers.svg("heroicons/outline/cog-6-tooth", class: 'h-4') %>
+          <div class="w-full space-y-1">
+            <%= link_for.("DailyScore") %>
+            <%= link_for.("Permission") %>
+            <%= link_for.("PushDevice") %>
+            <%= link_for.("RefreshToken") %>
+            <%= link_for.("PublicActivity::Activity") %>
+          </div>
+        </div>
+        <%= render partial: "/avo/partials/sidebar_extra" %>
+      </div>
+    </div>
+    <% if Rails.env.development? %>
+      <div class="p-4 border-t group">
+        <%= link_to helpers.avo.avo_private_status_path, class: "block px-4 py-2 border rounded flex justify-between items-center w-full text-black text-sm" do %>
+          <span>Avo Status</span> <span>
+            <div class="rounded-full w-4 h-4 <%= Avo.app_status ? "bg-green-400" : "bg-orange-400" %>"></div>
+          </span>
+        <% end %>
+        <div class="absolute text-xs text-gray-700 group-hover:block hidden text-center w-full -ml-4">Visible only in development</div>
+      </div>
+    <% end %>
+    <%= render Avo::SidebarProfileComponent.new user: helpers._current_user %>
+  </div>
+<% end %>
