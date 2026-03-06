@@ -364,6 +364,30 @@ export interface ObjectiveMastery {
   masteredAt: string | null;
 }
 
+// === Yearly Curriculum ===
+export interface AcademicYear {
+  id: string;
+  label: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+}
+
+export interface GradeCurriculum {
+  id: string;
+  grade: number;
+  academicYear: AcademicYear;
+  gradeCurriculumItems: GradeCurriculumItem[];
+}
+
+export interface GradeCurriculumItem {
+  id: string;
+  subject?: Subject;
+  topic?: Topic;
+  position: number;
+  displayName: string;
+}
+
 // === Session user (decoded from JWT, stored in locals) ===
 export interface SessionUser {
   id: string;
