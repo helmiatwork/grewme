@@ -146,6 +146,22 @@ module Types
       OpenStruct.new(weeks: weeks)
     end
 
+    field :classroom_daily_scores, [ Types::DailyScoreType ], null: false, description: "Daily scores for a classroom on a given date and skill" do
+      argument :classroom_id, ID, required: true
+      argument :date, GraphQL::Types::ISO8601Date, required: true
+      argument :skill_category, Types::SkillCategoryEnum, required: true
+    end
+
+    def classroom_daily_scores(classroom_id:, date:, skill_category:)
+      authenticate!
+      classroom = Classroom.find(classroom_id)
+      raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).show?
+
+      student_ids = classroom.students.pluck(:id)
+      DailyScore.where(student_id: student_ids, date: date, skill_category: skill_category)
+        .includes(:student, :teacher)
+    end
+
     field :student_daily_scores, Types::DailyScoreType.connection_type, null: false, description: "Student daily scores (paginated)" do
       argument :student_id, ID, required: true
       argument :skill_category, Types::SkillCategoryEnum, required: false

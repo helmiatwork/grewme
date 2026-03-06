@@ -182,12 +182,19 @@ export interface Connection<T> {
 }
 
 // === Feed ===
+export interface MediaAttachment {
+  url: string;
+  filename: string;
+  contentType: string;
+}
+
 export interface FeedPost {
   id: string;
   body: string;
   teacher: { name: string };
   classroom: { id: string; name: string };
   mediaUrls: string[];
+  mediaAttachments: MediaAttachment[];
   taggedStudents: { id: string; name: string }[];
   likesCount: number;
   commentsCount: number;

@@ -7,6 +7,7 @@ module Types
     field :teacher, Types::TeacherType, null: false
     field :classroom, Types::ClassroomType, null: false
     field :media_urls, [ String ], null: false
+    field :media_attachments, [ Types::MediaAttachmentType ], null: false
     field :tagged_students, [ Types::StudentType ], null: false
     field :likes_count, Integer, null: false
     field :comments_count, Integer, null: false
@@ -21,6 +22,16 @@ module Types
     def media_urls
       object.media.map do |attachment|
         Rails.application.routes.url_helpers.rails_blob_url(attachment, host: ENV.fetch("APP_HOST", "http://localhost:3004"))
+      end
+    end
+
+    def media_attachments
+      object.media.map do |attachment|
+        {
+          url: Rails.application.routes.url_helpers.rails_blob_url(attachment, host: ENV.fetch("APP_HOST", "http://localhost:3004")),
+          filename: attachment.filename.to_s,
+          content_type: attachment.content_type
+        }
       end
     end
 

@@ -14,6 +14,7 @@ module Types
     # Daily Scores
     field :create_daily_score, mutation: Mutations::CreateDailyScore
     field :update_daily_score, mutation: Mutations::UpdateDailyScore
+    field :bulk_create_daily_scores, mutation: Mutations::BulkCreateDailyScores
 
     # Feed
     field :create_feed_post, mutation: Mutations::CreateFeedPost

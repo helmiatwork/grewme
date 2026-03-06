@@ -8,6 +8,7 @@ export const FEED_POSTS_QUERY = `
         classroom { id name }
         taggedStudents { id name }
         mediaUrls
+        mediaAttachments { url filename contentType }
         likesCount
         commentsCount
         likedByMe
@@ -30,6 +31,7 @@ export const FEED_POST_QUERY = `
       classroom { id name }
       taggedStudents { id name }
       mediaUrls
+      mediaAttachments { url filename contentType }
       likesCount
       commentsCount
       likedByMe

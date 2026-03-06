@@ -7,7 +7,6 @@
 
   const navItems = [
     { label: 'Dashboard', href: '/teacher/dashboard', icon: '🏠' },
-    { label: 'Score Entry', href: '/teacher/scores', icon: '📝' },
     { label: 'Class Feed', href: '/teacher/feed', icon: '📢' },
     { label: 'Calendar', href: '/teacher/calendar', icon: '📅' },
     { label: 'Profile', href: '/teacher/profile', icon: '👤' }
