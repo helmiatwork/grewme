@@ -37,4 +37,10 @@ class SubjectTest < ActiveSupport::TestCase
       topic.delete # use delete to bypass callbacks since Exam model is not yet defined
     end
   end
+
+  test "validates school presence" do
+    subject = Subject.new(name: "Test")
+    assert_not subject.valid?
+    assert_includes subject.errors[:school], "must exist"
+  end
 end

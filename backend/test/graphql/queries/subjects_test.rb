@@ -40,4 +40,23 @@ class SubjectsQueryTest < ActiveSupport::TestCase
 
     assert_equal [], result["data"]["subjects"]
   end
+
+  test "parent can view subjects" do
+    parent = parents(:parent_carol)
+    result = execute_query(
+      query: QUERY,
+      variables: { schoolId: schools(:greenwood).id.to_s },
+      user: parent
+    )
+    subjects = result["data"]["subjects"]
+    assert subjects.size >= 2
+  end
+
+  test "unauthenticated user cannot view subjects" do
+    result = execute_query(
+      query: QUERY,
+      variables: { schoolId: schools(:greenwood).id.to_s }
+    )
+    assert result["errors"].present?
+  end
 end

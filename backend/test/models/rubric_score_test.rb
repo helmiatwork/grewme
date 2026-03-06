@@ -16,4 +16,13 @@ class RubricScoreTest < ActiveSupport::TestCase
     rs = RubricScore.new(score: -1)
     assert_not rs.valid?
   end
+
+  test "validates uniqueness of criteria per submission" do
+    sub = exam_submissions(:emma_fractions_quiz)
+    criteria = rubric_criteria(:creativity)
+
+    RubricScore.create!(exam_submission: sub, rubric_criteria: criteria, score: 4)
+    duplicate = RubricScore.new(exam_submission: sub, rubric_criteria: criteria, score: 3)
+    assert_not duplicate.valid?
+  end
 end

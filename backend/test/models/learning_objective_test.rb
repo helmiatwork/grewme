@@ -51,4 +51,14 @@ class LearningObjectiveTest < ActiveSupport::TestCase
     obj = learning_objectives(:add_fractions)
     assert_equal subjects(:math), obj.topic.subject
   end
+
+  test "subject method delegates to topic" do
+    obj = learning_objectives(:add_fractions)
+    assert_equal subjects(:math), obj.subject
+  end
+
+  test "has many objective_masteries" do
+    obj = learning_objectives(:add_fractions)
+    assert_respond_to obj, :objective_masteries
+  end
 end

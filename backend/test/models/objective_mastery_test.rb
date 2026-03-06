@@ -30,4 +30,25 @@ class ObjectiveMasteryTest < ActiveSupport::TestCase
     assert_equal false, om.daily_mastered
     assert_nil om.mastered_at
   end
+
+  test "mastered scope returns only fully mastered" do
+    om = objective_masteries(:emma_add_fractions)
+    om.update!(exam_mastered: true, daily_mastered: true)
+
+    assert_includes ObjectiveMastery.mastered, om
+  end
+
+  test "mastered scope excludes partially mastered" do
+    om = objective_masteries(:emma_add_fractions)
+    om.update!(exam_mastered: true, daily_mastered: false)
+
+    assert_not_includes ObjectiveMastery.mastered, om
+  end
+
+  test "for_student scope filters by student" do
+    om = objective_masteries(:emma_add_fractions)
+
+    assert_includes ObjectiveMastery.for_student(students(:student_emma).id), om
+    assert_not_includes ObjectiveMastery.for_student(students(:student_finn).id), om
+  end
 end

@@ -51,4 +51,26 @@ class CreateSubjectMutationTest < ActiveSupport::TestCase
 
     assert result["errors"].present? || result.dig("data", "createSubject", "errors")&.any?
   end
+
+  test "school_manager can create a subject" do
+    manager = school_managers(:manager_pat)
+    result = execute_query(
+      mutation: MUTATION,
+      variables: { input: { name: "Art", schoolId: schools(:greenwood).id.to_s } },
+      user: manager
+    )
+    data = result["data"]["createSubject"]
+    assert_empty data["errors"]
+    assert_equal "Art", data["subject"]["name"]
+  end
+
+  test "parent cannot create a subject" do
+    parent = parents(:parent_carol)
+    result = execute_query(
+      mutation: MUTATION,
+      variables: { input: { name: "Art", schoolId: schools(:greenwood).id.to_s } },
+      user: parent
+    )
+    assert result["errors"].present?
+  end
 end

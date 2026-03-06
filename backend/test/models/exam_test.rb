@@ -41,4 +41,29 @@ class ExamTest < ActiveSupport::TestCase
     exam = exams(:fractions_score_exam)
     assert_equal subjects(:math), exam.topic.subject
   end
+
+  test "subject method returns subject through topic" do
+    exam = exams(:fractions_score_exam)
+    assert_equal subjects(:math), exam.subject
+  end
+
+  test "validates max_score is positive" do
+    exam = Exam.new(title: "Test", topic: topics(:fractions), exam_type: :score_based, created_by: teachers(:teacher_alice), max_score: 0)
+    assert_not exam.valid?
+  end
+
+  test "validates duration_minutes is positive when present" do
+    exam = Exam.new(title: "Test", topic: topics(:fractions), exam_type: :score_based, created_by: teachers(:teacher_alice), duration_minutes: -1)
+    assert_not exam.valid?
+  end
+
+  test "allows nil max_score" do
+    exam = Exam.new(title: "Test", topic: topics(:fractions), exam_type: :pass_fail, created_by: teachers(:teacher_alice), max_score: nil)
+    assert exam.valid?
+  end
+
+  test "allows nil duration_minutes" do
+    exam = Exam.new(title: "Test", topic: topics(:fractions), exam_type: :score_based, created_by: teachers(:teacher_alice), duration_minutes: nil)
+    assert exam.valid?
+  end
 end
