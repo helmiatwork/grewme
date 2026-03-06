@@ -10,11 +10,19 @@ class Notification < ApplicationRecord
   scope :unread, -> { where(read_at: nil) }
   scope :recent, -> { order(created_at: :desc) }
 
+  after_commit :invalidate_unread_count
+
   def read?
     read_at.present?
   end
 
   def mark_as_read!
     update!(read_at: Time.current) unless read?
+  end
+
+  private
+
+  def invalidate_unread_count
+    Rails.cache.delete("unread_count/#{recipient_type}/#{recipient_id}")
   end
 end

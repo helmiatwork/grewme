@@ -59,27 +59,29 @@ module Types
       classroom = Classroom.find(classroom_id)
       raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).overview?
 
-      students = classroom.students.includes(:daily_scores)
-      student_radars = students.map do |student|
-        averages = student.radar_data
-        OpenStruct.new(
-          student_id: student.id,
-          student_name: student.name,
-          skills: OpenStruct.new(
-            reading: averages["reading"]&.round(1),
-            math: averages["math"]&.round(1),
-            writing: averages["writing"]&.round(1),
-            logic: averages["logic"]&.round(1),
-            social: averages["social"]&.round(1)
-          )
-        )
-      end
+      Rails.cache.fetch("classroom_overview/#{classroom_id}", expires_in: 5.minutes) do
+        students = classroom.students.includes(:daily_scores)
+        student_radars = students.map do |student|
+          averages = student.radar_data
+          {
+            student_id: student.id,
+            student_name: student.name,
+            skills: {
+              reading: averages["reading"]&.round(1),
+              math: averages["math"]&.round(1),
+              writing: averages["writing"]&.round(1),
+              logic: averages["logic"]&.round(1),
+              social: averages["social"]&.round(1)
+            }
+          }
+        end
 
-      OpenStruct.new(
-        classroom_id: classroom.id,
-        classroom_name: classroom.name,
-        students: student_radars
-      )
+        {
+          classroom_id: classroom.id,
+          classroom_name: classroom.name,
+          students: student_radars
+        }
+      end.then { |data| deep_ostruct(data) }
     end
 
     # === Students ===
@@ -104,18 +106,20 @@ module Types
       student = Student.find(student_id)
       raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).radar?
 
-      averages = student.radar_data
-      OpenStruct.new(
-        student_id: student.id,
-        student_name: student.name,
-        skills: OpenStruct.new(
-          reading: averages["reading"]&.round(1),
-          math: averages["math"]&.round(1),
-          writing: averages["writing"]&.round(1),
-          logic: averages["logic"]&.round(1),
-          social: averages["social"]&.round(1)
-        )
-      )
+      Rails.cache.fetch("student_radar/#{student_id}", expires_in: 5.minutes) do
+        averages = student.radar_data
+        {
+          student_id: student.id,
+          student_name: student.name,
+          skills: {
+            reading: averages["reading"]&.round(1),
+            math: averages["math"]&.round(1),
+            writing: averages["writing"]&.round(1),
+            logic: averages["logic"]&.round(1),
+            social: averages["social"]&.round(1)
+          }
+        }
+      end.then { |data| deep_ostruct(data) }
     end
 
     field :student_progress, Types::ProgressDataType, null: false, description: "Student weekly progress" do
@@ -127,23 +131,25 @@ module Types
       student = Student.find(student_id)
       raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).progress?
 
-      weeks = 4.downto(0).map do |i|
-        week_start = i.weeks.ago.beginning_of_week.to_date
-        week_end = i.weeks.ago.end_of_week.to_date
-        averages = student.radar_data(start_date: week_start, end_date: week_end)
-        OpenStruct.new(
-          period: "Week of #{week_start.strftime("%b %d")}",
-          skills: OpenStruct.new(
-            reading: averages["reading"]&.round(1),
-            math: averages["math"]&.round(1),
-            writing: averages["writing"]&.round(1),
-            logic: averages["logic"]&.round(1),
-            social: averages["social"]&.round(1)
-          )
-        )
-      end
+      Rails.cache.fetch("student_progress/#{student_id}", expires_in: 10.minutes) do
+        weeks = 4.downto(0).map do |i|
+          week_start = i.weeks.ago.beginning_of_week.to_date
+          week_end = i.weeks.ago.end_of_week.to_date
+          averages = student.radar_data(start_date: week_start, end_date: week_end)
+          {
+            period: "Week of #{week_start.strftime("%b %d")}",
+            skills: {
+              reading: averages["reading"]&.round(1),
+              math: averages["math"]&.round(1),
+              writing: averages["writing"]&.round(1),
+              logic: averages["logic"]&.round(1),
+              social: averages["social"]&.round(1)
+            }
+          }
+        end
 
-      OpenStruct.new(weeks: weeks)
+        { weeks: weeks }
+      end.then { |data| deep_ostruct(data) }
     end
 
     field :classroom_daily_scores, [ Types::DailyScoreType ], null: false, description: "Daily scores for a classroom on a given date and skill" do
@@ -354,7 +360,9 @@ module Types
       authenticate!
       return 0 unless current_user.parent? || current_user.teacher?
 
-      current_user.notifications.unread.count
+      Rails.cache.fetch("unread_count/#{current_user.class.name}/#{current_user.id}", expires_in: 30.seconds) do
+        current_user.notifications.unread.count
+      end
     end
 
     # === School ===
@@ -366,15 +374,17 @@ module Types
       raise GraphQL::ExecutionError, "Only school managers can access this" unless current_user.school_manager?
 
       school = current_user.school
-      OpenStruct.new(
-        school_name: school.name,
-        classroom_count: school.classrooms.count,
-        student_count: Student.joins(classroom_students: :classroom)
-          .merge(ClassroomStudent.current)
-          .where(classrooms: { school_id: school.id })
-          .distinct.count,
-        teacher_count: school.teachers.count
-      )
+      Rails.cache.fetch("school_overview/#{school.id}", expires_in: 15.minutes) do
+        {
+          school_name: school.name,
+          classroom_count: school.classrooms.count,
+          student_count: Student.joins(classroom_students: :classroom)
+            .merge(ClassroomStudent.current)
+            .where(classrooms: { school_id: school.id })
+            .distinct.count,
+          teacher_count: school.teachers.count
+        }
+      end.then { |data| OpenStruct.new(data) }
     end
 
     field :school_teachers, [ Types::TeacherType ], null: false, description: "All teachers in the school (school_manager only)"
@@ -396,7 +406,9 @@ module Types
       authenticate!
       school = School.find(school_id)
       raise Pundit::NotAuthorizedError unless SubjectPolicy.new(current_user, Subject.new).index?
-      school.subjects
+      Rails.cache.fetch("subjects/#{school_id}", expires_in: 1.hour) do
+        school.subjects.to_a
+      end
     end
 
     field :subject, Types::SubjectType, description: "Get a subject with topics and objectives" do
@@ -484,7 +496,9 @@ module Types
     def academic_years(school_id:)
       authenticate!
       raise Pundit::NotAuthorizedError unless AcademicYearPolicy.new(current_user, AcademicYear.new).index?
-      School.find(school_id).academic_years.order(start_date: :desc)
+      Rails.cache.fetch("academic_years/#{school_id}", expires_in: 1.hour) do
+        School.find(school_id).academic_years.order(start_date: :desc).to_a
+      end
     end
 
     field :grade_curriculum, Types::GradeCurriculumType, description: "Get grade curriculum for a year and grade" do
@@ -529,6 +543,19 @@ module Types
         overrides: overrides,
         effective: effective
       )
+    end
+
+    private
+
+    def deep_ostruct(data)
+      case data
+      when Hash
+        OpenStruct.new(data.transform_values { |v| deep_ostruct(v) })
+      when Array
+        data.map { |v| deep_ostruct(v) }
+      else
+        data
+      end
     end
   end
 end

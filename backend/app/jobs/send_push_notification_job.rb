@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SendPushNotificationJob < ApplicationJob
-  queue_as :notifications
+  queue_as :critical
   retry_on StandardError, wait: :exponentially_longer, attempts: 5
   discard_on ActiveRecord::RecordNotFound
 

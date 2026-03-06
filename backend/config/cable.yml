@@ -20,5 +20,5 @@ production:
   connects_to:
     database:
       writing: cable
-  polling_interval: 0.3.seconds
-  message_retention: 1.day
+  polling_interval: 1.second
+  message_retention: 6.hours

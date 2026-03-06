@@ -7,4 +7,12 @@ class Subject < ApplicationRecord
   has_many :topics, dependent: :destroy
 
   validates :name, presence: true, uniqueness: { scope: :school_id }
+
+  after_commit :invalidate_subject_cache
+
+  private
+
+  def invalidate_subject_cache
+    Rails.cache.delete("subjects/#{school_id}")
+  end
 end
