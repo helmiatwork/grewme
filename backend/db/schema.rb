@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_011524) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -307,6 +307,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_011524) do
     t.index ["permissionable_type", "permissionable_id"], name: "index_permissions_on_permissionable"
   end
 
+  create_table "push_devices", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "last_seen_at"
+    t.string "platform", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["token"], name: "index_push_devices_on_token", unique: true
+    t.index ["user_type", "user_id"], name: "index_push_devices_on_user_type_and_user_id"
+  end
+
   create_table "refresh_tokens", force: :cascade do |t|
     t.bigint "authenticatable_id", null: false
     t.string "authenticatable_type", null: false
@@ -363,6 +376,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_011524) do
     t.string "state_province"
     t.datetime "updated_at", null: false
     t.string "website"
+  end
+
+  create_table "solid_cable_messages", force: :cascade do |t|
+    t.binary "channel", null: false
+    t.bigint "channel_hash", null: false
+    t.datetime "created_at", null: false
+    t.binary "payload", null: false
+    t.index ["channel"], name: "index_solid_cable_messages_on_channel"
+    t.index ["channel_hash"], name: "index_solid_cable_messages_on_channel_hash"
+    t.index ["created_at"], name: "index_solid_cable_messages_on_created_at"
   end
 
   create_table "students", force: :cascade do |t|

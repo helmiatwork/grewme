@@ -26,6 +26,10 @@ module Types
     # Notifications
     field :mark_notification_read, mutation: Mutations::MarkNotificationRead
 
+    # Push Devices
+    field :register_push_device, mutation: Mutations::RegisterPushDevice
+    field :unregister_push_device, mutation: Mutations::UnregisterPushDevice
+
     # Calendar
     field :create_classroom_event, mutation: Mutations::CreateClassroomEvent
     field :delete_classroom_event, mutation: Mutations::DeleteClassroomEvent

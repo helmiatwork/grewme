@@ -13,6 +13,7 @@ class Parent < ApplicationRecord
   has_many :permissions, as: :permissionable, dependent: :destroy
   has_many :classroom_events, as: :creator, dependent: :destroy
   has_many :notifications, as: :recipient, dependent: :destroy
+  has_many :push_devices, as: :user, dependent: :destroy
   has_many :conversations, dependent: :destroy
 
   has_one_attached :avatar_image

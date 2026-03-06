@@ -70,7 +70,7 @@ module Mutations
             title: "New post about #{tagged_children.to_sentence}",
             body: "#{teacher_name} posted in #{classroom_name}: #{post.body.truncate(100)}"
           )
-          broadcast_notification(parent, notification)
+          NotificationService.deliver(parent, notification)
         end
       else
         # Notify all parents with children in this classroom
@@ -85,23 +85,9 @@ module Mutations
             title: "New post in #{classroom_name}",
             body: "#{teacher_name}: #{post.body.truncate(100)}"
           )
-          broadcast_notification(parent, notification)
+          NotificationService.deliver(parent, notification)
         end
       end
-    end
-
-    def broadcast_notification(recipient, notification)
-      NotificationsChannel.broadcast_to(recipient, {
-        type: "new_notification",
-        notification: {
-          id: notification.id,
-          title: notification.title,
-          body: notification.body,
-          notifiable_type: notification.notifiable_type,
-          notifiable_id: notification.notifiable_id,
-          created_at: notification.created_at.iso8601
-        }
-      })
     end
   end
 end

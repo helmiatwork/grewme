@@ -50,6 +50,9 @@ gem "public_activity", "~> 3.0"
 gem "flipper", "~> 1.3"
 gem "flipper-active_record", "~> 1.3"
 
+# Push notifications
+gem "fcm", "~> 2.0"
+
 # Utilities
 gem "countries", "~> 7.1"
 gem "ruby_llm", "~> 1.2"

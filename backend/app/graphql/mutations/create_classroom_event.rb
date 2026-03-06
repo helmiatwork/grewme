@@ -55,7 +55,7 @@ module Mutations
           title: "New event: #{event_title}",
           body: "#{creator_name} added \"#{event_title}\" on #{event_date} in #{classroom_name}"
         )
-        broadcast_notification(teacher, notification)
+        NotificationService.deliver(teacher, notification)
       end
 
       # Notify all parents with children in this classroom
@@ -70,22 +70,8 @@ module Mutations
           title: "New event: #{event_title}",
           body: "#{event_title} on #{event_date} in #{classroom_name}"
         )
-        broadcast_notification(parent, notification)
+        NotificationService.deliver(parent, notification)
       end
-    end
-
-    def broadcast_notification(recipient, notification)
-      NotificationsChannel.broadcast_to(recipient, {
-        type: "new_notification",
-        notification: {
-          id: notification.id,
-          title: notification.title,
-          body: notification.body,
-          notifiable_type: notification.notifiable_type,
-          notifiable_id: notification.notifiable_id,
-          created_at: notification.created_at.iso8601
-        }
-      })
     end
   end
 end
