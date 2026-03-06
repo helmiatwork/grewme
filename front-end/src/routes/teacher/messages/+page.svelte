@@ -301,10 +301,10 @@
         addMessage(result.message);
         setTimeout(scrollToBottom, 50);
       }
-    } catch {
+    } catch (err: any) {
       uploading = false;
-      errorMessage = 'Failed to send message. Please try again.';
-      setTimeout(() => (errorMessage = ''), 3000);
+      errorMessage = err?.message || 'Failed to send message. Please try again.';
+      setTimeout(() => (errorMessage = ''), 5000);
     }
   }
 
