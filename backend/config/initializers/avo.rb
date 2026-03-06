@@ -13,6 +13,9 @@ Avo.configure do |config|
   config.authorization_client = nil
   config.explicit_authorization = false
 
+  ## == Sign out ==
+  config.sign_out_path_name = :avo_sign_out_path
+
   ## == Customization ==
   config.click_row_to_view_record = true
 
