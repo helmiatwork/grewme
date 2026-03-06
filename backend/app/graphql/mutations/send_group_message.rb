@@ -15,19 +15,10 @@ module Mutations
       group_conversation = GroupConversation.find(group_conversation_id)
       classroom = group_conversation.classroom
 
-      # Verify user is a participant
-      authorized = if current_user.teacher?
-        classroom.classroom_teachers.exists?(teacher_id: current_user.id)
-      elsif current_user.parent?
-        current_user.children
-          .joins(:classroom_students)
-          .where(classroom_students: { classroom_id: classroom.id, status: :active })
-          .exists?
-      else
-        false
+      # Only teachers can send group messages (parents are read-only)
+      unless current_user.teacher? && classroom.classroom_teachers.exists?(teacher_id: current_user.id)
+        raise Pundit::NotAuthorizedError
       end
-
-      raise Pundit::NotAuthorizedError unless authorized
 
       message = group_conversation.group_messages.build(
         sender: current_user,
