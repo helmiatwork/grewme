@@ -50,6 +50,12 @@ module Mutations
         end
       end
 
+      # Trigger mastery evaluation for auto-graded MC exams
+      if exam.multiple_choice?
+        topic = classroom_exam.exam.topic
+        EvaluateMasteryJob.perform_later(submission.student_id, topic.id)
+      end
+
       { exam_submission: submission, errors: [] }
     rescue ActiveRecord::RecordInvalid => e
       { exam_submission: nil, errors: e.record.errors.map { |err| { message: err.full_message, path: [ err.attribute.to_s.camelize(:lower) ] } } }

@@ -38,6 +38,10 @@ module Mutations
         submission.status = :graded
         submission.graded_at = Time.current
         submission.save!
+
+        # Trigger mastery evaluation
+        topic = submission.classroom_exam.exam.topic
+        EvaluateMasteryJob.perform_later(submission.student_id, topic.id)
       end
 
       { exam_submission: submission, errors: [] }
