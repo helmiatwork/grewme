@@ -1,5 +1,6 @@
 import { createConsumer } from '@rails/actioncable';
 import type { Subscription, Consumer } from '@rails/actioncable';
+import { addToast } from './toasts.svelte';
 
 export interface Notification {
   id: string;
@@ -44,6 +45,16 @@ export function connectNotifications(accessToken: string) {
       if (data.type === 'new_notification') {
         notifications = [data.notification, ...notifications];
         unreadCount += 1;
+
+        // Show toast popup for realtime notification
+        addToast({
+          title: data.notification.title,
+          body: data.notification.body,
+          variant: 'info',
+          href: data.notification.feed_post_id
+            ? `/posts/${data.notification.feed_post_id}`
+            : undefined,
+        });
       }
     }
   });
