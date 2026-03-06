@@ -27,7 +27,7 @@
     } catch { /* ignore */ }
 
     if (data.accessToken) {
-      connectNotifications(data.accessToken);
+      connectNotifications(data.accessToken, data.cableUrl);
     }
   });
 

@@ -30,7 +30,7 @@
 
     // Connect WebSocket for real-time notifications
     if (data.accessToken) {
-      connectNotifications(data.accessToken);
+      connectNotifications(data.accessToken, data.cableUrl);
     }
   });
 

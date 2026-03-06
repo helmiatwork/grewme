@@ -34,7 +34,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
       setAuthCookies(cookies, result.accessToken, result.refreshToken, result.expiresIn, role);
     }
 
-    return json({ success: true });
+    return json({ success: true, accessToken: result.accessToken });
   } catch {
     clearAuthCookies(cookies);
     return json({ error: 'Refresh failed' }, { status: 401 });
