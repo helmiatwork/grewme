@@ -5,6 +5,7 @@ module Types
     field :id, ID, null: false
     field :name, String, null: false
     field :school, Types::SchoolType, null: false
+    field :grade, Integer
     field :student_count, Integer, null: false
     field :students, [ Types::StudentType ], null: false
 

@@ -15,6 +15,7 @@ class Classroom < ApplicationRecord
   has_many :exams, through: :classroom_exams
 
   validates :name, presence: true
+  validates :grade, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 12 }, allow_nil: true
 
   def primary_teacher
     classroom_teachers.primary.first&.teacher

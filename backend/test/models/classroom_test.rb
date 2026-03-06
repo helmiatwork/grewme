@@ -27,4 +27,20 @@ class ClassroomTest < ActiveSupport::TestCase
     classroom = classrooms(:alice_class)
     assert_equal teachers(:teacher_alice), classroom.primary_teacher
   end
+
+  test "validates grade range 1-12" do
+    classroom = classrooms(:alice_class)
+    classroom.grade = 0
+    assert_not classroom.valid?
+    classroom.grade = 13
+    assert_not classroom.valid?
+    classroom.grade = 6
+    assert classroom.valid?
+  end
+
+  test "allows nil grade" do
+    classroom = classrooms(:alice_class)
+    classroom.grade = nil
+    assert classroom.valid?
+  end
 end

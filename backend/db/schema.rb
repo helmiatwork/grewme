@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_174041) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "academic_years", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "current", default: false, null: false
+    t.date "end_date", null: false
+    t.string "label", null: false
+    t.bigint "school_id", null: false
+    t.date "start_date", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "label"], name: "index_academic_years_on_school_id_and_label", unique: true
+    t.index ["school_id"], name: "index_academic_years_on_school_id"
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -132,6 +144,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
 
   create_table "classrooms", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "grade"
     t.string "name", null: false
     t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
@@ -281,6 +294,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
     t.datetime "updated_at", null: false
     t.text "value"
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
+  end
+
+  create_table "grade_curriculum_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "grade_curriculum_id", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "subject_id"
+    t.bigint "topic_id"
+    t.datetime "updated_at", null: false
+    t.index ["grade_curriculum_id", "subject_id", "topic_id"], name: "idx_grade_curriculum_items_unique", unique: true
+    t.index ["grade_curriculum_id"], name: "index_grade_curriculum_items_on_grade_curriculum_id"
+    t.index ["subject_id"], name: "index_grade_curriculum_items_on_subject_id"
+    t.index ["topic_id"], name: "index_grade_curriculum_items_on_topic_id"
+  end
+
+  create_table "grade_curriculums", force: :cascade do |t|
+    t.bigint "academic_year_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "grade", null: false
+    t.datetime "updated_at", null: false
+    t.index ["academic_year_id", "grade"], name: "index_grade_curriculums_on_academic_year_id_and_grade", unique: true
+    t.index ["academic_year_id"], name: "index_grade_curriculums_on_academic_year_id"
   end
 
   create_table "group_conversations", force: :cascade do |t|
@@ -496,6 +531,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
     t.string "email"
     t.decimal "latitude", precision: 10, scale: 7
     t.decimal "longitude", precision: 10, scale: 7
+    t.integer "max_grade", default: 6, null: false
+    t.integer "min_grade", default: 1, null: false
     t.string "name", null: false
     t.string "phone"
     t.string "postal_code"
@@ -585,6 +622,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
     t.index ["subject_id"], name: "index_topics_on_subject_id"
   end
 
+  add_foreign_key "academic_years", "schools"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "classroom_events", "classrooms"
@@ -612,6 +650,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
   add_foreign_key "feed_post_students", "students"
   add_foreign_key "feed_posts", "classrooms"
   add_foreign_key "feed_posts", "teachers"
+  add_foreign_key "grade_curriculum_items", "grade_curriculums"
+  add_foreign_key "grade_curriculum_items", "subjects"
+  add_foreign_key "grade_curriculum_items", "topics"
+  add_foreign_key "grade_curriculums", "academic_years"
   add_foreign_key "group_conversations", "classrooms"
   add_foreign_key "group_messages", "group_conversations"
   add_foreign_key "learning_objectives", "topics"
