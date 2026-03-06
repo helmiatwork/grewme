@@ -16,6 +16,13 @@
     error: 'bg-red-50 border-red-200 text-red-800',
   };
 
+  const variantBarColors: Record<string, string> = {
+    info: 'bg-blue-400',
+    success: 'bg-emerald-400',
+    warning: 'bg-amber-400',
+    error: 'bg-red-400',
+  };
+
   const variantIcons: Record<string, string> = {
     info: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
     success: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
@@ -33,7 +40,8 @@
     removeToast(toast.id);
   }
 
-  const baseClass = `w-80 border rounded-lg shadow-lg transition-shadow`;
+  const baseClass = `w-80 border rounded-lg shadow-lg transition-shadow overflow-hidden`;
+  const duration = `${toast.dismissAfterMs}ms`;
 </script>
 
 {#snippet toastContent()}
@@ -60,6 +68,13 @@
       </svg>
     </button>
   </div>
+  <!-- Progress bar -->
+  <div class="h-1 w-full bg-black/5">
+    <div
+      class="h-full {variantBarColors[toast.variant]} toast-progress"
+      style="animation-duration: {duration};"
+    ></div>
+  </div>
 {/snippet}
 
 {#if toast.href}
@@ -82,3 +97,16 @@
     {@render toastContent()}
   </div>
 {/if}
+
+<style>
+  .toast-progress {
+    animation-name: shrink;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes shrink {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+</style>
