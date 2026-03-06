@@ -55,5 +55,22 @@ module Types
     # Profile
     field :update_profile, mutation: Mutations::UpdateProfile
     field :change_password, mutation: Mutations::ChangePassword
+
+    # Curriculum
+    field :create_subject, mutation: Mutations::CreateSubject
+    field :update_subject, mutation: Mutations::UpdateSubject
+    field :delete_subject, mutation: Mutations::DeleteSubject
+    field :create_topic, mutation: Mutations::CreateTopic
+    field :update_topic, mutation: Mutations::UpdateTopic
+    field :delete_topic, mutation: Mutations::DeleteTopic
+    field :create_learning_objective, mutation: Mutations::CreateLearningObjective
+    field :update_learning_objective, mutation: Mutations::UpdateLearningObjective
+    field :delete_learning_objective, mutation: Mutations::DeleteLearningObjective
+
+    # Exams
+    field :create_exam, mutation: Mutations::CreateExam
+    field :assign_exam_to_classroom, mutation: Mutations::AssignExamToClassroom
+    field :submit_exam_answers, mutation: Mutations::SubmitExamAnswers
+    field :grade_exam_submission, mutation: Mutations::GradeExamSubmission
   end
 end

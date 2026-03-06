@@ -386,6 +386,95 @@ module Types
       current_user.school.teachers.includes(:classrooms)
     end
 
+    # === Curriculum ===
+
+    field :subjects, [ Types::SubjectType ], null: false, description: "List subjects for a school" do
+      argument :school_id, ID, required: true
+    end
+
+    def subjects(school_id:)
+      authenticate!
+      school = School.find(school_id)
+      raise Pundit::NotAuthorizedError unless SubjectPolicy.new(current_user, Subject.new).index?
+      school.subjects
+    end
+
+    field :subject, Types::SubjectType, description: "Get a subject with topics and objectives" do
+      argument :id, ID, required: true
+    end
+
+    def subject(id:)
+      authenticate!
+      subject = Subject.find(id)
+      raise Pundit::NotAuthorizedError unless SubjectPolicy.new(current_user, subject).show?
+      subject
+    end
+
+    field :topic, Types::TopicType, description: "Get a topic with objectives and exams" do
+      argument :id, ID, required: true
+    end
+
+    def topic(id:)
+      authenticate!
+      topic = Topic.find(id)
+      raise Pundit::NotAuthorizedError unless SubjectPolicy.new(current_user, topic.subject).show?
+      topic
+    end
+
+    # === Exams ===
+
+    field :exam, Types::ExamObjectType, description: "Get an exam with questions/criteria" do
+      argument :id, ID, required: true
+    end
+
+    def exam(id:)
+      authenticate!
+      exam = Exam.find(id)
+      raise Pundit::NotAuthorizedError unless ExamPolicy.new(current_user, exam).show?
+      exam
+    end
+
+    field :classroom_exams, [ Types::ClassroomExamType ], null: false, description: "List exams for a classroom" do
+      argument :classroom_id, ID, required: true
+      argument :status, Types::ClassroomExamStatusEnum, required: false
+    end
+
+    def classroom_exams(classroom_id:, status: nil)
+      authenticate!
+      classroom = Classroom.find(classroom_id)
+      scope = classroom.classroom_exams.includes(:exam)
+      scope = scope.where(status: status) if status
+      scope
+    end
+
+    field :exam_submission, Types::ExamSubmissionType, description: "Get an exam submission" do
+      argument :id, ID, required: true
+    end
+
+    def exam_submission(id:)
+      authenticate!
+      submission = ExamSubmission.find(id)
+      raise Pundit::NotAuthorizedError unless ExamSubmissionPolicy.new(current_user, submission).show?
+      submission
+    end
+
+    field :student_masteries, [ Types::ObjectiveMasteryType ], null: false, description: "Get mastery status for a student" do
+      argument :student_id, ID, required: true
+      argument :subject_id, ID, required: false
+    end
+
+    def student_masteries(student_id:, subject_id: nil)
+      authenticate!
+      student = Student.find(student_id)
+      raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).show?
+
+      scope = student.objective_masteries.includes(learning_objective: { topic: :subject })
+      if subject_id
+        scope = scope.joins(learning_objective: { topic: :subject }).where(subjects: { id: subject_id })
+      end
+      scope
+    end
+
     # === Admin ===
 
     field :user_permissions, Types::UserPermissionsType, null: false, description: "Get user permissions (admin only)" do
