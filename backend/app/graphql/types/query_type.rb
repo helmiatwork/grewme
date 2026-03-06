@@ -475,6 +475,29 @@ module Types
       scope
     end
 
+    # === Yearly Curriculum ===
+
+    field :academic_years, [ Types::AcademicYearType ], null: false, description: "List academic years for a school" do
+      argument :school_id, ID, required: true
+    end
+
+    def academic_years(school_id:)
+      authenticate!
+      raise Pundit::NotAuthorizedError unless AcademicYearPolicy.new(current_user, AcademicYear.new).index?
+      School.find(school_id).academic_years.order(start_date: :desc)
+    end
+
+    field :grade_curriculum, Types::GradeCurriculumType, description: "Get grade curriculum for a year and grade" do
+      argument :academic_year_id, ID, required: true
+      argument :grade, Integer, required: true
+    end
+
+    def grade_curriculum(academic_year_id:, grade:)
+      authenticate!
+      raise Pundit::NotAuthorizedError unless GradeCurriculumPolicy.new(current_user, GradeCurriculum.new).show?
+      GradeCurriculum.find_by(academic_year_id: academic_year_id, grade: grade)
+    end
+
     # === Admin ===
 
     field :user_permissions, Types::UserPermissionsType, null: false, description: "Get user permissions (admin only)" do

@@ -67,6 +67,12 @@ module Types
     field :update_learning_objective, mutation: Mutations::UpdateLearningObjective
     field :delete_learning_objective, mutation: Mutations::DeleteLearningObjective
 
+    # Yearly Curriculum
+    field :create_academic_year, mutation: Mutations::CreateAcademicYear
+    field :update_academic_year, mutation: Mutations::UpdateAcademicYear
+    field :set_current_academic_year, mutation: Mutations::SetCurrentAcademicYear
+    field :save_grade_curriculum, mutation: Mutations::SaveGradeCurriculum
+
     # Exams
     field :create_exam, mutation: Mutations::CreateExam
     field :assign_exam_to_classroom, mutation: Mutations::AssignExamToClassroom

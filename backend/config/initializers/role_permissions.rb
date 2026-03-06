@@ -9,7 +9,9 @@ module RolePermissions
       "learning_objectives" => %w[index show create update destroy],
       "exams" => %w[index show create update destroy],
       "classroom_exams" => %w[index show create update],
-      "exam_submissions" => %w[index show create update]
+      "exam_submissions" => %w[index show create update],
+      "academic_years" => %w[index show create update],
+      "grade_curriculums" => %w[index show create update]
     },
     "parent" => {
       "students" => %w[show radar progress],
@@ -17,7 +19,9 @@ module RolePermissions
       "children" => %w[index],
       "subjects" => %w[index show],
       "exams" => %w[index show],
-      "exam_submissions" => %w[index show]
+      "exam_submissions" => %w[index show],
+      "academic_years" => %w[index show],
+      "grade_curriculums" => %w[index show]
     },
     "school_manager" => {
       "classrooms" => %w[index show overview],
@@ -32,7 +36,9 @@ module RolePermissions
       "learning_objectives" => %w[index show create update destroy],
       "exams" => %w[index show create update destroy],
       "classroom_exams" => %w[index show create update destroy],
-      "exam_submissions" => %w[index show]
+      "exam_submissions" => %w[index show],
+      "academic_years" => %w[index show create update],
+      "grade_curriculums" => %w[index show create update]
     },
     "admin" => :all
   }.freeze
