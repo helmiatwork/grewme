@@ -1,0 +1,17 @@
+fractions:
+  name: Fractions
+  description: "Working with fractions"
+  subject: math
+  position: 0
+
+algebra:
+  name: Algebra
+  description: "Basic algebra"
+  subject: math
+  position: 1
+
+poetry:
+  name: Poetry
+  description: "Reading and writing poetry"
+  subject: reading
+  position: 0

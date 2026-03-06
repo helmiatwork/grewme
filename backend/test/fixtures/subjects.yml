@@ -1,0 +1,9 @@
+math:
+  name: Mathematics
+  description: "Core math curriculum"
+  school: greenwood
+
+reading:
+  name: Reading
+  description: "Reading and comprehension"
+  school: greenwood

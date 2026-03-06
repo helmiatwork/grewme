@@ -1,0 +1,21 @@
+add_fractions:
+  name: "Add fractions with different denominators"
+  description: "Student can add fractions with unlike denominators"
+  topic: fractions
+  exam_pass_threshold: 70
+  daily_score_threshold: 75
+  position: 0
+
+simplify_fractions:
+  name: "Simplify fractions to lowest terms"
+  topic: fractions
+  exam_pass_threshold: 80
+  daily_score_threshold: 80
+  position: 1
+
+solve_linear:
+  name: "Solve linear equations"
+  topic: algebra
+  exam_pass_threshold: 70
+  daily_score_threshold: 70
+  position: 0

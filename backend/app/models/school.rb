@@ -4,6 +4,7 @@ class School < ApplicationRecord
   tracked
 
   has_many :classrooms, dependent: :destroy
+  has_many :subjects, dependent: :destroy
   has_many :teachers, dependent: :nullify
   has_many :school_managers, dependent: :destroy
 
