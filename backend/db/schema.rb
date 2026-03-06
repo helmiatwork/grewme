@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_170002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,6 +88,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
     t.index ["creator_type", "creator_id"], name: "index_classroom_events_on_creator_type_and_creator_id"
   end
 
+  create_table "classroom_exams", force: :cascade do |t|
+    t.bigint "assigned_by_id", null: false
+    t.string "assigned_by_type", null: false
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "due_at"
+    t.bigint "exam_id", null: false
+    t.datetime "scheduled_at"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_by_type", "assigned_by_id"], name: "index_classroom_exams_on_assigned_by"
+    t.index ["classroom_id", "exam_id"], name: "index_classroom_exams_on_classroom_id_and_exam_id", unique: true
+    t.index ["classroom_id", "status"], name: "index_classroom_exams_on_classroom_id_and_status"
+    t.index ["classroom_id"], name: "index_classroom_exams_on_classroom_id"
+    t.index ["exam_id"], name: "index_classroom_exams_on_exam_id"
+  end
+
   create_table "classroom_students", force: :cascade do |t|
     t.string "academic_year", null: false
     t.bigint "classroom_id", null: false
@@ -145,6 +162,65 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
     t.index ["student_id", "date", "skill_category"], name: "idx_daily_scores_unique", unique: true
     t.index ["student_id"], name: "index_daily_scores_on_student_id"
     t.index ["teacher_id"], name: "index_daily_scores_on_teacher_id"
+  end
+
+  create_table "exam_answers", force: :cascade do |t|
+    t.boolean "correct"
+    t.datetime "created_at", null: false
+    t.bigint "exam_question_id", null: false
+    t.bigint "exam_submission_id", null: false
+    t.integer "points_awarded", default: 0
+    t.string "selected_answer"
+    t.datetime "updated_at", null: false
+    t.index ["exam_question_id"], name: "index_exam_answers_on_exam_question_id"
+    t.index ["exam_submission_id", "exam_question_id"], name: "index_exam_answers_on_exam_submission_id_and_exam_question_id", unique: true
+    t.index ["exam_submission_id"], name: "index_exam_answers_on_exam_submission_id"
+  end
+
+  create_table "exam_questions", force: :cascade do |t|
+    t.string "correct_answer", null: false
+    t.datetime "created_at", null: false
+    t.bigint "exam_id", null: false
+    t.jsonb "options", default: []
+    t.integer "points", default: 1, null: false
+    t.integer "position", default: 0, null: false
+    t.text "question_text", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exam_id", "position"], name: "index_exam_questions_on_exam_id_and_position"
+    t.index ["exam_id"], name: "index_exam_questions_on_exam_id"
+  end
+
+  create_table "exam_submissions", force: :cascade do |t|
+    t.bigint "classroom_exam_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "graded_at"
+    t.boolean "passed"
+    t.decimal "score", precision: 5, scale: 2
+    t.datetime "started_at"
+    t.integer "status", default: 0, null: false
+    t.bigint "student_id", null: false
+    t.datetime "submitted_at"
+    t.text "teacher_notes"
+    t.datetime "updated_at", null: false
+    t.index ["classroom_exam_id"], name: "index_exam_submissions_on_classroom_exam_id"
+    t.index ["student_id", "classroom_exam_id"], name: "index_exam_submissions_on_student_id_and_classroom_exam_id", unique: true
+    t.index ["student_id"], name: "index_exam_submissions_on_student_id"
+  end
+
+  create_table "exams", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "created_by_type", null: false
+    t.text "description"
+    t.integer "duration_minutes"
+    t.integer "exam_type", default: 0, null: false
+    t.integer "max_score", default: 100
+    t.string "title", null: false
+    t.bigint "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_type", "created_by_id"], name: "index_exams_on_created_by"
+    t.index ["topic_id", "exam_type"], name: "index_exams_on_topic_id_and_exam_type"
+    t.index ["topic_id"], name: "index_exams_on_topic_id"
   end
 
   create_table "feed_post_comments", force: :cascade do |t|
@@ -273,6 +349,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
     t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient"
   end
 
+  create_table "objective_masteries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "daily_mastered", default: false, null: false
+    t.boolean "exam_mastered", default: false, null: false
+    t.bigint "learning_objective_id", null: false
+    t.datetime "mastered_at"
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["learning_objective_id"], name: "index_objective_masteries_on_learning_objective_id"
+    t.index ["student_id", "learning_objective_id"], name: "idx_objective_masteries_unique", unique: true
+    t.index ["student_id"], name: "index_objective_masteries_on_student_id"
+  end
+
   create_table "parent_students", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "parent_id", null: false
@@ -346,6 +435,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
     t.index ["authenticatable_type", "authenticatable_id", "revoked_at"], name: "index_refresh_tokens_on_auth_revoked"
     t.index ["authenticatable_type", "authenticatable_id"], name: "index_refresh_tokens_on_authenticatable"
     t.index ["token_digest"], name: "index_refresh_tokens_on_token_digest", unique: true
+  end
+
+  create_table "rubric_criteria", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.bigint "exam_id", null: false
+    t.integer "max_score", default: 5, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["exam_id", "position"], name: "index_rubric_criteria_on_exam_id_and_position"
+    t.index ["exam_id"], name: "index_rubric_criteria_on_exam_id"
+  end
+
+  create_table "rubric_scores", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "exam_submission_id", null: false
+    t.text "feedback"
+    t.bigint "rubric_criteria_id", null: false
+    t.integer "score", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exam_submission_id", "rubric_criteria_id"], name: "idx_rubric_scores_unique", unique: true
+    t.index ["exam_submission_id"], name: "index_rubric_scores_on_exam_submission_id"
+    t.index ["rubric_criteria_id"], name: "index_rubric_scores_on_rubric_criteria_id"
   end
 
   create_table "school_managers", force: :cascade do |t|
@@ -475,6 +588,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "classroom_events", "classrooms"
+  add_foreign_key "classroom_exams", "classrooms"
+  add_foreign_key "classroom_exams", "exams"
   add_foreign_key "classroom_students", "classrooms"
   add_foreign_key "classroom_students", "students"
   add_foreign_key "classroom_teachers", "classrooms"
@@ -485,6 +600,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
   add_foreign_key "conversations", "teachers"
   add_foreign_key "daily_scores", "students"
   add_foreign_key "daily_scores", "teachers"
+  add_foreign_key "exam_answers", "exam_questions"
+  add_foreign_key "exam_answers", "exam_submissions"
+  add_foreign_key "exam_questions", "exams"
+  add_foreign_key "exam_submissions", "classroom_exams"
+  add_foreign_key "exam_submissions", "students"
+  add_foreign_key "exams", "topics"
   add_foreign_key "feed_post_comments", "feed_posts"
   add_foreign_key "feed_post_likes", "feed_posts"
   add_foreign_key "feed_post_students", "feed_posts"
@@ -495,8 +616,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
   add_foreign_key "group_messages", "group_conversations"
   add_foreign_key "learning_objectives", "topics"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "objective_masteries", "learning_objectives"
+  add_foreign_key "objective_masteries", "students"
   add_foreign_key "parent_students", "parents"
   add_foreign_key "parent_students", "students"
+  add_foreign_key "rubric_criteria", "exams"
+  add_foreign_key "rubric_scores", "exam_submissions"
+  add_foreign_key "rubric_scores", "rubric_criteria", column: "rubric_criteria_id"
   add_foreign_key "school_managers", "schools"
   add_foreign_key "subjects", "schools"
   add_foreign_key "teachers", "schools"
