@@ -3,16 +3,22 @@ development:
   connects_to:
     database:
       writing: primary
-  polling_interval: 0.1.seconds
+  polling_interval: 0.3.seconds
   message_retention: 1.day
 
 test:
   adapter: test
 
+# NOTE: When reaching ~500 concurrent users, switch to Redis adapter:
+#   adapter: redis
+#   url: redis://localhost:6379/1
+#   channel_prefix: grewme_production
+#
+# When reaching ~10,000 concurrent users, consider AnyCable (Go WebSocket server).
 production:
   adapter: solid_cable
   connects_to:
     database:
       writing: cable
-  polling_interval: 0.1.seconds
+  polling_interval: 0.3.seconds
   message_retention: 1.day
