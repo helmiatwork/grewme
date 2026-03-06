@@ -20,6 +20,11 @@ const CONVERSATIONS_QUERY = `
     classrooms {
       id
       name
+      students {
+        id
+        name
+        parents { id name }
+      }
     }
   }
 `;

@@ -24,9 +24,18 @@
   let textareaEl: HTMLTextAreaElement = $state()!;
   let showEmojiPicker = $state(false);
   let uploading = $state(false);
+  let showNewChatModal = $state(false);
+  let newChatClassroomId = $state('');
   const MAX_FILE_SIZE = 2 * 1024 * 1024;
   const MAX_MEDIA = 4;
   const MAX_DOCS = 4;
+
+  // ── Derived modal data ────────────────────────────────────────────────────
+  const newChatStudents = $derived(
+    newChatClassroomId
+      ? (data.classrooms ?? []).find((c: any) => c.id === newChatClassroomId)?.students ?? []
+      : []
+  );
 
   // ── Derived sidebar data ───────────────────────────────────────────────────
   const groupChats = $derived(
@@ -122,6 +131,15 @@
     mutation SendGroupMessage($groupConversationId: ID!, $body: String!, $signedBlobIds: [String!]) {
       sendGroupMessage(groupConversationId: $groupConversationId, body: $body, signedBlobIds: $signedBlobIds) {
         message { id body senderName senderType senderId mine createdAt attachments { url filename contentType } }
+        errors { message }
+      }
+    }
+  `;
+
+  const CREATE_CONVERSATION_MUTATION = `
+    mutation CreateConversation($studentId: ID!, $parentId: ID) {
+      createConversation(studentId: $studentId, parentId: $parentId) {
+        conversation { id student { id name } parent { id name } teacher { id name } }
         errors { message }
       }
     }
@@ -297,6 +315,30 @@
     }
   }
 
+  // ── New chat handler ───────────────────────────────────────────────────────
+  async function startNewChat(studentId: string, parentId: string) {
+    try {
+      const res = await gql(CREATE_CONVERSATION_MUTATION, { studentId, parentId });
+      const conv = res?.createConversation?.conversation;
+      if (conv) {
+        if (!data.conversations.find((c: any) => c.id === conv.id)) {
+          data.conversations = [conv, ...data.conversations];
+        }
+        showNewChatModal = false;
+        newChatClassroomId = '';
+        selectDirectChat(conv);
+      }
+      const errors = res?.createConversation?.errors;
+      if (errors?.length) {
+        errorMessage = errors[0].message;
+        setTimeout(() => (errorMessage = ''), 3000);
+      }
+    } catch (err: any) {
+      errorMessage = err.message || 'Failed to create conversation';
+      setTimeout(() => (errorMessage = ''), 3000);
+    }
+  }
+
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   onMount(() => {
     consumer = createConsumer(`ws://localhost:3004/cable?token=${data.accessToken}`);
@@ -321,6 +363,12 @@
         placeholder="Search..."
         class="w-full bg-gray-100 rounded-full px-4 py-2 text-sm text-text placeholder-text-muted outline-none focus:ring-2 focus:ring-primary/40 transition"
       />
+      <button
+        onclick={() => showNewChatModal = true}
+        class="w-full mt-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-full px-4 py-2 transition-colors"
+      >
+        + New Chat
+      </button>
     </div>
 
     <!-- Chat list -->
@@ -738,3 +786,63 @@
     {/if}
   </div>
 </div>
+
+{#if showNewChatModal}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onkeydown={(e) => { if (e.key === 'Escape') showNewChatModal = false; }}>
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="absolute inset-0" onclick={() => showNewChatModal = false}></div>
+    <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-text">New Conversation</h2>
+        <button type="button" onclick={() => showNewChatModal = false} class="p-1 rounded-lg text-text-muted hover:text-text hover:bg-slate-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Classroom selector -->
+      <div class="mb-4">
+        <label for="new-chat-classroom" class="block text-sm font-medium text-text mb-1">Classroom</label>
+        <select
+          id="new-chat-classroom"
+          bind:value={newChatClassroomId}
+          class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+        >
+          <option value="">Select a classroom...</option>
+          {#each data.classrooms ?? [] as classroom}
+            <option value={classroom.id}>{classroom.name}</option>
+          {/each}
+        </select>
+      </div>
+
+      <!-- Student/Parent list -->
+      {#if newChatStudents.length > 0}
+        <div class="max-h-64 overflow-y-auto space-y-1">
+          {#each newChatStudents as student}
+            {#each student.parents ?? [] as parent}
+              <button
+                type="button"
+                onclick={() => startNewChat(student.id, parent.id)}
+                class="w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-3"
+              >
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                  {parent.name?.charAt(0)?.toUpperCase() ?? '?'}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-text truncate">{parent.name}</p>
+                  <p class="text-xs text-text-muted truncate">Parent of {student.name}</p>
+                </div>
+              </button>
+            {/each}
+          {/each}
+        </div>
+      {:else if newChatClassroomId}
+        <p class="text-sm text-text-muted text-center py-4">No students found in this classroom</p>
+      {:else}
+        <p class="text-sm text-text-muted text-center py-4">Select a classroom to see parents</p>
+      {/if}
+    </div>
+  </div>
+{/if}
