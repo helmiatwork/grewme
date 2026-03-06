@@ -14,8 +14,11 @@ class Avo::Resources::School < Avo::BaseResource
     field :phone, as: :text, hide_on: :index
     field :email, as: :text, hide_on: :index
     field :website, as: :text, hide_on: :index
+    field :min_grade, as: :number
+    field :max_grade, as: :number
     field :classrooms, as: :has_many
     field :teachers, as: :has_many
-     field :created_at, as: :date_time, sortable: true, readonly: true
-   end
+    field :academic_years, as: :has_many
+    field :created_at, as: :date_time, sortable: true, readonly: true
+  end
 end
