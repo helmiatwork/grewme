@@ -1,5 +1,6 @@
 class Student < ApplicationRecord
   include PublicActivity::Model
+
   tracked
 
   has_many :classroom_students, dependent: :destroy
@@ -7,6 +8,8 @@ class Student < ApplicationRecord
   has_many :parent_students, dependent: :destroy
   has_many :parents, through: :parent_students, source: :parent
   has_many :daily_scores, dependent: :destroy
+  has_many :exam_submissions, dependent: :destroy
+  has_many :objective_masteries, dependent: :destroy
 
   validates :name, presence: true
 

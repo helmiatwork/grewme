@@ -5,6 +5,8 @@ class LearningObjective < ApplicationRecord
 
   belongs_to :topic
 
+  has_many :objective_masteries, dependent: :destroy
+
   validates :name, presence: true, uniqueness: { scope: :topic_id }
   validates :exam_pass_threshold, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :daily_score_threshold, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }

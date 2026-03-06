@@ -1,0 +1,31 @@
+mc_q1:
+  exam: fractions_mc_exam
+  question_text: "What is 1/2 + 1/4?"
+  options:
+    - label: "A"
+      text: "2/6"
+    - label: "B"
+      text: "3/4"
+    - label: "C"
+      text: "1/3"
+    - label: "D"
+      text: "2/4"
+  correct_answer: "B"
+  points: 2
+  position: 0
+
+mc_q2:
+  exam: fractions_mc_exam
+  question_text: "Simplify 4/8"
+  options:
+    - label: "A"
+      text: "1/2"
+    - label: "B"
+      text: "2/4"
+    - label: "C"
+      text: "1/4"
+    - label: "D"
+      text: "3/4"
+  correct_answer: "A"
+  points: 2
+  position: 1

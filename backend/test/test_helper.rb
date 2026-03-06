@@ -43,6 +43,7 @@ end
 
 module ActiveSupport
   class TestCase
+    set_fixture_class rubric_criteria: RubricCriteria
     fixtures :all
     include GraphqlTestHelper
 

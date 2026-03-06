@@ -1,0 +1,30 @@
+fractions_score_exam:
+  title: "Fractions Quiz"
+  description: "Score-based fractions quiz"
+  exam_type: 0
+  topic: fractions
+  created_by_type: Teacher
+  created_by_id: <%= ActiveRecord::FixtureSet.identify(:teacher_alice) %>
+  max_score: 100
+
+fractions_mc_exam:
+  title: "Fractions Multiple Choice"
+  exam_type: 1
+  topic: fractions
+  created_by_type: Teacher
+  created_by_id: <%= ActiveRecord::FixtureSet.identify(:teacher_alice) %>
+  max_score: 10
+
+poetry_rubric_exam:
+  title: "Poetry Analysis"
+  exam_type: 2
+  topic: poetry
+  created_by_type: Teacher
+  created_by_id: <%= ActiveRecord::FixtureSet.identify(:teacher_alice) %>
+
+algebra_pass_fail:
+  title: "Algebra Competency Check"
+  exam_type: 3
+  topic: algebra
+  created_by_type: Teacher
+  created_by_id: <%= ActiveRecord::FixtureSet.identify(:teacher_alice) %>

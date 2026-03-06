@@ -11,6 +11,8 @@ class Classroom < ApplicationRecord
   has_many :students, -> { merge(ClassroomStudent.current) }, through: :classroom_students
   has_many :feed_posts, dependent: :destroy
   has_many :classroom_events, dependent: :destroy
+  has_many :classroom_exams, dependent: :destroy
+  has_many :exams, through: :classroom_exams
 
   validates :name, presence: true
 
