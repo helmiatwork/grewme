@@ -239,6 +239,131 @@ export interface ClassroomEvent {
   createdAt: string;
 }
 
+// === Curriculum ===
+export interface Subject {
+  id: string;
+  name: string;
+  description: string | null;
+  topics: Topic[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Topic {
+  id: string;
+  name: string;
+  description: string | null;
+  position: number;
+  subject: { id: string; name: string };
+  learningObjectives: LearningObjective[];
+  exams: Exam[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LearningObjective {
+  id: string;
+  description: string;
+  position: number;
+  masteryThreshold: number;
+  topic: { id: string; name: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// === Exams ===
+export type ExamType = 'score_based' | 'multiple_choice' | 'rubric_based' | 'pass_fail';
+export type ClassroomExamStatus = 'draft' | 'scheduled' | 'active' | 'closed' | 'archived';
+export type ExamSubmissionStatus = 'in_progress' | 'submitted' | 'graded';
+
+export interface ExamQuestion {
+  id: string;
+  questionText: string;
+  questionType: string;
+  options: string[] | null;
+  correctAnswer: string | null;
+  points: number;
+  position: number;
+}
+
+export interface RubricCriteria {
+  id: string;
+  name: string;
+  description: string | null;
+  maxScore: number;
+  position: number;
+}
+
+export interface Exam {
+  id: string;
+  title: string;
+  description: string | null;
+  examType: ExamType;
+  maxScore: number | null;
+  durationMinutes: number | null;
+  topic: { id: string; name: string; subject: { id: string; name: string } };
+  examQuestions: ExamQuestion[];
+  rubricCriteria: RubricCriteria[];
+  classroomExams: ClassroomExam[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ClassroomExam {
+  id: string;
+  exam: Exam;
+  classroom: { id: string; name: string };
+  status: ClassroomExamStatus;
+  scheduledAt: string | null;
+  dueAt: string | null;
+  examSubmissions: ExamSubmission[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExamAnswer {
+  id: string;
+  examQuestion: ExamQuestion;
+  answerText: string | null;
+  selectedOption: string | null;
+  score: number | null;
+  correct: boolean | null;
+}
+
+export interface RubricScore {
+  id: string;
+  rubricCriteria: RubricCriteria;
+  score: number;
+  comment: string | null;
+}
+
+export interface ExamSubmission {
+  id: string;
+  student: { id: string; name: string };
+  classroomExam: ClassroomExam;
+  status: ExamSubmissionStatus;
+  score: number | null;
+  passed: boolean | null;
+  startedAt: string | null;
+  submittedAt: string | null;
+  gradedAt: string | null;
+  teacherNotes: string | null;
+  examAnswers: ExamAnswer[];
+  rubricScores: RubricScore[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ObjectiveMastery {
+  id: string;
+  student: { id: string; name: string };
+  learningObjective: LearningObjective;
+  examMastered: boolean;
+  dailyMastered: boolean;
+  mastered: boolean;
+  masteredAt: string | null;
+}
+
 // === Session user (decoded from JWT, stored in locals) ===
 export interface SessionUser {
   id: string;

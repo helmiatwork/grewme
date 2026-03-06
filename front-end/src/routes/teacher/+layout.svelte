@@ -10,6 +10,8 @@
     { label: 'Class Feed', href: '/teacher/feed', icon: '📢' },
     { label: 'Messages', href: '/teacher/messages', icon: '💬' },
     { label: 'Calendar', href: '/teacher/calendar', icon: '📅' },
+    { label: 'Curriculum', href: '/teacher/curriculum', icon: '📚' },
+    { label: 'Exams', href: '/teacher/exams', icon: '📝' },
     { label: 'Profile', href: '/teacher/profile', icon: '👤' }
   ];
 
