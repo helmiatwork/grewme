@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_170001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -232,6 +232,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170000) do
     t.index ["jti"], name: "index_jwt_denylist_on_jti"
   end
 
+  create_table "learning_objectives", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "daily_score_threshold", default: 75, null: false
+    t.text "description"
+    t.integer "exam_pass_threshold", default: 70, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "topic_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["topic_id", "name"], name: "index_learning_objectives_on_topic_id_and_name", unique: true
+    t.index ["topic_id"], name: "index_learning_objectives_on_topic_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.text "body", null: false
     t.bigint "conversation_id", null: false
@@ -410,6 +423,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "subjects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.bigint "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "name"], name: "index_subjects_on_school_id_and_name", unique: true
+    t.index ["school_id"], name: "index_subjects_on_school_id"
+  end
+
   create_table "teachers", force: :cascade do |t|
     t.string "address_line1"
     t.string "address_line2"
@@ -438,6 +461,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170000) do
     t.index ["school_id"], name: "index_teachers_on_school_id"
   end
 
+  create_table "topics", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "subject_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["subject_id", "name"], name: "index_topics_on_subject_id_and_name", unique: true
+    t.index ["subject_id"], name: "index_topics_on_subject_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "classroom_events", "classrooms"
@@ -459,11 +493,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_170000) do
   add_foreign_key "feed_posts", "teachers"
   add_foreign_key "group_conversations", "classrooms"
   add_foreign_key "group_messages", "group_conversations"
+  add_foreign_key "learning_objectives", "topics"
   add_foreign_key "messages", "conversations"
   add_foreign_key "parent_students", "parents"
   add_foreign_key "parent_students", "students"
   add_foreign_key "school_managers", "schools"
+  add_foreign_key "subjects", "schools"
   add_foreign_key "teachers", "schools"
+  add_foreign_key "topics", "subjects"
 
   create_view "student_radar_summaries", materialized: true, sql_definition: <<-SQL
       SELECT s.id AS student_id,
