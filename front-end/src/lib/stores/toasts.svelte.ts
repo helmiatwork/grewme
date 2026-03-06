@@ -10,7 +10,7 @@ export interface Toast {
 }
 
 const MAX_VISIBLE = 3;
-const DEFAULT_DISMISS_MS = 5000;
+const DEFAULT_DISMISS_MS = 30000;
 
 let toasts = $state<Toast[]>([]);
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
