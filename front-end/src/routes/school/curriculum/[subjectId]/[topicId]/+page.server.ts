@@ -90,8 +90,14 @@ export const actions: Actions = {
 
   createLO: async ({ request, locals, cookies, params }) => {
     const formData = await request.formData();
+    const name = formData.get('name') as string;
     const description = formData.get('description') as string;
-    const masteryThreshold = formData.get('masteryThreshold') as string;
+    const examPassThreshold = formData.get('examPassThreshold') as string;
+    const dailyScoreThreshold = formData.get('dailyScoreThreshold') as string;
+
+    if (!name?.trim()) {
+      return fail(400, { loError: 'Name is required' });
+    }
 
     if (!description?.trim()) {
       return fail(400, { loError: 'Description is required' });
@@ -104,9 +110,11 @@ export const actions: Actions = {
         CREATE_LEARNING_OBJECTIVE_MUTATION,
         {
           input: {
+            name: name.trim(),
             description: description.trim(),
             topicId: params.topicId,
-            masteryThreshold: masteryThreshold ? parseFloat(masteryThreshold) : 0.8
+            examPassThreshold: examPassThreshold ? parseInt(examPassThreshold, 10) : undefined,
+            dailyScoreThreshold: dailyScoreThreshold ? parseInt(dailyScoreThreshold, 10) : undefined
           }
         },
         locals.accessToken!
@@ -129,8 +137,10 @@ export const actions: Actions = {
   updateLO: async ({ request, locals, cookies }) => {
     const formData = await request.formData();
     const id = formData.get('id') as string;
+    const name = formData.get('name') as string;
     const description = formData.get('description') as string;
-    const masteryThreshold = formData.get('masteryThreshold') as string;
+    const examPassThreshold = formData.get('examPassThreshold') as string;
+    const dailyScoreThreshold = formData.get('dailyScoreThreshold') as string;
 
     if (!description?.trim()) {
       return fail(400, { loUpdateError: 'Description is required' });
@@ -144,8 +154,10 @@ export const actions: Actions = {
         {
           input: {
             id,
+            name: name?.trim() || undefined,
             description: description.trim(),
-            masteryThreshold: masteryThreshold ? parseFloat(masteryThreshold) : undefined
+            examPassThreshold: examPassThreshold ? parseInt(examPassThreshold, 10) : undefined,
+            dailyScoreThreshold: dailyScoreThreshold ? parseInt(dailyScoreThreshold, 10) : undefined
           }
         },
         locals.accessToken!

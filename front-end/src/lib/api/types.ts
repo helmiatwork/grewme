@@ -263,9 +263,11 @@ export interface Topic {
 
 export interface LearningObjective {
   id: string;
+  name: string;
   description: string;
   position: number;
-  masteryThreshold: number;
+  examPassThreshold: number;
+  dailyScoreThreshold: number;
   topic: { id: string; name: string };
   createdAt: string;
   updatedAt: string;
@@ -279,7 +281,6 @@ export type ExamSubmissionStatus = 'in_progress' | 'submitted' | 'graded';
 export interface ExamQuestion {
   id: string;
   questionText: string;
-  questionType: string;
   options: string[] | null;
   correctAnswer: string | null;
   points: number;
@@ -334,7 +335,7 @@ export interface RubricScore {
   id: string;
   rubricCriteria: RubricCriteria;
   score: number;
-  comment: string | null;
+  feedback: string | null;
 }
 
 export interface ExamSubmission {

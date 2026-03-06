@@ -7,6 +7,7 @@ module Types
     field :avatar, String
     field :daily_scores, Types::DailyScoreType.connection_type, null: false
     field :parents, [ Types::ParentType ], null: false
+    field :classrooms, [ Types::ClassroomType ], null: false
 
     def daily_scores
       object.daily_scores.order(date: :desc)

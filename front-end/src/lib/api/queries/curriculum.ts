@@ -31,9 +31,11 @@ export const SUBJECT_QUERY = `
         position
         learningObjectives {
           id
+          name
           description
           position
-          masteryThreshold
+          examPassThreshold
+          dailyScoreThreshold
         }
         exams {
           id
@@ -57,9 +59,11 @@ export const TOPIC_QUERY = `
       subject { id name }
       learningObjectives {
         id
+        name
         description
         position
-        masteryThreshold
+        examPassThreshold
+        dailyScoreThreshold
         createdAt
       }
       exams {
@@ -175,7 +179,6 @@ export const EXAM_SUBMISSION_QUERY = `
           examQuestions {
             id
             questionText
-            questionType
             options
             correctAnswer
             points
@@ -210,7 +213,7 @@ export const EXAM_SUBMISSION_QUERY = `
         id
         rubricCriteria { id name maxScore }
         score
-        comment
+        feedback
       }
       createdAt
     }
@@ -314,9 +317,11 @@ export const CREATE_LEARNING_OBJECTIVE_MUTATION = `
     createLearningObjective(input: $input) {
       learningObjective {
         id
+        name
         description
         position
-        masteryThreshold
+        examPassThreshold
+        dailyScoreThreshold
       }
       errors
     }
@@ -328,9 +333,11 @@ export const UPDATE_LEARNING_OBJECTIVE_MUTATION = `
     updateLearningObjective(input: $input) {
       learningObjective {
         id
+        name
         description
         position
-        masteryThreshold
+        examPassThreshold
+        dailyScoreThreshold
       }
       errors
     }

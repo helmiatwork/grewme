@@ -122,8 +122,8 @@ export const actions: Actions = {
       durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null
     };
 
-    if (questions?.length) input.examQuestionsAttributes = questions;
-    if (rubricCriteria?.length) input.rubricCriteriaAttributes = rubricCriteria;
+    if (questions?.length) input.questions = questions;
+    if (rubricCriteria?.length) input.rubricCriteria = rubricCriteria;
 
     try {
       const data = await graphql<{

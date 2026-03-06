@@ -91,15 +91,17 @@ export const actions: Actions = {
 
   createLearningObjective: async ({ request, locals, cookies, params }) => {
     const formData = await request.formData();
+    const name = formData.get('name') as string;
     const description = formData.get('description') as string;
-    const masteryThreshold = parseInt(formData.get('masteryThreshold') as string, 10);
+    const examPassThreshold = parseInt(formData.get('examPassThreshold') as string, 10);
+    const dailyScoreThreshold = parseInt(formData.get('dailyScoreThreshold') as string, 10);
+
+    if (!name?.trim()) {
+      return fail(400, { loError: 'Name is required' });
+    }
 
     if (!description?.trim()) {
       return fail(400, { loError: 'Description is required' });
-    }
-
-    if (isNaN(masteryThreshold) || masteryThreshold < 0 || masteryThreshold > 100) {
-      return fail(400, { loError: 'Mastery threshold must be between 0 and 100' });
     }
 
     try {
@@ -107,7 +109,15 @@ export const actions: Actions = {
         createLearningObjective: { learningObjective: LearningObjective | null; errors: string[] };
       }>(
         CREATE_LEARNING_OBJECTIVE_MUTATION,
-        { input: { description: description.trim(), masteryThreshold, topicId: params.topicId } },
+        {
+          input: {
+            name: name.trim(),
+            description: description.trim(),
+            examPassThreshold: isNaN(examPassThreshold) ? undefined : examPassThreshold,
+            dailyScoreThreshold: isNaN(dailyScoreThreshold) ? undefined : dailyScoreThreshold,
+            topicId: params.topicId
+          }
+        },
         locals.accessToken!
       );
 
@@ -128,8 +138,10 @@ export const actions: Actions = {
   updateLearningObjective: async ({ request, locals, cookies }) => {
     const formData = await request.formData();
     const id = formData.get('id') as string;
+    const name = formData.get('name') as string;
     const description = formData.get('description') as string;
-    const masteryThreshold = parseInt(formData.get('masteryThreshold') as string, 10);
+    const examPassThreshold = parseInt(formData.get('examPassThreshold') as string, 10);
+    const dailyScoreThreshold = parseInt(formData.get('dailyScoreThreshold') as string, 10);
 
     if (!description?.trim()) {
       return fail(400, { loEditError: 'Description is required' });
@@ -140,7 +152,15 @@ export const actions: Actions = {
         updateLearningObjective: { learningObjective: LearningObjective | null; errors: string[] };
       }>(
         UPDATE_LEARNING_OBJECTIVE_MUTATION,
-        { input: { id, description: description.trim(), masteryThreshold } },
+        {
+          input: {
+            id,
+            name: name?.trim() || undefined,
+            description: description.trim(),
+            examPassThreshold: isNaN(examPassThreshold) ? undefined : examPassThreshold,
+            dailyScoreThreshold: isNaN(dailyScoreThreshold) ? undefined : dailyScoreThreshold
+          }
+        },
         locals.accessToken!
       );
 
