@@ -13,6 +13,7 @@
     { label: 'Yearly Plan', href: '/school/curriculum/yearly', icon: '📋' },
     { label: 'Exams', href: '/school/exams', icon: '📝' },
     { label: 'Calendar', href: '/school/calendar', icon: '📅' },
+    { label: 'Settings', href: '/school/settings/academic-years', icon: '⚙️' },
     { label: 'Profile', href: '/school/profile', icon: '👤' }
   ];
 </script>
