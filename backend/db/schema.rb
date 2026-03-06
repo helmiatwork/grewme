@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_005837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -121,6 +121,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
     t.index ["school_id"], name: "index_classrooms_on_school_id"
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "parent_id", null: false
+    t.bigint "student_id", null: false
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_conversations_on_parent_id"
+    t.index ["student_id", "parent_id", "teacher_id"], name: "idx_conversations_unique_trio", unique: true
+    t.index ["student_id"], name: "index_conversations_on_student_id"
+    t.index ["teacher_id"], name: "index_conversations_on_teacher_id"
+  end
+
   create_table "daily_scores", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "date", null: false
@@ -199,6 +211,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
     t.datetime "exp", null: false
     t.string "jti", null: false
     t.index ["jti"], name: "index_jwt_denylist_on_jti"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.text "body", null: false
+    t.bigint "conversation_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "read_at"
+    t.bigint "sender_id", null: false
+    t.string "sender_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["sender_type", "sender_id"], name: "index_messages_on_sender"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -379,6 +404,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
   add_foreign_key "classroom_teachers", "classrooms"
   add_foreign_key "classroom_teachers", "teachers"
   add_foreign_key "classrooms", "schools"
+  add_foreign_key "conversations", "parents"
+  add_foreign_key "conversations", "students"
+  add_foreign_key "conversations", "teachers"
   add_foreign_key "daily_scores", "students"
   add_foreign_key "daily_scores", "teachers"
   add_foreign_key "feed_post_comments", "feed_posts"
@@ -387,6 +415,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200006) do
   add_foreign_key "feed_post_students", "students"
   add_foreign_key "feed_posts", "classrooms"
   add_foreign_key "feed_posts", "teachers"
+  add_foreign_key "messages", "conversations"
   add_foreign_key "parent_students", "parents"
   add_foreign_key "parent_students", "students"
   add_foreign_key "school_managers", "schools"

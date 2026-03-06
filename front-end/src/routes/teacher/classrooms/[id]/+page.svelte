@@ -153,10 +153,10 @@
       </div>
 
       {#if successMessage}
-        <Alert variant="success" class="mb-4">{successMessage}</Alert>
+        <div class="mb-4"><Alert variant="success">{successMessage}</Alert></div>
       {/if}
       {#if errorMessage}
-        <Alert variant="error" class="mb-4">{errorMessage}</Alert>
+        <div class="mb-4"><Alert variant="error">{errorMessage}</Alert></div>
       {/if}
 
       {#if selectedSkill}

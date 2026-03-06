@@ -235,6 +235,30 @@ module Types
       post
     end
 
+    # === Chat ===
+
+    field :conversations, [ Types::ConversationType ], null: false, description: "List conversations for current user"
+
+    def conversations
+      authenticate!
+      raise GraphQL::ExecutionError, "Only teachers and parents can access chat" unless current_user.teacher? || current_user.parent?
+
+      Conversation.for_user(current_user)
+        .includes(:student, :parent, :teacher, messages: :sender)
+        .order(updated_at: :desc)
+    end
+
+    field :conversation, Types::ConversationType, null: false, description: "Get a single conversation" do
+      argument :id, ID, required: true
+    end
+
+    def conversation(id:)
+      authenticate!
+      conv = Conversation.find(id)
+      raise Pundit::NotAuthorizedError unless ConversationPolicy.new(current_user, conv).show?
+      conv
+    end
+
     # === Calendar ===
 
     field :classroom_events, [ Types::ClassroomEventType ], null: false, description: "Events for classrooms in a given month" do
