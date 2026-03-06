@@ -138,6 +138,11 @@ export function disconnectNotifications() {
   connected = false;
 }
 
+export function setInitialNotifications(items: Notification[], count: number) {
+  notifications = items;
+  unreadCount = count;
+}
+
 export function setInitialCount(count: number) {
   unreadCount = count;
 }
