@@ -8,6 +8,35 @@
   let { data } = $props();
 
   let showScoreForm = $state(false);
+  let startingChat = $state(false);
+
+  async function chatWithParent() {
+    startingChat = true;
+    try {
+      const res = await fetch('/api/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `mutation CreateConversation($studentId: ID!) {
+            createConversation(studentId: $studentId) {
+              conversation { id }
+              errors { message path }
+            }
+          }`,
+          variables: { studentId: data.radar.studentId }
+        })
+      });
+      const json = await res.json();
+      const conv = json?.data?.createConversation?.conversation;
+      if (conv?.id) {
+        window.location.href = `/teacher/messages/${conv.id}`;
+      }
+    } catch {
+      // ignore
+    } finally {
+      startingChat = false;
+    }
+  }
   let selectedSkill = $state<SkillCategory>('READING');
   let scoreDate = $state(today());
   let scoreValue = $state('');
@@ -84,7 +113,16 @@
     <button onclick={() => history.back()} class="text-sm text-text-muted hover:text-primary transition-colors">
       ← Back
     </button>
-    <h1 class="text-2xl font-bold text-text mt-2">{data.radar.studentName}</h1>
+    <div class="flex items-center justify-between mt-2">
+      <h1 class="text-2xl font-bold text-text">{data.radar.studentName}</h1>
+      <button
+        onclick={chatWithParent}
+        disabled={startingChat}
+        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+      >
+        💬 {startingChat ? 'Opening...' : 'Chat with Parent'}
+      </button>
+    </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
