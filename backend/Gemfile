@@ -40,8 +40,8 @@ gem "blind_index", "~> 2.3"
 
 # Logging & monitoring
 gem "lograge", "~> 0.14"
-gem "sentry-ruby", "~> 5.22"
-gem "sentry-rails", "~> 5.22"
+gem "sentry-ruby", "~> 6.4"
+gem "sentry-rails", "~> 6.4"
 
 # Activity tracking
 gem "public_activity", "~> 3.0"
@@ -54,7 +54,7 @@ gem "flipper-active_record", "~> 1.3"
 gem "fcm", "~> 2.0"
 
 # Utilities
-gem "countries", "~> 7.1"
+gem "countries", "~> 8.1"
 gem "ruby_llm", "~> 1.2"
 
 # Admin
@@ -72,11 +72,11 @@ group :test do
   gem "simplecov", require: false
   gem "factory_bot_rails", "~> 6.4"
   gem "faker", "~> 3.5"
-  gem "shoulda-matchers", "~> 6.4"
+  gem "shoulda-matchers", "~> 7.0"
   gem "shoulda-context", "~> 2.0"
   gem "database_cleaner-active_record", "~> 2.2"
   gem "webmock", "~> 3.24"
   gem "vcr", "~> 6.3"
-  gem "mocha", "~> 2.7"
+  gem "mocha", "~> 3.0"
   gem "timecop", "~> 0.9"
 end
