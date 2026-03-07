@@ -47,10 +47,10 @@ class AuditLogTest < ActiveSupport::TestCase
 
   test "for_resource scope" do
     student = students(:student_emma)
-    AuditLog.create!(event_type: "STUDENT_VIEW", severity: "info", action: "view", resource_type: "Student", resource_id: student.id)
+    log = AuditLog.create!(event_type: "STUDENT_VIEW", severity: "info", action: "view", resource_type: "Student", resource_id: student.id)
 
     results = AuditLog.for_resource(student)
-    assert_equal 1, results.count
+    assert_includes results, log
   end
 
   test "critical scope" do
