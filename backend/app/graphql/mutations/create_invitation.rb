@@ -23,6 +23,14 @@ module Mutations
 
       if invitation.save
         InvitationMailer.teacher_invitation(invitation).deliver_later
+        AuditLogger.log(
+          event_type: :INVITATION_SENT,
+          action: "create_invitation",
+          user: current_user,
+          resource: invitation,
+          metadata: { email: email, role: role },
+          request: context[:request]
+        )
         { invitation: invitation, errors: [] }
       else
         { errors: invitation.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }

@@ -59,6 +59,8 @@ module Types
       classroom = Classroom.find(classroom_id)
       raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).overview?
 
+      AuditLogger.log(event_type: :CLASSROOM_OVERVIEW_VIEW, action: "classroom_overview", user: current_user, resource: classroom, request: context[:request])
+
       Rails.cache.fetch("classroom_overview/#{classroom_id}", expires_in: 5.minutes) do
         students = classroom.students.includes(:daily_scores)
         student_radars = students.map do |student|
@@ -106,6 +108,8 @@ module Types
       student = Student.find(student_id)
       raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).radar?
 
+      AuditLogger.log(event_type: :RADAR_CHART_VIEW, action: "student_radar", user: current_user, resource: student, request: context[:request])
+
       Rails.cache.fetch("student_radar/#{student_id}", expires_in: 5.minutes) do
         averages = student.radar_data
         {
@@ -130,6 +134,8 @@ module Types
       authenticate!
       student = Student.find(student_id)
       raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).progress?
+
+      AuditLogger.log(event_type: :STUDENT_SCORES_VIEW, action: "student_progress", user: current_user, resource: student, request: context[:request])
 
       Rails.cache.fetch("student_progress/#{student_id}", expires_in: 10.minutes) do
         weeks = 4.downto(0).map do |i|
@@ -177,6 +183,8 @@ module Types
       authenticate!
       student = Student.find(student_id)
       raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).show?
+
+      AuditLogger.log(event_type: :STUDENT_SCORES_VIEW, action: "student_daily_scores", user: current_user, resource: student, request: context[:request])
 
       scope = student.daily_scores.order(date: :desc)
       scope = scope.where(skill_category: skill_category) if skill_category
@@ -541,6 +549,24 @@ module Types
       else
         raise GraphQL::ExecutionError, "Not authorized"
       end
+    end
+
+    # === Audit Logs ===
+
+    field :audit_logs, [ Types::AuditLogType ], null: false, description: "Audit trail (school_manager only)" do
+      argument :event_type, String, required: false
+      argument :since, GraphQL::Types::ISO8601DateTime, required: false
+      argument :limit, Integer, required: false
+    end
+
+    def audit_logs(event_type: nil, since: nil, limit: 50)
+      authenticate!
+      raise GraphQL::ExecutionError, "Only school managers can view audit logs" unless current_user.school_manager?
+
+      scope = AuditLog.recent
+      scope = scope.where(event_type: event_type) if event_type
+      scope = scope.since(since) if since
+      scope.limit([ limit, 100 ].min)
     end
 
     # === Admin ===

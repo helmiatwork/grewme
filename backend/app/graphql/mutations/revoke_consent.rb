@@ -19,6 +19,13 @@ module Mutations
       end
 
       consent.revoke!
+      AuditLogger.log(
+        event_type: :CONSENT_REVOKED,
+        action: "revoke_consent",
+        user: current_user,
+        resource: consent,
+        request: context[:request]
+      )
       { consent: consent, errors: [] }
     end
   end

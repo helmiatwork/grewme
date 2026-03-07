@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_07_152739) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_07_160452) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,6 +24,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_152739) do
     t.datetime "updated_at", null: false
     t.index ["school_id", "label"], name: "index_academic_years_on_school_id_and_label", unique: true
     t.index ["school_id"], name: "index_academic_years_on_school_id"
+  end
+
+  create_table "account_deletion_requests", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "grace_period_ends_at", null: false
+    t.text "reason"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["grace_period_ends_at"], name: "index_account_deletion_requests_on_grace_period_ends_at"
+    t.index ["status"], name: "index_account_deletion_requests_on_status"
+    t.index ["user_type", "user_id"], name: "index_account_deletion_requests_on_user_type_and_user_id", unique: true, where: "((status)::text = 'pending'::text)"
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|

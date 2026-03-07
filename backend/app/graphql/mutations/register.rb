@@ -46,6 +46,12 @@ module Mutations
       end
 
       invitation.accept!(teacher)
+      AuditLogger.log(
+        event_type: :ACCOUNT_CREATED,
+        action: "register_via_invitation",
+        user: teacher,
+        request: context[:request]
+      )
       issue_tokens(teacher)
     end
 
@@ -84,6 +90,12 @@ module Mutations
         ParentStudent.create!(parent: parent, student: consent.student)
       end
 
+      AuditLogger.log(
+        event_type: :ACCOUNT_CREATED,
+        action: "register_via_consent",
+        user: parent,
+        request: context[:request]
+      )
       issue_tokens(parent)
     end
 

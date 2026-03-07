@@ -49,6 +49,14 @@ module Mutations
       # Send confirmation email
       ConsentMailer.consent_confirmation(consent).deliver_later
 
+      AuditLogger.log(
+        event_type: :CONSENT_GRANTED,
+        action: "grant_consent",
+        user: parent,
+        resource: consent,
+        request: context[:request]
+      )
+
       access_token = generate_jwt_for(parent)
       { access_token: access_token, user: parent, consent: consent, errors: [] }
     end

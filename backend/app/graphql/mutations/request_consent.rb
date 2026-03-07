@@ -22,6 +22,13 @@ module Mutations
 
       if consent.save
         ConsentMailer.consent_request(consent).deliver_later
+        AuditLogger.log(
+          event_type: :CONSENT_REQUESTED,
+          action: "request_consent",
+          user: current_user,
+          resource: consent,
+          request: context[:request]
+        )
         { consent: consent, errors: [] }
       else
         { errors: consent.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }

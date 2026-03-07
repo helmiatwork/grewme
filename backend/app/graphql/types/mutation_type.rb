@@ -89,5 +89,10 @@ module Types
     field :assign_exam_to_classroom, mutation: Mutations::AssignExamToClassroom
     field :submit_exam_answers, mutation: Mutations::SubmitExamAnswers
     field :grade_exam_submission, mutation: Mutations::GradeExamSubmission
+
+    # Data Rights
+    field :export_child_data, mutation: Mutations::ExportChildData
+    field :request_account_deletion, mutation: Mutations::RequestAccountDeletion
+    field :request_child_data_deletion, mutation: Mutations::RequestChildDataDeletion
   end
 end

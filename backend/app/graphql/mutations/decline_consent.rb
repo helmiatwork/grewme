@@ -19,6 +19,12 @@ module Mutations
       end
 
       consent.decline!
+      AuditLogger.log(
+        event_type: :CONSENT_DECLINED,
+        action: "decline_consent",
+        resource: consent,
+        request: context[:request]
+      )
       { consent: consent, errors: [] }
     end
   end

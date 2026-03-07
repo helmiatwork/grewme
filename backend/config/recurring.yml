@@ -14,3 +14,7 @@ production:
   clear_old_cable_messages:
     command: "SolidCable::Message.where('created_at < ?', 1.day.ago).delete_all"
     schedule: every day at 4am
+
+  data_retention_cleanup:
+    class: DataRetentionCleanupJob
+    schedule: every day at 5am

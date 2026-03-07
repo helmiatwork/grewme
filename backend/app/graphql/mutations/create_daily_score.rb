@@ -18,6 +18,13 @@ module Mutations
       raise Pundit::NotAuthorizedError unless DailyScorePolicy.new(current_user, daily_score).create?
 
       if daily_score.save
+        AuditLogger.log(
+          event_type: :SCORE_CREATE,
+          action: "create_daily_score",
+          user: current_user,
+          resource: daily_score,
+          request: context[:request]
+        )
         { daily_score: daily_score, errors: [] }
       else
         {
