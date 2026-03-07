@@ -33,7 +33,7 @@ module Mutations
           { exam: es.classroom_exam&.exam&.title, score: es.score, submitted_at: es.created_at }
         },
         objective_masteries: student.objective_masteries.includes(:learning_objective).map { |om|
-          { objective: om.learning_objective&.description, mastery_level: om.mastery_level, assessed_at: om.updated_at }
+          { objective: om.learning_objective&.description, exam_mastered: om.exam_mastered, daily_mastered: om.daily_mastered, mastered_at: om.mastered_at }
         },
         classrooms: student.classrooms.map { |c| { name: c.name } },
         exported_at: Time.current.iso8601
@@ -47,7 +47,7 @@ module Mutations
         request: context[:request]
       )
 
-      { data: export, errors: [] }
+      { data: export.deep_stringify_keys, errors: [] }
     end
   end
 end

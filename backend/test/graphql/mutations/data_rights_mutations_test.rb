@@ -47,8 +47,11 @@ class DataRightsMutationsTest < ActiveSupport::TestCase
       user: @parent
     )
 
+    # Ensure no top-level GraphQL errors
+    assert_nil result["errors"], "Unexpected GraphQL errors: #{result["errors"].inspect}"
     data = gql_data(result)
     assert_not_nil data
+    assert_not_nil data["exportChildData"], "exportChildData was nil, result: #{result.to_h.inspect[0..300]}"
     assert_empty data["exportChildData"]["errors"]
     assert_not_nil data["exportChildData"]["data"]
     export = data["exportChildData"]["data"]
