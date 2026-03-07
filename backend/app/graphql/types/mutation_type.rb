@@ -47,6 +47,11 @@ module Types
     field :toggle_permission, mutation: Mutations::Admin::TogglePermission
     field :delete_permission, mutation: Mutations::Admin::DeletePermission
 
+    # Invitations
+    field :create_invitation, mutation: Mutations::CreateInvitation
+    field :accept_invitation, mutation: Mutations::AcceptInvitation
+    field :revoke_invitation, mutation: Mutations::RevokeInvitation
+
     # School Management
     field :assign_teacher_to_classroom, mutation: Mutations::AssignTeacherToClassroom
     field :remove_teacher_from_classroom, mutation: Mutations::RemoveTeacherFromClassroom

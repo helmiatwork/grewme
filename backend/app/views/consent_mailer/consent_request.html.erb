@@ -1,0 +1,20 @@
+<h1>Parental Consent Required</h1>
+<p>A teacher has requested to add your child, <strong><%= @student.name %></strong>, to GrewMe, an educational learning platform.</p>
+<h2>What Information We Collect</h2>
+<ul>
+  <li>Student name</li>
+  <li>Daily learning scores and skill assessments</li>
+  <li>Classroom participation data</li>
+</ul>
+<h2>How We Use This Information</h2>
+<p>We use this data solely for educational purposes: tracking learning progress, generating skill radar charts, and providing feedback to teachers and parents.</p>
+<h2>Who Has Access</h2>
+<p>Only the student's assigned teachers, school administrators, and you (the parent/guardian) can view your child's data.</p>
+<h2>Your Rights</h2>
+<p>You may review, request deletion of, or refuse further collection of your child's data at any time.</p>
+<p>
+  <a href="<%= @accept_url %>">Grant Consent</a> |
+  <a href="<%= @decline_url %>">Decline</a>
+</p>
+<p>This consent request expires in 60 days.</p>
+<p><a href="<%= @privacy_url %>">Read our full Privacy Policy</a></p>

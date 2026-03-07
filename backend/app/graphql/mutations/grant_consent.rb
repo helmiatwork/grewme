@@ -1,0 +1,71 @@
+# frozen_string_literal: true
+
+module Mutations
+  class GrantConsent < BaseMutation
+    argument :token, String, required: true
+    argument :name, String, required: true
+    argument :password, String, required: true
+    argument :password_confirmation, String, required: true
+
+    field :access_token, String
+    field :user, Types::UserUnion
+    field :consent, Types::ConsentType
+    field :errors, [ Types::UserErrorType ], null: false
+
+    def resolve(token:, name:, password:, password_confirmation:)
+      consent = Consent.find_by(token: token)
+
+      unless consent
+        return { errors: [ { message: "Invalid consent token", path: [ "token" ] } ] }
+      end
+
+      unless consent.pending?
+        return { errors: [ { message: "Consent has already been processed", path: [ "token" ] } ] }
+      end
+
+      if consent.expires_at < Time.current
+        return { errors: [ { message: "Consent request has expired", path: [ "token" ] } ] }
+      end
+
+      # Find or create parent account
+      parent = Parent.find_by(email: consent.parent_email)
+      if parent.nil?
+        parent = Parent.new(
+          name: name,
+          email: consent.parent_email,
+          password: password,
+          password_confirmation: password_confirmation
+        )
+        unless parent.save
+          return { errors: parent.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }
+        end
+      end
+
+      # Grant consent and link parent to student
+      consent.grant!(parent: parent, ip_address: context[:request]&.remote_ip)
+
+      # Create parent-student link if not exists
+      unless ParentStudent.exists?(parent: parent, student: consent.student)
+        ParentStudent.create!(parent: parent, student: consent.student)
+      end
+
+      # Send confirmation email
+      ConsentMailer.consent_confirmation(consent).deliver_later
+
+      access_token = generate_jwt_for(parent)
+      { access_token: access_token, user: parent, consent: consent, errors: [] }
+    end
+
+    private
+
+    def generate_jwt_for(entity)
+      secret = Rails.application.credentials.devise_jwt_secret_key!
+      payload = entity.jwt_payload.merge(
+        "jti" => SecureRandom.uuid,
+        "iat" => Time.current.to_i,
+        "exp" => Devise::JWT.config.expiration_time.seconds.from_now.to_i
+      )
+      JWT.encode(payload, secret, "HS256")
+    end
+  end
+end

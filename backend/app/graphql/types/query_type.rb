@@ -396,6 +396,14 @@ module Types
       current_user.school.teachers.includes(:classrooms)
     end
 
+    field :school_invitations, [ Types::InvitationType ], null: false, description: "All invitations for the school (school_manager only)"
+
+    def school_invitations
+      authenticate!
+      raise GraphQL::ExecutionError, "Only school managers can access this" unless current_user.school_manager?
+      current_user.school.invitations.order(created_at: :desc)
+    end
+
     # === Curriculum ===
 
     field :subjects, [ Types::SubjectType ], null: false, description: "List subjects for a school" do
