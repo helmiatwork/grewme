@@ -520,6 +520,29 @@ module Types
       GradeCurriculum.find_by(academic_year_id: academic_year_id, grade: grade)
     end
 
+    # === Consent ===
+
+    field :consent_status, [ Types::ConsentType ], null: false, description: "Consent status for parent's children" do
+      argument :student_id, ID, required: false
+    end
+
+    def consent_status(student_id: nil)
+      authenticate!
+      if current_user.parent?
+        scope = Consent.where(parent: current_user)
+        scope = scope.where(student_id: student_id) if student_id
+        scope.order(created_at: :desc)
+      elsif current_user.teacher?
+        # Teachers can see consent status for students in their classrooms
+        student_ids = current_user.classrooms.joins(:classroom_students).pluck("classroom_students.student_id")
+        scope = Consent.where(student_id: student_ids)
+        scope = scope.where(student_id: student_id) if student_id
+        scope.order(created_at: :desc)
+      else
+        raise GraphQL::ExecutionError, "Not authorized"
+      end
+    end
+
     # === Admin ===
 
     field :user_permissions, Types::UserPermissionsType, null: false, description: "Get user permissions (admin only)" do

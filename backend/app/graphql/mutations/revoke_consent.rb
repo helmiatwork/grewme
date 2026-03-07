@@ -2,18 +2,18 @@
 
 module Mutations
   class RevokeConsent < BaseMutation
-    argument :id, ID, required: true
+    argument :input, Types::RevokeConsentInputType, required: true
 
     field :consent, Types::ConsentType
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(id:)
+    def resolve(input:)
       authenticate!
       unless current_user.parent?
         raise GraphQL::ExecutionError, "Only parents can revoke consent"
       end
 
-      consent = Consent.find(id)
+      consent = Consent.find(input.id)
       unless consent.parent_id == current_user.id
         raise GraphQL::ExecutionError, "You can only revoke your own consent"
       end

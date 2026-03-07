@@ -78,6 +78,12 @@ module Types
     field :set_current_academic_year, mutation: Mutations::SetCurrentAcademicYear
     field :save_grade_curriculum, mutation: Mutations::SaveGradeCurriculum
 
+    # Consent
+    field :request_consent, mutation: Mutations::RequestConsent
+    field :grant_consent, mutation: Mutations::GrantConsent
+    field :decline_consent, mutation: Mutations::DeclineConsent
+    field :revoke_consent, mutation: Mutations::RevokeConsent
+
     # Exams
     field :create_exam, mutation: Mutations::CreateExam
     field :assign_exam_to_classroom, mutation: Mutations::AssignExamToClassroom

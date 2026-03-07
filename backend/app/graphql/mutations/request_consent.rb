@@ -2,22 +2,21 @@
 
 module Mutations
   class RequestConsent < BaseMutation
-    argument :student_id, ID, required: true
-    argument :parent_email, String, required: true
+    argument :input, Types::RequestConsentInputType, required: true
 
     field :consent, Types::ConsentType
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(student_id:, parent_email:)
+    def resolve(input:)
       authenticate!
       unless current_user.teacher?
         raise GraphQL::ExecutionError, "Only teachers can request consent"
       end
 
-      student = Student.find(student_id)
+      student = Student.find(input.student_id)
       consent = Consent.new(
         student: student,
-        parent_email: parent_email,
+        parent_email: input.parent_email,
         consent_method: "email_plus"
       )
 

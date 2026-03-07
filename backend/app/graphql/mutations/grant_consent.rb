@@ -2,18 +2,15 @@
 
 module Mutations
   class GrantConsent < BaseMutation
-    argument :token, String, required: true
-    argument :name, String, required: true
-    argument :password, String, required: true
-    argument :password_confirmation, String, required: true
+    argument :input, Types::GrantConsentInputType, required: true
 
     field :access_token, String
     field :user, Types::UserUnion
     field :consent, Types::ConsentType
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(token:, name:, password:, password_confirmation:)
-      consent = Consent.find_by(token: token)
+    def resolve(input:)
+      consent = Consent.find_by(token: input.token)
 
       unless consent
         return { errors: [ { message: "Invalid consent token", path: [ "token" ] } ] }
@@ -31,10 +28,10 @@ module Mutations
       parent = Parent.find_by(email: consent.parent_email)
       if parent.nil?
         parent = Parent.new(
-          name: name,
+          name: input.name,
           email: consent.parent_email,
-          password: password,
-          password_confirmation: password_confirmation
+          password: input.password,
+          password_confirmation: input.password_confirmation
         )
         unless parent.save
           return { errors: parent.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }

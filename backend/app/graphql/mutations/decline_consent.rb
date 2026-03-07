@@ -2,13 +2,13 @@
 
 module Mutations
   class DeclineConsent < BaseMutation
-    argument :token, String, required: true
+    argument :input, Types::DeclineConsentInputType, required: true
 
     field :consent, Types::ConsentType
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(token:)
-      consent = Consent.find_by(token: token)
+    def resolve(input:)
+      consent = Consent.find_by(token: input.token)
 
       unless consent
         return { errors: [ { message: "Invalid consent token", path: [ "token" ] } ] }
