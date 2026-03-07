@@ -73,7 +73,7 @@ class ConsentTest < ActiveSupport::TestCase
     assert consent.granted?
     assert_equal @parent, consent.parent
     assert_not_nil consent.granted_at
-    assert_equal "127.0.0.1", consent.ip_address.to_s
+    assert_equal "127.0.0.1", consent.ip_address
   end
 
   test "revoke! sets status and timestamp" do

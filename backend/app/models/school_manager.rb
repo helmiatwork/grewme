@@ -13,6 +13,9 @@ class SchoolManager < ApplicationRecord
   has_many :classroom_events, as: :creator, dependent: :nullify
   has_one_attached :avatar_image
 
+  encrypts :name
+  encrypts :email, deterministic: true
+
   validates :name, presence: true
 
   def role

@@ -7,7 +7,7 @@ class CreateConsents < ActiveRecord::Migration[8.1]
       t.string :status, null: false, default: "pending"
       t.string :consent_method, null: false, default: "email_plus"
       t.string :token, null: false
-      t.inet :ip_address
+      t.text :ip_address
       t.datetime :granted_at
       t.datetime :revoked_at
       t.datetime :expires_at

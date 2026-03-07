@@ -1,6 +1,6 @@
 <% require 'bcrypt' %>
 manager_pat:
-  name: Pat Principal
-  email: pat@greenwood.test
+  name: '<%= SchoolManager.new.tap { |sm| sm.name = "Pat Principal" }.ciphertext_for(:name) %>'
+  email: '<%= SchoolManager.new.tap { |sm| sm.email = "pat@greenwood.test" }.ciphertext_for(:email) %>'
   encrypted_password: <%= BCrypt::Password.create("password123") %>
   school: greenwood

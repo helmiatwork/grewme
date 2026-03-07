@@ -12,6 +12,9 @@ class Consent < ApplicationRecord
     expired: "expired"
   }
 
+  encrypts :parent_email, deterministic: true
+  encrypts :ip_address
+
   validates :parent_email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :token, presence: true, uniqueness: true
   validates :consent_method, presence: true, inclusion: { in: %w[email_plus school_official] }

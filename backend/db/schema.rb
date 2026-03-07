@@ -177,7 +177,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_152739) do
     t.datetime "created_at", null: false
     t.datetime "expires_at"
     t.datetime "granted_at"
-    t.inet "ip_address"
+    t.text "ip_address"
     t.string "notice_content_hash"
     t.string "parent_email", null: false
     t.bigint "parent_id"
