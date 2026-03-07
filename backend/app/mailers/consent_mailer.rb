@@ -24,4 +24,16 @@ class ConsentMailer < ApplicationMailer
       subject: "Consent Confirmed for #{@student.name} on GrewMe"
     )
   end
+
+  def consent_reminder(consent)
+    @consent = consent
+    @student = consent.student
+    @accept_url = "#{ENV.fetch("FRONTEND_URL", "http://localhost:5173")}/consent/grant?token=#{consent.token}"
+    @decline_url = "#{ENV.fetch("FRONTEND_URL", "http://localhost:5173")}/consent/decline?token=#{consent.token}"
+
+    mail(
+      to: consent.parent_email,
+      subject: "Reminder: Parental Consent Needed for #{@student.name} on GrewMe"
+    )
+  end
 end

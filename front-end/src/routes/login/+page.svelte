@@ -110,6 +110,11 @@
         Don't have an account?
         <a href="/register" class="text-primary hover:underline font-medium">Register</a>
       </p>
+      <div class="mt-4 text-center text-xs text-text-muted">
+        <a href="/privacy" class="hover:underline">Privacy Policy</a>
+        <span class="mx-2">·</span>
+        <a href="/terms" class="hover:underline">Terms of Service</a>
+      </div>
     </div>
   </div>
 </div>

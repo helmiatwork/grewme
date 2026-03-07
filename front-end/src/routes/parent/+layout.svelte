@@ -11,7 +11,8 @@
     { label: 'Calendar', href: '/parent/calendar', icon: '📅' },
     { label: 'Curriculum', href: '/parent/curriculum', icon: '📚' },
     { label: 'Yearly Plan', href: '/parent/curriculum/yearly', icon: '📋' },
-    { label: 'Profile', href: '/parent/profile', icon: '👤' }
+    { label: 'Profile', href: '/parent/profile', icon: '👤' },
+    { label: 'Data Rights', href: '/parent/data-rights', icon: '🔒' }
   ];
 
   onMount(async () => {

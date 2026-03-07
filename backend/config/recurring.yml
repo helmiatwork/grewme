@@ -18,3 +18,11 @@ production:
   data_retention_cleanup:
     class: DataRetentionCleanupJob
     schedule: every day at 5am
+
+  consent_reminder:
+    class: ConsentReminderJob
+    schedule: every monday at 9am
+
+  consent_expiry:
+    class: ConsentExpiryJob
+    schedule: every day at 6am
