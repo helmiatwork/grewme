@@ -11,16 +11,83 @@ module Mutations
     field :errors, [ Types::UserErrorType ], null: false
 
     def resolve(input:)
-      attrs = input.to_h.except(:role)
-      klass = (input.role == "teacher") ? Teacher : Parent
-      user = klass.new(attrs)
+      if input.invitation_token.present?
+        register_via_invitation(input)
+      elsif input.consent_token.present?
+        register_via_consent(input)
+      else
+        { errors: [ { message: "Registration requires an invitation_token or consent_token", path: [ "token" ] } ] }
+      end
+    end
 
-      unless user.save
-        return {
-          errors: user.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } }
-        }
+    private
+
+    def register_via_invitation(input)
+      invitation = Invitation.find_by(token: input.invitation_token)
+
+      unless invitation
+        return { errors: [ { message: "Invalid invitation token", path: [ "invitationToken" ] } ] }
       end
 
+      if invitation.expired? || !invitation.pending?
+        return { errors: [ { message: "Invitation has expired or already been used", path: [ "invitationToken" ] } ] }
+      end
+
+      teacher = Teacher.new(
+        name: input.name,
+        email: invitation.email,
+        password: input.password,
+        password_confirmation: input.password_confirmation,
+        school: invitation.school
+      )
+
+      unless teacher.save
+        return { errors: teacher.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }
+      end
+
+      invitation.accept!(teacher)
+      issue_tokens(teacher)
+    end
+
+    def register_via_consent(input)
+      consent = Consent.find_by(token: input.consent_token)
+
+      unless consent
+        return { errors: [ { message: "Invalid consent token", path: [ "consentToken" ] } ] }
+      end
+
+      unless consent.pending?
+        return { errors: [ { message: "Consent has already been processed", path: [ "consentToken" ] } ] }
+      end
+
+      if consent.expires_at < Time.current
+        return { errors: [ { message: "Consent request has expired", path: [ "consentToken" ] } ] }
+      end
+
+      parent = Parent.find_by(email: consent.parent_email)
+      if parent.nil?
+        parent = Parent.new(
+          name: input.name,
+          email: consent.parent_email,
+          password: input.password,
+          password_confirmation: input.password_confirmation
+        )
+
+        unless parent.save
+          return { errors: parent.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }
+        end
+      end
+
+      consent.grant!(parent: parent, ip_address: context[:request]&.remote_ip)
+
+      unless ParentStudent.exists?(parent: parent, student: consent.student)
+        ParentStudent.create!(parent: parent, student: consent.student)
+      end
+
+      issue_tokens(parent)
+    end
+
+    def issue_tokens(user)
       access_token = generate_jwt_for(user)
       refresh = user.refresh_tokens.create!(
         ip_address: context[:request].remote_ip,
@@ -35,8 +102,6 @@ module Mutations
         errors: []
       }
     end
-
-    private
 
     def generate_jwt_for(entity)
       secret = Rails.application.credentials.devise_jwt_secret_key!
