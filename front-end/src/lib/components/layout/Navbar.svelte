@@ -3,6 +3,7 @@
   import type { SessionUser } from '$lib/api/types';
   import { getNotifications } from '$lib/stores/notifications.svelte';
   import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
+  import * as m from '$lib/paraglide/messages.js';
 
   interface Props {
     user: SessionUser;
@@ -64,12 +65,12 @@
           <div class="fixed inset-0 z-40" onclick={() => showDropdown = false}></div>
           <div class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-100">
-              <h3 class="text-sm font-semibold text-text">Notifications</h3>
+              <h3 class="text-sm font-semibold text-text">{m.common_notifications()}</h3>
             </div>
             <div class="max-h-80 overflow-y-auto">
               {#if notifs.items.length === 0}
                 <div class="px-4 py-8 text-center text-sm text-text-muted">
-                  No new notifications
+                  {m.common_no_notifications()}
                 </div>
               {:else}
                 {#each notifs.items as notif (notif.id)}
@@ -103,14 +104,14 @@
     </select>
 
     <Badge variant={user.type === 'Teacher' ? 'primary' : user.type === 'SchoolManager' ? 'warning' : 'success'}>
-      {user.type === 'SchoolManager' ? 'School Manager' : user.type}
+      {user.type === 'SchoolManager' ? m.role_school_manager() : user.type === 'Teacher' ? m.role_teacher() : m.role_parent()}
     </Badge>
     <span class="text-sm text-text">{user.email}</span>
     <button
       onclick={logout}
       class="text-sm text-text-muted hover:text-red-500 transition-colors"
     >
-      Sign out
+      {m.common_sign_out()}
     </button>
   </div>
 </header>

@@ -2,19 +2,20 @@
   import { onMount, onDestroy } from 'svelte';
   import { AppShell } from '$lib/components/layout';
   import { connectNotifications, disconnectNotifications, setInitialNotifications } from '$lib/stores/notifications.svelte';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, children } = $props();
 
-  const navItems = [
-    { label: 'Dashboard', href: '/teacher/dashboard', icon: '🏠' },
-    { label: 'Class Feed', href: '/teacher/feed', icon: '📢' },
-    { label: 'Messages', href: '/teacher/messages', icon: '💬' },
-    { label: 'Calendar', href: '/teacher/calendar', icon: '📅' },
-    { label: 'Curriculum', href: '/teacher/curriculum', icon: '📚' },
-    { label: 'Yearly Plan', href: '/teacher/curriculum/yearly', icon: '📋' },
-    { label: 'Exams', href: '/teacher/exams', icon: '📝' },
-    { label: 'Profile', href: '/teacher/profile', icon: '👤' }
-  ];
+  const navItems = $derived([
+    { label: m.nav_dashboard(), href: '/teacher/dashboard', icon: '🏠' },
+    { label: m.nav_class_feed(), href: '/teacher/feed', icon: '📢' },
+    { label: m.nav_messages(), href: '/teacher/messages', icon: '💬' },
+    { label: m.nav_calendar(), href: '/teacher/calendar', icon: '📅' },
+    { label: m.nav_curriculum(), href: '/teacher/curriculum', icon: '📚' },
+    { label: m.nav_yearly_plan(), href: '/teacher/curriculum/yearly', icon: '📋' },
+    { label: m.nav_exams(), href: '/teacher/exams', icon: '📝' },
+    { label: m.nav_profile(), href: '/teacher/profile', icon: '👤' }
+  ]);
 
   onMount(async () => {
     try {

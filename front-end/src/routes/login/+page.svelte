@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import { Button, Input, Alert } from '$lib/components/ui';
   import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { form } = $props();
   let loading = $state(false);
@@ -15,12 +16,12 @@
 <div class="min-h-screen bg-background flex items-center justify-center p-4">
   <div class="w-full max-w-md">
     <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold text-primary mb-2">GrewMe</h1>
-      <p class="text-text-muted">Kids Learning Radar</p>
+      <h1 class="text-4xl font-bold text-primary mb-2">{m.app_name()}</h1>
+      <p class="text-text-muted">{m.app_tagline()}</p>
     </div>
 
     <div class="bg-surface rounded-xl shadow-sm border border-slate-100 p-8">
-      <h2 class="text-xl font-semibold text-text mb-6">Sign in to your account</h2>
+      <h2 class="text-xl font-semibold text-text mb-6">{m.login_title()}</h2>
 
       {#if form?.error}
         <div class="mb-4">
@@ -40,7 +41,7 @@
         class="space-y-4"
       >
         <Input
-          label="Email"
+          label={m.common_email()}
           type="email"
           name="email"
           id="email"
@@ -51,7 +52,7 @@
 
         <div class="relative">
           <Input
-            label="Password"
+            label={m.common_password()}
             type={showPassword ? 'text' : 'password'}
             name="password"
             id="password"
@@ -73,14 +74,14 @@
         </div>
 
         <div class="space-y-1">
-          <label class="block text-sm font-medium text-text">I am a...</label>
+          <label class="block text-sm font-medium text-text">{m.login_role_label()}</label>
           <div class="flex gap-3">
             <label class="flex-1">
               <input type="radio" name="role" value="teacher" checked={!form?.role || form?.role === 'teacher'} class="peer sr-only" />
               <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 cursor-pointer
                 peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary
                 transition-colors text-sm font-medium">
-                Teacher
+                {m.role_teacher()}
               </div>
             </label>
             <label class="flex-1">
@@ -88,7 +89,7 @@
               <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 cursor-pointer
                 peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary
                 transition-colors text-sm font-medium">
-                Parent
+                {m.role_parent()}
               </div>
             </label>
             <label class="flex-1">
@@ -96,25 +97,25 @@
               <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 cursor-pointer
                 peer-checked:border-amber-600 peer-checked:bg-amber-50 peer-checked:text-amber-700
                 transition-colors text-sm font-medium">
-                School
+                {m.role_school()}
               </div>
             </label>
           </div>
         </div>
 
         <Button type="submit" {loading} class="w-full">
-          Sign in
+          {m.login_submit()}
         </Button>
       </form>
 
       <p class="mt-6 text-center text-sm text-text-muted">
-        Don't have an account?
-        <a href="/register" class="text-primary hover:underline font-medium">Register</a>
+        {m.login_no_account()}
+        <a href="/register" class="text-primary hover:underline font-medium">{m.login_register_link()}</a>
       </p>
       <div class="mt-4 text-center text-xs text-text-muted">
-        <a href="/privacy" class="hover:underline">Privacy Policy</a>
+        <a href="/privacy" class="hover:underline">{m.login_privacy()}</a>
         <span class="mx-2">·</span>
-        <a href="/terms" class="hover:underline">Terms of Service</a>
+        <a href="/terms" class="hover:underline">{m.login_terms()}</a>
       </div>
       <div class="mt-2 text-center">
         <select

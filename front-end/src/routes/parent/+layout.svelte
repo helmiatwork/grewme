@@ -2,18 +2,19 @@
   import { onMount, onDestroy } from 'svelte';
   import { AppShell } from '$lib/components/layout';
   import { connectNotifications, disconnectNotifications, setInitialNotifications } from '$lib/stores/notifications.svelte';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, children } = $props();
 
-  const navItems = [
-    { label: 'My Children', href: '/parent/dashboard', icon: '👨‍👧‍👦' },
-    { label: 'Messages', href: '/parent/messages', icon: '💬' },
-    { label: 'Calendar', href: '/parent/calendar', icon: '📅' },
-    { label: 'Curriculum', href: '/parent/curriculum', icon: '📚' },
-    { label: 'Yearly Plan', href: '/parent/curriculum/yearly', icon: '📋' },
-    { label: 'Profile', href: '/parent/profile', icon: '👤' },
-    { label: 'Data Rights', href: '/parent/data-rights', icon: '🔒' }
-  ];
+  const navItems = $derived([
+    { label: m.nav_my_children(), href: '/parent/dashboard', icon: '👨‍👧‍👦' },
+    { label: m.nav_messages(), href: '/parent/messages', icon: '💬' },
+    { label: m.nav_calendar(), href: '/parent/calendar', icon: '📅' },
+    { label: m.nav_curriculum(), href: '/parent/curriculum', icon: '📚' },
+    { label: m.nav_yearly_plan(), href: '/parent/curriculum/yearly', icon: '📋' },
+    { label: m.nav_profile(), href: '/parent/profile', icon: '👤' },
+    { label: m.nav_data_rights(), href: '/parent/data-rights', icon: '🔒' }
+  ]);
 
   onMount(async () => {
     try {
