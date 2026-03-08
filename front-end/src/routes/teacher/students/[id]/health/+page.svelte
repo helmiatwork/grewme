@@ -1,22 +1,23 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
   let showForm = $state(false);
 </script>
 
 <svelte:head>
-  <title>Health Checkups — GrewMe</title>
+  <title>{m.health_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div class="max-w-4xl mx-auto py-8 px-4">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-text">Health Checkups</h1>
+    <h1 class="text-2xl font-bold text-text">{m.health_title()}</h1>
     <button
       onclick={() => showForm = !showForm}
       class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
     >
-      {showForm ? 'Cancel' : '+ New Checkup'}
+      {showForm ? m.common_cancel() : m.health_new_checkup()}
     </button>
   </div>
 
@@ -30,7 +31,7 @@
 
   {#if showForm}
     <div class="bg-surface rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
-      <h2 class="text-lg font-semibold text-text mb-4">Record Measurement</h2>
+      <h2 class="text-lg font-semibold text-text mb-4">{m.health_record_title()}</h2>
       <form method="POST" action="?/create" use:enhance={() => {
         return async ({ update }) => {
           await update();
@@ -39,38 +40,38 @@
       }}>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="measuredAt" class="block text-sm font-medium text-text mb-1">Date *</label>
+            <label for="measuredAt" class="block text-sm font-medium text-text mb-1">{m.health_date_label()}</label>
             <input type="date" id="measuredAt" name="measuredAt" required
               value={new Date().toISOString().split('T')[0]}
               class="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label for="weightKg" class="block text-sm font-medium text-text mb-1">Weight (kg)</label>
+            <label for="weightKg" class="block text-sm font-medium text-text mb-1">{m.health_weight_label()}</label>
             <input type="number" id="weightKg" name="weightKg" step="0.01" min="0.1" max="200"
               placeholder="e.g. 20.5"
               class="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label for="heightCm" class="block text-sm font-medium text-text mb-1">Height (cm)</label>
+            <label for="heightCm" class="block text-sm font-medium text-text mb-1">{m.health_height_label()}</label>
             <input type="number" id="heightCm" name="heightCm" step="0.1" min="1" max="250"
               placeholder="e.g. 115.0"
               class="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label for="headCircumferenceCm" class="block text-sm font-medium text-text mb-1">Head Circumference (cm)</label>
+            <label for="headCircumferenceCm" class="block text-sm font-medium text-text mb-1">{m.health_head_label()}</label>
             <input type="number" id="headCircumferenceCm" name="headCircumferenceCm" step="0.1" min="1" max="100"
               placeholder="e.g. 51.0"
               class="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
           </div>
         </div>
         <div class="mt-4">
-          <label for="notes" class="block text-sm font-medium text-text mb-1">Notes</label>
-          <textarea id="notes" name="notes" rows="2" placeholder="Optional observations..."
+          <label for="notes" class="block text-sm font-medium text-text mb-1">{m.health_notes_label()}</label>
+          <textarea id="notes" name="notes" rows="2" placeholder={m.health_notes_placeholder()}
             class="w-full p-2.5 border border-slate-200 rounded-lg text-sm"></textarea>
         </div>
-        <p class="text-xs text-text-muted mt-2">* At least one measurement (weight, height, or head circumference) is required.</p>
+        <p class="text-xs text-text-muted mt-2">{m.health_required_hint()}</p>
         <button type="submit" class="mt-4 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
-          Save Checkup
+          {m.health_save_btn()}
         </button>
       </form>
     </div>
@@ -79,19 +80,19 @@
   <!-- History -->
   <div class="bg-surface rounded-xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-100">
-      <h2 class="text-lg font-semibold text-text">History</h2>
+      <h2 class="text-lg font-semibold text-text">{m.health_history()}</h2>
     </div>
     {#if data.checkups?.length > 0}
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="bg-slate-50">
             <tr>
-              <th class="px-4 py-3 text-left font-medium text-text-muted">Date</th>
-              <th class="px-4 py-3 text-right font-medium text-text-muted">Weight (kg)</th>
-              <th class="px-4 py-3 text-right font-medium text-text-muted">Height (cm)</th>
-              <th class="px-4 py-3 text-right font-medium text-text-muted">Head (cm)</th>
-              <th class="px-4 py-3 text-right font-medium text-text-muted">BMI</th>
-              <th class="px-4 py-3 text-left font-medium text-text-muted">Notes</th>
+              <th class="px-4 py-3 text-left font-medium text-text-muted">{m.health_col_date()}</th>
+              <th class="px-4 py-3 text-right font-medium text-text-muted">{m.health_col_weight()}</th>
+              <th class="px-4 py-3 text-right font-medium text-text-muted">{m.health_col_height()}</th>
+              <th class="px-4 py-3 text-right font-medium text-text-muted">{m.health_col_head()}</th>
+              <th class="px-4 py-3 text-right font-medium text-text-muted">{m.health_col_bmi()}</th>
+              <th class="px-4 py-3 text-left font-medium text-text-muted">{m.health_col_notes()}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -122,8 +123,8 @@
       </div>
     {:else}
       <div class="px-6 py-12 text-center text-text-muted">
-        <p>No health checkups recorded yet.</p>
-        <p class="text-sm mt-1">Click "+ New Checkup" to record the first measurement.</p>
+        <p>{m.health_no_checkups()}</p>
+        <p class="text-sm mt-1">{m.health_no_checkups_hint()}</p>
       </div>
     {/if}
   </div>

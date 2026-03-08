@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card, Badge } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -36,17 +37,17 @@
 </script>
 
 <svelte:head>
-  <title>Exams — GrewMe</title>
+  <title>{m.exam_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-text">Exams</h1>
+    <h1 class="text-2xl font-bold text-text">{m.exam_title()}</h1>
     <a
       href="/teacher/exams/new"
       class="inline-flex items-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
     >
-      + Create Exam
+      {m.exam_create()}
     </a>
   </div>
 
@@ -56,7 +57,7 @@
       bind:value={filterSubject}
       class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
     >
-      <option value="">All Subjects</option>
+      <option value="">{m.exam_filter_all_subjects()}</option>
       {#each subjects as subject}
         <option value={subject.id}>{subject.name}</option>
       {/each}
@@ -65,18 +66,18 @@
       bind:value={filterType}
       class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
     >
-      <option value="">All Types</option>
-      <option value="SCORE_BASED">Score Based</option>
-      <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-      <option value="RUBRIC">Rubric</option>
-      <option value="PASS_FAIL">Pass/Fail</option>
+      <option value="">{m.exam_filter_all_types()}</option>
+      <option value="SCORE_BASED">{m.exam_type_score_based()}</option>
+      <option value="MULTIPLE_CHOICE">{m.exam_type_multiple_choice()}</option>
+      <option value="RUBRIC">{m.exam_type_rubric()}</option>
+      <option value="PASS_FAIL">{m.exam_type_pass_fail()}</option>
     </select>
   </div>
 
   {#if filteredExams.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No exams yet.</p>
-      <p class="text-sm mt-1">Create your first exam to get started.</p>
+      <p class="text-lg">{m.exam_no_exams()}</p>
+      <p class="text-sm mt-1">{m.exam_no_exams_hint()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -3,6 +3,7 @@
   import { Button, Alert } from '$lib/components/ui';
   import { FeedCard } from '$lib/components/feed';
   import { uploadFiles } from '$lib/api/upload';
+  import * as m from '$lib/paraglide/messages.js';
 
   onMount(() => import('emoji-picker-element'));
 
@@ -87,7 +88,7 @@
     const body = formData.get('body') as string;
 
     if (!body?.trim()) {
-      uploadError = 'Message is required';
+      uploadError = m.feed_message_required();
       uploading = false;
       return;
     }
@@ -139,19 +140,19 @@
 </script>
 
 <svelte:head>
-  <title>Class Feed — GrewMe</title>
+  <title>{m.feed_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div class="max-w-2xl mx-auto">
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-text">Class Feed</h1>
-    <Button onclick={openModal}>+ New Post</Button>
+    <h1 class="text-2xl font-bold text-text">{m.feed_title()}</h1>
+    <Button onclick={openModal}>{m.feed_new_post()}</Button>
   </div>
 
   <!-- Recent Posts -->
   {#if data.feedPosts.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p>No posts yet. Create your first update!</p>
+      <p>{m.feed_no_posts()}</p>
     </div>
   {:else}
     <div class="space-y-4">
@@ -176,7 +177,7 @@
     <!-- Modal content -->
     <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-text">Create Post</h2>
+        <h2 class="text-lg font-semibold text-text">{m.feed_create_post()}</h2>
         <button
           type="button"
           onclick={closeModal}
@@ -196,7 +197,7 @@
 
       <form onsubmit={handleSubmit} class="space-y-4">
         <div>
-          <label for="modal-classroomId" class="block text-sm font-medium text-text mb-1">Classroom</label>
+          <label for="modal-classroomId" class="block text-sm font-medium text-text mb-1">{m.feed_classroom_label()}</label>
           <select
             id="modal-classroomId"
             bind:value={selectedClassroomId}
@@ -204,20 +205,20 @@
             disabled={uploading}
             class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="all">All Classes</option>
+            <option value="all">{m.feed_all_classes()}</option>
             {#each data.classrooms as classroom}
               <option value={classroom.id}>{classroom.name}</option>
             {/each}
           </select>
           {#if isAllClasses}
-            <p class="text-xs text-text-muted mt-1">All parents across your classes will see this post</p>
+            <p class="text-xs text-text-muted mt-1">{m.feed_all_classes_hint()}</p>
           {/if}
         </div>
 
         {#if !isAllClasses && classroomStudents.length > 0}
           <div>
             <label class="block text-sm font-medium text-text mb-1">
-              Tag students <span class="text-text-muted font-normal">(optional)</span>
+              {m.feed_tag_students()} <span class="text-text-muted font-normal">{m.feed_optional()}</span>
             </label>
             <div class="flex flex-wrap gap-2">
               {#each classroomStudents as student}
@@ -232,7 +233,7 @@
               {/each}
             </div>
             {#if selectedStudentIds.length > 0}
-              <p class="text-xs text-text-muted mt-1">{selectedStudentIds.length} student{selectedStudentIds.length > 1 ? 's' : ''} tagged</p>
+              <p class="text-xs text-text-muted mt-1">{selectedStudentIds.length} {selectedStudentIds.length > 1 ? m.feed_tagged_students() : m.feed_tagged_student()}</p>
             {/if}
           </div>
         {/if}
@@ -301,7 +302,7 @@
             required
             rows={3}
             disabled={uploading}
-            placeholder="Type a message..."
+            placeholder={m.feed_message_placeholder()}
             class="w-full border border-slate-200 rounded-2xl px-4 pt-2.5 pb-9 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           ></textarea>
           <!-- Icons inside textarea, bottom-right -->
@@ -403,7 +404,7 @@
         />
 
         <Button type="submit" class="w-full" disabled={uploading}>
-          {uploading ? 'Posting...' : 'Post Update'}
+          {uploading ? m.feed_posting() : m.feed_post_btn()}
         </Button>
       </form>
     </div>

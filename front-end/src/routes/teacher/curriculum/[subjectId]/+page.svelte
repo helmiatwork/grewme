@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { Card, Button, Input, Alert } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -30,7 +31,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.subject.name} — GrewMe</title>
+  <title>{data.subject.name} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
@@ -44,7 +45,7 @@
   <!-- Subject Header -->
   {#if editing}
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
-      <h2 class="text-lg font-semibold text-text mb-4">Edit Subject</h2>
+      <h2 class="text-lg font-semibold text-text mb-4">{m.curriculum_edit_subject()}</h2>
       {#if form?.updateError}
         <div class="mb-4"><Alert variant="error">{form.updateError}</Alert></div>
       {/if}
@@ -61,16 +62,16 @@
       >
         <div class="space-y-4">
           <div>
-            <label for="edit-name" class="block text-sm font-medium text-text mb-1">Name</label>
+            <label for="edit-name" class="block text-sm font-medium text-text mb-1">{m.curriculum_subject_name()}</label>
             <Input id="edit-name" name="name" value={data.subject.name} required />
           </div>
           <div>
-            <label for="edit-description" class="block text-sm font-medium text-text mb-1">Description</label>
+            <label for="edit-description" class="block text-sm font-medium text-text mb-1">{m.curriculum_description()}</label>
             <Input id="edit-description" name="description" value={data.subject.description ?? ''} />
           </div>
           <div class="flex gap-2">
-            <Button type="submit" disabled={submitting}>{submitting ? 'Saving...' : 'Save'}</Button>
-            <Button variant="ghost" onclick={() => (editing = false)}>Cancel</Button>
+            <Button type="submit" disabled={submitting}>{submitting ? m.curriculum_saving() : m.common_save()}</Button>
+            <Button variant="ghost" onclick={() => (editing = false)}>{m.common_cancel()}</Button>
           </div>
         </div>
       </form>
@@ -84,8 +85,8 @@
         {/if}
       </div>
       <div class="flex gap-2">
-        <Button variant="outline" onclick={() => (editing = true)}>Edit</Button>
-        <Button variant="danger" onclick={confirmDelete}>Delete</Button>
+        <Button variant="outline" onclick={() => (editing = true)}>{m.common_edit()}</Button>
+        <Button variant="danger" onclick={confirmDelete}>{m.common_delete()}</Button>
       </div>
     </div>
   {/if}
@@ -100,9 +101,9 @@
 
   <!-- Topics Section -->
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-xl font-semibold text-text">Topics</h2>
+    <h2 class="text-xl font-semibold text-text">{m.curriculum_topics()}</h2>
     <Button onclick={() => (showTopicForm = !showTopicForm)}>
-      {showTopicForm ? 'Cancel' : 'Add Topic'}
+      {showTopicForm ? m.common_cancel() : m.curriculum_add_topic()}
     </Button>
   </div>
 
@@ -112,7 +113,7 @@
 
   {#if showTopicForm}
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-4">
-      <h3 class="text-base font-semibold text-text mb-3">New Topic</h3>
+      <h3 class="text-base font-semibold text-text mb-3">{m.curriculum_new_topic()}</h3>
       <form
         method="POST"
         action="?/createTopic"
@@ -126,20 +127,18 @@
       >
         <div class="space-y-3">
           <div>
-            <label for="topic-name" class="block text-sm font-medium text-text mb-1">Topic Name</label>
-            <Input id="topic-name" name="name" placeholder="e.g. Algebra Basics" required />
+            <label for="topic-name" class="block text-sm font-medium text-text mb-1">{m.curriculum_topic_name()}</label>
+            <Input id="topic-name" name="name" placeholder={m.curriculum_topic_name_placeholder()} required />
           </div>
           <div>
-            <label for="topic-description" class="block text-sm font-medium text-text mb-1">
-              Description <span class="text-text-muted">(optional)</span>
-            </label>
-            <Input id="topic-description" name="description" placeholder="Brief description..." />
+            <label for="topic-description" class="block text-sm font-medium text-text mb-1">{m.curriculum_description_optional()}</label>
+            <Input id="topic-description" name="description" placeholder={m.curriculum_description_placeholder()} />
           </div>
           <div class="flex gap-2">
             <Button type="submit" disabled={topicSubmitting}>
-              {topicSubmitting ? 'Adding...' : 'Add Topic'}
+              {topicSubmitting ? m.curriculum_adding() : m.curriculum_add_topic()}
             </Button>
-            <Button variant="ghost" onclick={() => (showTopicForm = false)}>Cancel</Button>
+            <Button variant="ghost" onclick={() => (showTopicForm = false)}>{m.common_cancel()}</Button>
           </div>
         </div>
       </form>
@@ -148,7 +147,7 @@
 
   {#if data.subject.topics?.length === 0}
     <div class="text-center py-10 text-text-muted">
-      <p>No topics yet. Add your first topic above.</p>
+      <p>{m.curriculum_no_topics()}</p>
     </div>
   {:else}
     <div class="space-y-3">

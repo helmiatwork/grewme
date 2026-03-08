@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { Card, Alert, Button } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -60,7 +61,7 @@
 </script>
 
 <svelte:head>
-  <title>{exam?.title ?? 'Exam'} — GrewMe</title>
+  <title>{exam?.title ?? m.exam_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
@@ -104,7 +105,7 @@
 
   <!-- Tabs -->
   <div class="flex gap-1 border-b border-slate-100 mb-6">
-    {#each [['questions', 'Questions / Criteria'], ['classrooms', 'Classrooms'], ['submissions', 'Submissions']] as [tab, label]}
+    {#each [['questions', m.exam_tab_questions()], ['classrooms', m.exam_tab_classrooms()], ['submissions', m.exam_tab_submissions()]] as [tab, label]}
       <button
         type="button"
         onclick={() => (activeTab = tab as any)}
@@ -121,7 +122,7 @@
   {#if activeTab === 'questions'}
     {#if exam?.examType === 'RUBRIC'}
       {#if exam.rubricCriteria?.length === 0}
-        <p class="text-sm text-text-muted">No rubric criteria defined.</p>
+        <p class="text-sm text-text-muted">{m.exam_no_rubric()}</p>
       {:else}
         <div class="space-y-3">
           {#each exam.rubricCriteria as criterion, i}
@@ -138,10 +139,10 @@
         </div>
       {/if}
     {:else if exam?.examType === 'PASS_FAIL'}
-      <p class="text-sm text-text-muted">Pass/Fail exam — no questions required.</p>
+      <p class="text-sm text-text-muted">{m.exam_pass_fail_info()}</p>
     {:else}
       {#if exam?.examQuestions?.length === 0}
-        <p class="text-sm text-text-muted">No questions added yet.</p>
+        <p class="text-sm text-text-muted">{m.exam_no_questions_added()}</p>
       {:else}
         <div class="space-y-3">
           {#each exam?.examQuestions ?? [] as question, i}
@@ -177,10 +178,10 @@
     {/if}
 
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-text">Assigned Classrooms</h2>
+      <h2 class="text-lg font-semibold text-text">{m.exam_assigned_classrooms()}</h2>
       {#if unassignedClassrooms.length > 0}
         <Button variant="ghost" onclick={() => (showAssignForm = !showAssignForm)}>
-          {showAssignForm ? 'Cancel' : 'Assign to Classroom'}
+          {showAssignForm ? m.common_cancel() : m.exam_assign_to_classroom()}
         </Button>
       {/if}
     </div>
@@ -201,13 +202,13 @@
           <input type="hidden" name="examId" value={exam?.id} />
           <div class="space-y-3">
             <div>
-              <label class="block text-sm font-medium text-text mb-1">Classroom</label>
+              <label class="block text-sm font-medium text-text mb-1">{m.calendar_classroom_label()}</label>
               <select
                 name="classroomId"
                 required
                 class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
-                <option value="">Select classroom…</option>
+                <option value="">{m.calendar_select_classroom()}</option>
                 {#each unassignedClassrooms as classroom}
                   <option value={classroom.id}>{classroom.name}</option>
                 {/each}
@@ -216,7 +217,7 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-sm font-medium text-text mb-1">
-                  Scheduled At <span class="text-text-muted">(optional)</span>
+                  {m.exam_scheduled_at()}
                 </label>
                 <input
                   type="datetime-local"
@@ -226,7 +227,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-text mb-1">
-                  Due At <span class="text-text-muted">(optional)</span>
+                  {m.exam_due_at()}
                 </label>
                 <input
                   type="datetime-local"
@@ -236,7 +237,7 @@
               </div>
             </div>
             <Button type="submit" disabled={assigning}>
-              {assigning ? 'Assigning…' : 'Assign'}
+              {assigning ? m.exam_assigning() : m.exam_assign_btn()}
             </Button>
           </div>
         </form>
@@ -244,7 +245,7 @@
     {/if}
 
     {#if exam?.classroomExams?.length === 0}
-      <p class="text-sm text-text-muted">Not assigned to any classrooms yet.</p>
+      <p class="text-sm text-text-muted">{m.exam_not_assigned()}</p>
     {:else}
       <div class="space-y-3">
         {#each exam?.classroomExams ?? [] as ce}
@@ -271,13 +272,13 @@
   <!-- Tab: Submissions -->
   {#if activeTab === 'submissions'}
     {#if exam?.classroomExams?.length === 0}
-      <p class="text-sm text-text-muted">No classrooms assigned yet.</p>
+      <p class="text-sm text-text-muted">{m.exam_no_classrooms_assigned()}</p>
     {:else}
       {#each exam?.classroomExams ?? [] as ce}
         <div class="mb-6">
           <h3 class="font-semibold text-text mb-3">{ce.classroom.name}</h3>
           {#if ce.examSubmissions?.length === 0}
-            <p class="text-sm text-text-muted ml-1">No submissions yet.</p>
+            <p class="text-sm text-text-muted ml-1">{m.exam_no_submissions()}</p>
           {:else}
             <div class="space-y-2">
               {#each ce.examSubmissions as sub}

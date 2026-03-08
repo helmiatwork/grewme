@@ -3,6 +3,7 @@
   import { RadarChart } from '$lib/components/charts';
   import { SKILL_CATEGORIES, SKILL_LABELS, SKILL_EMOJIS, SKILL_BG_COLORS } from '$lib/utils/constants';
   import { today } from '$lib/utils/helpers';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -96,11 +97,11 @@
       if (result?.errors?.length > 0) {
         errorMessage = result.errors.map((e: { message: string }) => e.message).join(', ');
       } else {
-        successMessage = 'Scores saved successfully!';
+        successMessage = m.classroom_scores_saved();
         setTimeout(() => location.reload(), 800);
       }
     } catch {
-      errorMessage = 'Failed to save scores. Please try again.';
+      errorMessage = m.classroom_scores_failed();
     } finally {
       saving = false;
     }
@@ -108,13 +109,13 @@
 </script>
 
 <svelte:head>
-  <title>{data.classroom.name} — GrewMe</title>
+  <title>{data.classroom.name} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
   <div class="mb-6">
     <a href="/teacher/dashboard" class="text-sm text-text-muted hover:text-primary transition-colors">
-      ← Back to Dashboard
+      {m.classroom_back_dashboard()}
     </a>
     <h1 class="text-2xl font-bold text-text mt-2">{data.classroom.name}</h1>
     {#if data.classroom.school}
@@ -127,8 +128,8 @@
     <Card>
       {#snippet header()}
         <div>
-          <h2 class="text-lg font-semibold text-text">Quick Score</h2>
-          <p class="text-sm text-text-muted">Score all students at once</p>
+          <h2 class="text-lg font-semibold text-text">{m.classroom_quick_score()}</h2>
+          <p class="text-sm text-text-muted">{m.classroom_quick_score_hint()}</p>
         </div>
       {/snippet}
 
@@ -161,7 +162,7 @@
 
       {#if selectedSkill}
         {#if loadingScores}
-          <p class="text-text-muted text-sm py-4">Loading scores...</p>
+          <p class="text-text-muted text-sm py-4">{m.classroom_loading_scores()}</p>
         {:else if data.classroom.students && data.classroom.students.length > 0}
           <div class="divide-y divide-slate-100 -mx-6">
             {#each data.classroom.students as student}
@@ -185,11 +186,11 @@
 
           <div class="mt-4">
             <Button onclick={saveAll} disabled={saving} class="w-full">
-              {saving ? 'Saving...' : 'Save All'}
+              {saving ? m.classroom_saving() : m.classroom_save_all()}
             </Button>
           </div>
         {:else}
-          <p class="text-text-muted text-center py-4">No students enrolled</p>
+          <p class="text-text-muted text-center py-4">{m.classroom_no_students()}</p>
         {/if}
       {/if}
     </Card>
@@ -211,19 +212,19 @@
               class="flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition-colors"
             >
               <span class="font-medium text-text">{student.name}</span>
-              <span class="text-sm text-text-muted">View →</span>
+              <span class="text-sm text-text-muted">{m.classroom_view_arrow()}</span>
             </a>
           {/each}
         </div>
       {:else}
-        <p class="text-text-muted text-center py-4">No students enrolled</p>
+        <p class="text-text-muted text-center py-4">{m.classroom_no_students()}</p>
       {/if}
     </Card>
 
     <!-- Class Overview Radar -->
     <Card>
       {#snippet header()}
-        <h2 class="text-lg font-semibold text-text">Class Overview</h2>
+        <h2 class="text-lg font-semibold text-text">{m.classroom_class_overview()}</h2>
       {/snippet}
       {#if data.overview.students.length > 0}
         <div class="space-y-6">
@@ -235,7 +236,7 @@
           {/each}
         </div>
       {:else}
-        <p class="text-text-muted text-center py-4">No data available</p>
+        <p class="text-text-muted text-center py-4">{m.classroom_no_data()}</p>
       {/if}
     </Card>
   </div>

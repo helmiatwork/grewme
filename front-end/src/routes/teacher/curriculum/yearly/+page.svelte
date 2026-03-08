@@ -4,6 +4,7 @@
   import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import { Card, Button, Alert } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
   import { gradeDisplayName, gradeOptions } from '$lib/utils/grade';
   import type { GradeCurriculumItem as GCItem } from '$lib/api/types';
 
@@ -98,17 +99,17 @@
 </script>
 
 <svelte:head>
-  <title>Yearly Curriculum — GrewMe</title>
+  <title>{m.yearly_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-text">Yearly Curriculum</h1>
-      <p class="text-sm text-text-muted mt-1">Build the curriculum for your grade levels.</p>
+      <h1 class="text-2xl font-bold text-text">{m.yearly_title()}</h1>
+      <p class="text-sm text-text-muted mt-1">{m.yearly_subtitle()}</p>
     </div>
     <a href="/teacher/curriculum" class="text-sm text-primary hover:underline">
-      ← Back to Master Curriculum
+      {m.yearly_back()}
     </a>
   </div>
 
@@ -117,24 +118,24 @@
   {/if}
 
   {#if saveSuccess}
-    <div class="mb-4"><Alert variant="success">Curriculum saved successfully!</Alert></div>
+      <div class="mb-4"><Alert variant="success">{m.yearly_saved()}</Alert></div>
   {/if}
 
   {#if !data.school}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No school found</p>
-      <p class="text-sm mt-1">Your classrooms are not linked to a school.</p>
+      <p class="text-lg">{m.yearly_no_school()}</p>
+      <p class="text-sm mt-1">{m.yearly_no_school_hint()}</p>
     </div>
   {:else if data.academicYears.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No academic years configured</p>
-      <p class="text-sm mt-1">Ask your school manager to create an academic year.</p>
+      <p class="text-lg">{m.yearly_no_years()}</p>
+      <p class="text-sm mt-1">{m.yearly_no_years_hint()}</p>
     </div>
   {:else}
     <!-- Selectors -->
     <div class="flex flex-wrap gap-4 mb-6">
       <div>
-        <label for="year-select" class="block text-sm font-medium text-text mb-1">Academic Year</label>
+        <label for="year-select" class="block text-sm font-medium text-text mb-1">{m.yearly_academic_year()}</label>
         <select id="year-select" class="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50" bind:value={selectedYearId} onchange={onSelectionChange}>
           {#each data.academicYears as year}
             <option value={year.id}>{year.label}{year.current ? ' (Current)' : ''}</option>
@@ -142,7 +143,7 @@
         </select>
       </div>
       <div>
-        <label for="grade-select" class="block text-sm font-medium text-text mb-1">Grade Level</label>
+        <label for="grade-select" class="block text-sm font-medium text-text mb-1">{m.yearly_grade_level()}</label>
         <select id="grade-select" class="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50" bind:value={selectedGrade} onchange={onSelectionChange}>
           {#each grades as grade}
             <option value={grade.value}>{grade.label}</option>
@@ -155,10 +156,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Left: Master Curriculum -->
       <div>
-        <h2 class="text-lg font-semibold text-text mb-3">Master Curriculum</h2>
+        <h2 class="text-lg font-semibold text-text mb-3">{m.yearly_master_curriculum()}</h2>
         <div class="bg-surface rounded-xl border border-slate-100 p-4 max-h-[600px] overflow-y-auto">
           {#if data.subjects.length === 0}
-            <p class="text-sm text-text-muted text-center py-4">No subjects in master curriculum.</p>
+            <p class="text-sm text-text-muted text-center py-4">{m.yearly_no_master_subjects()}</p>
           {:else}
             <div class="space-y-1">
               {#each data.subjects as subject}
@@ -173,7 +174,7 @@
                       <span class="text-sm font-medium text-text">{subject.name}</span>
                       <span class="text-xs text-text-muted ml-1">({subject.topics?.length ?? 0} topics)</span>
                     </div>
-                    <button class="opacity-0 group-hover:opacity-100 text-xs bg-primary text-white px-2 py-1 rounded transition-opacity disabled:opacity-30" onclick={() => addToCurriculum({ id: `master-subject-${subject.id}`, subjectId: subject.id, displayName: `${subject.name} (all topics)`, type: 'subject' })} disabled={inCurriculum}>+ Add All</button>
+                    <button class="opacity-0 group-hover:opacity-100 text-xs bg-primary text-white px-2 py-1 rounded transition-opacity disabled:opacity-30" onclick={() => addToCurriculum({ id: `master-subject-${subject.id}`, subjectId: subject.id, displayName: `${subject.name} (all topics)`, type: 'subject' })} disabled={inCurriculum}>{m.yearly_add_all()}</button>
                   </div>
                   {#if isExpanded}
                     <div class="ml-6 space-y-0.5">
@@ -209,7 +210,7 @@
         >
           {#if curriculumItems.length === 0}
             <div class="flex items-center justify-center h-32 text-text-muted text-sm">
-              <p>Click "+ Add" on subjects or topics to build the curriculum</p>
+              <p>{m.yearly_empty_hint()}</p>
             </div>
           {/if}
           {#each curriculumItems as item, index (item.id)}
@@ -236,7 +237,7 @@
             <input type="hidden" name="grade" value={selectedGrade} />
             <input type="hidden" name="items" value={buildItemsJson()} />
             <Button type="submit" disabled={saving || curriculumItems.length === 0} class="w-full">
-              {saving ? 'Saving...' : `Save ${gradeDisplayName(selectedGrade)} Curriculum`}
+              {saving ? m.yearly_saving() : `Save ${gradeDisplayName(selectedGrade)} Curriculum`}
             </Button>
           </form>
         </div>

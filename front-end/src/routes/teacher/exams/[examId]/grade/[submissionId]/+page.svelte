@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { Alert, Button } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -67,21 +68,21 @@
 </script>
 
 <svelte:head>
-  <title>Grade Submission — GrewMe</title>
+  <title>{m.grade_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div class="max-w-2xl">
   <!-- Breadcrumb -->
   <nav class="text-sm text-text-muted mb-4">
-    <a href="/teacher/exams" class="hover:text-primary">Exams</a>
+    <a href="/teacher/exams" class="hover:text-primary">{m.exam_title()}</a>
     <span class="mx-2">›</span>
     <a href="/teacher/exams/{exam?.id}" class="hover:text-primary">{exam?.title}</a>
     <span class="mx-2">›</span>
-    <span class="text-text">Grade › {submission?.student?.name}</span>
+    <span class="text-text">{m.grade_breadcrumb()} › {submission?.student?.name}</span>
   </nav>
 
-  <h1 class="text-2xl font-bold text-text mb-1">Grade Submission</h1>
-  <p class="text-text-muted text-sm mb-6">Student: {submission?.student?.name}</p>
+  <h1 class="text-2xl font-bold text-text mb-1">{m.grade_title()}</h1>
+  <p class="text-text-muted text-sm mb-6">{m.grade_student_label()} {submission?.student?.name}</p>
 
   {#if form?.error}
     <div class="mb-4"><Alert variant="error">{form.error}</Alert></div>
@@ -112,7 +113,7 @@
     <!-- Score Based: questions with score input -->
     {#if exam?.examType === 'SCORE_BASED'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6 space-y-4">
-        <h2 class="text-lg font-semibold text-text">Questions</h2>
+        <h2 class="text-lg font-semibold text-text">{m.grade_questions_section()}</h2>
         {#each exam.examQuestions ?? [] as question, i}
           {@const answer = getAnswer(question.id)}
           <div class="border border-slate-100 rounded-lg p-4">
@@ -126,7 +127,7 @@
               </div>
             {/if}
             <div class="flex items-center gap-3">
-              <label class="text-sm text-text-muted">Score:</label>
+              <label class="text-sm text-text-muted">{m.grade_score_label()}</label>
               <input
                 type="number"
                 min="0"
@@ -150,7 +151,7 @@
     <!-- Multiple Choice: auto-graded with override -->
     {#if exam?.examType === 'MULTIPLE_CHOICE'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6 space-y-4">
-        <h2 class="text-lg font-semibold text-text">Questions (Auto-Graded)</h2>
+        <h2 class="text-lg font-semibold text-text">{m.grade_mc_section()}</h2>
         {#each exam.examQuestions ?? [] as question, i}
           {@const answer = getAnswer(question.id)}
           <div class="border border-slate-100 rounded-lg p-4">
@@ -160,11 +161,11 @@
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm mb-3">
               <div>
-                <span class="text-text-muted">Student's answer:</span>
+                <span class="text-text-muted">{m.grade_student_answer()}</span>
                 <span class="ml-1 font-medium text-text">{answer?.selectedAnswer ?? '—'}</span>
               </div>
               <div>
-                <span class="text-text-muted">Correct:</span>
+                <span class="text-text-muted">{m.grade_correct_answer_label()}</span>
                 <span class="ml-1 font-medium text-green-700">{question.correctAnswer}</span>
               </div>
             </div>
@@ -174,11 +175,11 @@
                   ? 'bg-green-100 text-green-700'
                   : 'bg-red-100 text-red-700'}"
               >
-                {answer.correct ? '✓ Correct' : '✗ Incorrect'}
+                {answer.correct ? m.grade_correct_badge() : m.grade_incorrect_badge()}
               </div>
             {/if}
             <div class="flex items-center gap-3">
-              <label class="text-sm text-text-muted">Override score:</label>
+              <label class="text-sm text-text-muted">{m.grade_override_score()}</label>
               <input
                 type="number"
                 min="0"
@@ -202,7 +203,7 @@
     <!-- Rubric Based: score per criterion with comment -->
     {#if exam?.examType === 'RUBRIC'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6 space-y-4">
-        <h2 class="text-lg font-semibold text-text">Rubric Criteria</h2>
+        <h2 class="text-lg font-semibold text-text">{m.grade_rubric_section()}</h2>
         {#each exam.rubricCriteria ?? [] as criterion, i}
           <div class="border border-slate-100 rounded-lg p-4">
             <div class="flex items-start justify-between gap-2 mb-2">
@@ -215,7 +216,7 @@
               <span class="text-xs text-text-muted shrink-0">max {criterion.maxScore} pts</span>
             </div>
             <div class="flex items-center gap-3 mb-3">
-              <label class="text-sm text-text-muted">Score:</label>
+              <label class="text-sm text-text-muted">{m.grade_score_label()}</label>
               <input
                 type="number"
                 min="0"
@@ -236,7 +237,7 @@
             </div>
             <div>
               <label class="block text-xs font-medium text-text-muted mb-1">
-                Comment <span class="text-text-muted/70">(optional)</span>
+                {m.grade_comment_optional()}
               </label>
               <textarea
                 rows="2"
@@ -247,7 +248,7 @@
                     comment: (e.target as HTMLTextAreaElement).value
                   };
                 }}
-                placeholder="Add a comment for this criterion..."
+                placeholder={m.grade_comment_placeholder()}
                 class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               ></textarea>
             </div>
@@ -259,7 +260,7 @@
     <!-- Pass/Fail -->
     {#if exam?.examType === 'PASS_FAIL'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
-        <h2 class="text-lg font-semibold text-text mb-4">Result</h2>
+        <h2 class="text-lg font-semibold text-text mb-4">{m.grade_result_section()}</h2>
         <div class="flex gap-3">
           <button
             type="button"
@@ -268,7 +269,7 @@
               ? 'bg-green-600 text-white'
               : 'bg-green-50 text-green-700 hover:bg-green-100'}"
           >
-            ✓ Pass
+            {m.grade_pass_btn()}
           </button>
           <button
             type="button"
@@ -277,7 +278,7 @@
               ? 'bg-red-600 text-white'
               : 'bg-red-50 text-red-700 hover:bg-red-100'}"
           >
-            ✗ Fail
+            {m.grade_fail_btn()}
           </button>
         </div>
       </div>
@@ -286,7 +287,7 @@
     <!-- Total Score Summary -->
     {#if exam?.examType !== 'PASS_FAIL'}
       <div class="bg-primary/5 rounded-xl border border-primary/10 px-6 py-4 mb-6 flex items-center justify-between">
-        <span class="font-medium text-text">Total Score</span>
+        <span class="font-medium text-text">{m.grade_total_score()}</span>
         <span class="text-xl font-bold text-primary">{totalScore()}</span>
       </div>
     {/if}
@@ -294,25 +295,25 @@
     <!-- Teacher Notes -->
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
       <label for="teacherNotes" class="block text-sm font-medium text-text mb-2">
-        Teacher Notes <span class="text-text-muted">(optional)</span>
+        {m.grade_teacher_notes_optional()}
       </label>
       <textarea
         id="teacherNotes"
         name="teacherNotes"
         rows="4"
-        placeholder="Add feedback or notes for the student..."
+        placeholder={m.grade_notes_placeholder()}
         class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
       >{submission?.teacherNotes ?? ''}</textarea>
     </div>
 
     <div class="flex gap-3">
       <Button type="submit" disabled={submitting}>
-        {submitting ? 'Submitting…' : 'Submit Grade'}
+        {submitting ? m.grade_submitting() : m.grade_submit_btn()}
       </Button>
       <a
         href="/teacher/exams/{exam?.id}"
         class="inline-flex items-center text-sm text-text-muted hover:text-text px-4 py-2"
-      >Cancel</a>
+      >{m.common_cancel()}</a>
     </div>
   </form>
 </div>

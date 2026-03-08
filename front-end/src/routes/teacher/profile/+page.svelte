@@ -3,6 +3,7 @@
   import { uploadFile } from '$lib/api/upload';
   import { UPDATE_PROFILE_MUTATION, CHANGE_PASSWORD_MUTATION } from '$lib/api/queries/profile';
   import type { Teacher } from '$lib/api/types';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -119,7 +120,7 @@
       } else if (json.errors?.length > 0) {
         profileError = json.errors[0].message;
       } else {
-        profileSuccess = 'Profile updated successfully!';
+        profileSuccess = m.profile_updated();
         avatarBlobId = null;
         const updatedUser = json.data?.updateProfile?.user;
         if (updatedUser?.avatarUrl) {
@@ -127,7 +128,7 @@
         }
       }
     } catch (err) {
-      profileError = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      profileError = err instanceof Error ? err.message : m.profile_something_wrong();
     } finally {
       profileSaving = false;
     }
@@ -138,7 +139,7 @@
     e.preventDefault();
 
     if (newPassword !== newPasswordConfirmation) {
-      passwordError = 'New passwords do not match';
+      passwordError = m.profile_passwords_not_match();
       return;
     }
 
@@ -164,13 +165,13 @@
       } else if (json.errors?.length > 0) {
         passwordError = json.errors[0].message;
       } else if (payload?.success) {
-        passwordSuccess = 'Password changed successfully!';
+        passwordSuccess = m.profile_password_updated();
         currentPassword = '';
         newPassword = '';
         newPasswordConfirmation = '';
       }
     } catch (err) {
-      passwordError = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      passwordError = err instanceof Error ? err.message : m.profile_something_wrong();
     } finally {
       passwordSaving = false;
     }
@@ -178,7 +179,7 @@
 </script>
 
 <svelte:head>
-  <title>My Profile — GrewMe</title>
+  <title>{m.profile_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <div class="max-w-3xl mx-auto space-y-6 pb-12">
@@ -209,7 +210,7 @@
           class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center
             opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer
             disabled:cursor-not-allowed"
-          aria-label="Change photo"
+          aria-label={m.profile_change_photo_aria()}
         >
           {#if avatarUploading}
             <svg class="w-6 h-6 text-white animate-spin" viewBox="0 0 24 24" fill="none">
@@ -243,7 +244,7 @@
         onchange={handleAvatarChange}
       />
 
-      <h1 class="text-2xl font-bold text-white">{name || 'Your Name'}</h1>
+      <h1 class="text-2xl font-bold text-white">{name || m.profile_your_name()}</h1>
       <p class="text-white/70 text-sm mt-0.5">{email}</p>
 
       <button
@@ -253,7 +254,7 @@
         class="mt-4 px-4 py-1.5 rounded-full text-sm font-medium bg-white/20 text-white
           border border-white/30 hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {avatarUploading ? 'Uploading...' : avatarBlobId ? 'Photo ready — save below' : 'Change Photo'}
+        {avatarUploading ? m.profile_uploading() : avatarBlobId ? m.profile_photo_ready() : m.profile_change_photo()}
       </button>
 
       {#if avatarError}
@@ -274,8 +275,8 @@
             </svg>
           </div>
           <div>
-            <h2 class="font-semibold text-text">Personal Information</h2>
-            <p class="text-xs text-text-muted">Your name, contact details, and profile info</p>
+            <h2 class="font-semibold text-text">{m.profile_personal_info()}</h2>
+            <p class="text-xs text-text-muted">{m.profile_personal_info_hint()}</p>
           </div>
         </div>
       {/snippet}
@@ -292,31 +293,31 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               id="name"
-              label="Full Name"
+              label={m.profile_full_name()}
               bind:value={name}
               required
-              placeholder="e.g. Andreana Wijaya"
+              placeholder={m.profile_full_name_placeholder()}
               disabled={profileSaving}
             />
             <Input
               id="email"
-              label="Email"
+              label={m.common_email()}
               type="email"
               bind:value={email}
               required
-              placeholder="you@school.edu"
+              placeholder={m.profile_email_placeholder()}
               disabled={profileSaving}
             />
             <Input
               id="phone"
-              label="Phone"
+              label={m.profile_phone()}
               type="tel"
               bind:value={phone}
-              placeholder="+62 812 3456 7890"
+              placeholder={m.profile_phone_placeholder()}
               disabled={profileSaving}
             />
             <div class="space-y-1">
-              <label for="gender" class="block text-sm font-medium text-text">Gender</label>
+              <label for="gender" class="block text-sm font-medium text-text">{m.profile_gender()}</label>
               <select
                 id="gender"
                 bind:value={gender}
@@ -325,42 +326,42 @@
                   focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
                   disabled:opacity-50 disabled:bg-slate-50"
               >
-                <option value="">Prefer not to say</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="">{m.profile_gender_prefer_not()}</option>
+                <option value="male">{m.profile_gender_male()}</option>
+                <option value="female">{m.profile_gender_female()}</option>
+                <option value="other">{m.profile_gender_other()}</option>
               </select>
             </div>
             <Input
               id="birthdate"
-              label="Date of Birth"
+              label={m.profile_birthdate()}
               type="date"
               bind:value={birthdate}
               disabled={profileSaving}
             />
             <Input
               id="qualification"
-              label="Qualification"
+              label={m.profile_qualification()}
               bind:value={qualification}
-              placeholder="e.g. B.Ed Mathematics"
+              placeholder={m.profile_qualification_placeholder()}
               disabled={profileSaving}
             />
             <Input
               id="religion"
-              label="Religion"
+              label={m.profile_religion()}
               bind:value={religion}
-              placeholder="e.g. Islam, Christian..."
+              placeholder={m.profile_religion_placeholder()}
               disabled={profileSaving}
             />
           </div>
 
           <div class="space-y-1">
-            <label for="bio" class="block text-sm font-medium text-text">Bio</label>
+            <label for="bio" class="block text-sm font-medium text-text">{m.profile_bio()}</label>
             <textarea
               id="bio"
               bind:value={bio}
               rows={3}
-              placeholder="Tell parents a little about yourself..."
+              placeholder={m.profile_bio_placeholder()}
               disabled={profileSaving}
               class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm resize-none
                 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
@@ -384,8 +385,8 @@
               </svg>
             </div>
             <div>
-              <h2 class="font-semibold text-text">Address</h2>
-              <p class="text-xs text-text-muted">Your residential address details</p>
+              <h2 class="font-semibold text-text">{m.profile_address()}</h2>
+              <p class="text-xs text-text-muted">{m.profile_address_hint()}</p>
             </div>
           </div>
         {/snippet}
@@ -395,48 +396,48 @@
             <div class="sm:col-span-2">
               <Input
                 id="addressLine1"
-                label="Address Line 1"
+                label={m.profile_address_line1()}
                 bind:value={addressLine1}
-                placeholder="Street address, P.O. box"
+                placeholder={m.profile_address_line1_placeholder()}
                 disabled={profileSaving}
               />
             </div>
             <div class="sm:col-span-2">
               <Input
                 id="addressLine2"
-                label="Address Line 2"
+                label={m.profile_address_line2()}
                 bind:value={addressLine2}
-                placeholder="Apartment, suite, unit, floor (optional)"
+                placeholder={m.profile_address_line2_placeholder()}
                 disabled={profileSaving}
               />
             </div>
             <Input
               id="city"
-              label="City"
+              label={m.profile_city()}
               bind:value={city}
-              placeholder="e.g. Jakarta"
+              placeholder={m.profile_city_placeholder()}
               disabled={profileSaving}
             />
             <Input
               id="stateProvince"
-              label="State / Province"
+              label={m.profile_state()}
               bind:value={stateProvince}
-              placeholder="e.g. DKI Jakarta"
+              placeholder={m.profile_state_placeholder()}
               disabled={profileSaving}
             />
             <Input
               id="postalCode"
-              label="Postal Code"
+              label={m.profile_postal()}
               bind:value={postalCode}
-              placeholder="e.g. 10110"
+              placeholder={m.profile_postal_placeholder()}
               disabled={profileSaving}
             />
             <Input
               id="countryCode"
-              label="Country Code"
+              label={m.profile_country()}
               bind:value={countryCode}
               maxlength={2}
-              placeholder="e.g. ID"
+              placeholder={m.profile_country_placeholder()}
               disabled={profileSaving}
             />
           </div>
@@ -447,7 +448,7 @@
     <!-- ── Save profile footer ─────────────────────────────────────────────── -->
     <div class="mt-4 flex justify-end">
       <Button type="submit" loading={profileSaving} disabled={profileSaving}>
-        {profileSaving ? 'Saving…' : 'Save Profile'}
+        {profileSaving ? m.profile_saving() : m.profile_save_btn()}
       </Button>
     </div>
   </form>
@@ -464,8 +465,8 @@
             </svg>
           </div>
           <div>
-            <h2 class="font-semibold text-text">Change Password</h2>
-            <p class="text-xs text-text-muted">Keep your account secure</p>
+            <h2 class="font-semibold text-text">{m.profile_change_password()}</h2>
+            <p class="text-xs text-text-muted">{m.profile_change_password_hint()}</p>
           </div>
         </div>
       {/snippet}
@@ -481,7 +482,7 @@
 
           <Input
             id="currentPassword"
-            label="Current Password"
+             label={m.profile_current_password()}
             type="password"
             bind:value={currentPassword}
             required
@@ -492,7 +493,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               id="newPassword"
-              label="New Password"
+               label={m.profile_new_password()}
               type="password"
               bind:value={newPassword}
               required
@@ -501,7 +502,7 @@
             />
             <Input
               id="newPasswordConfirmation"
-              label="Confirm New Password"
+               label={m.profile_confirm_new_password()}
               type="password"
               bind:value={newPasswordConfirmation}
               required
@@ -518,7 +519,7 @@
       {#snippet footer()}
         <div class="flex justify-end">
           <Button type="submit" variant="outline" loading={passwordSaving} disabled={passwordSaving}>
-            {passwordSaving ? 'Updating…' : 'Update Password'}
+            {passwordSaving ? m.profile_updating() : m.profile_update_password()}
           </Button>
         </div>
       {/snippet}

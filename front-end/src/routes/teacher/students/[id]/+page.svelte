@@ -3,6 +3,7 @@
   import { RadarChart, ProgressChart } from '$lib/components/charts';
   import { SKILL_LABELS, SKILL_BG_COLORS, SKILL_EMOJIS, SKILL_CATEGORIES } from '$lib/utils/constants';
   import { formatDate, today } from '$lib/utils/helpers';
+  import * as m from '$lib/paraglide/messages.js';
   import type { SkillCategory } from '$lib/api/types';
 
   let { data } = $props();
@@ -48,7 +49,7 @@
     const score = parseInt(scoreValue);
     if (!scoreValue || isNaN(score) || score < 0 || score > 100) {
       alertType = 'error';
-      alertMessage = 'Please enter a valid score between 0 and 100.';
+      alertMessage = m.student_score_invalid();
       return;
     }
 
@@ -85,7 +86,7 @@
         alertMessage = result.errors.map((e: { message: string }) => e.message).join(', ');
       } else {
         alertType = 'success';
-        alertMessage = 'Score saved!';
+        alertMessage = m.student_score_saved();
         showScoreForm = false;
         scoreValue = '';
         scoreDate = today();
@@ -97,7 +98,7 @@
       }
     } catch {
       alertType = 'error';
-      alertMessage = 'Failed to save score. Please try again.';
+      alertMessage = m.student_score_failed();
     } finally {
       saving = false;
     }
@@ -105,7 +106,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.radar.studentName} — GrewMe</title>
+  <title>{data.radar.studentName} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
@@ -120,7 +121,7 @@
         disabled={startingChat}
         class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
       >
-        💬 {startingChat ? 'Opening...' : 'Chat with Parent'}
+        💬 {startingChat ? m.student_opening_chat() : m.student_chat_parent()}
       </button>
     </div>
   </div>
@@ -129,7 +130,7 @@
     <!-- Radar Chart -->
     <Card>
       {#snippet header()}
-        <h2 class="text-lg font-semibold text-text">Skill Radar</h2>
+        <h2 class="text-lg font-semibold text-text">{m.student_skill_radar()}</h2>
       {/snippet}
       <RadarChart skills={data.radar.skills} label={data.radar.studentName} size="lg" />
     </Card>
@@ -137,7 +138,7 @@
     <!-- Progress Chart -->
     <Card>
       {#snippet header()}
-        <h2 class="text-lg font-semibold text-text">Weekly Progress</h2>
+        <h2 class="text-lg font-semibold text-text">{m.student_weekly_progress()}</h2>
       {/snippet}
       <ProgressChart progress={data.progress} />
     </Card>
@@ -147,12 +148,12 @@
   <Card>
     {#snippet header()}
       <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-text">Recent Scores</h2>
+        <h2 class="text-lg font-semibold text-text">{m.student_recent_scores()}</h2>
         <button
           onclick={() => { showScoreForm = !showScoreForm; alertMessage = ''; }}
           class="text-sm text-primary hover:underline font-medium"
         >
-          {showScoreForm ? '✕ Cancel' : '+ Add Score'}
+          {showScoreForm ? m.student_cancel_score() : m.student_add_score()}
         </button>
       </div>
     {/snippet}
@@ -183,7 +184,7 @@
         <!-- Date + Score + Save -->
         <div class="flex flex-wrap items-end gap-3">
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-text-muted">Date</label>
+            <label class="text-xs font-medium text-text-muted">{m.student_date_label()}</label>
             <input
               type="date"
               bind:value={scoreDate}
@@ -191,7 +192,7 @@
             />
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-text-muted">Score (0–100)</label>
+            <label class="text-xs font-medium text-text-muted">{m.student_score_label()}</label>
             <input
               type="number"
               min="0"
@@ -206,7 +207,7 @@
             disabled={saving}
             class="px-4 py-1.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? m.student_saving() : m.student_save_score()}
           </button>
         </div>
       </div>
@@ -217,10 +218,10 @@
         <table class="w-full">
           <thead>
             <tr class="border-b border-slate-100">
-              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Date</th>
-              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Skill</th>
-              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Score</th>
-              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Teacher</th>
+              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.student_col_date()}</th>
+              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.student_col_skill()}</th>
+              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.student_col_score()}</th>
+              <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.student_col_teacher()}</th>
             </tr>
           </thead>
           <tbody>
@@ -241,7 +242,7 @@
         </table>
       </div>
     {:else}
-      <p class="text-text-muted text-center py-4">No scores recorded yet</p>
+      <p class="text-text-muted text-center py-4">{m.student_no_scores()}</p>
     {/if}
   </Card>
 </div>

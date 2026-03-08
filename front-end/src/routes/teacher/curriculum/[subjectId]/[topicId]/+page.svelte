@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { Card, Button, Input, Alert } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -52,7 +53,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.topic.name} — GrewMe</title>
+  <title>{data.topic.name} — {m.app_name()}</title>
 </svelte:head>
 
 <div>
@@ -70,7 +71,7 @@
   <!-- Topic Header -->
   {#if editingTopic}
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
-      <h2 class="text-lg font-semibold text-text mb-4">Edit Topic</h2>
+      <h2 class="text-lg font-semibold text-text mb-4">{m.curriculum_edit_topic()}</h2>
       {#if form?.updateError}
         <div class="mb-4"><Alert variant="error">{form.updateError}</Alert></div>
       {/if}
@@ -87,16 +88,16 @@
       >
         <div class="space-y-4">
           <div>
-            <label for="topic-name" class="block text-sm font-medium text-text mb-1">Name</label>
+            <label for="topic-name" class="block text-sm font-medium text-text mb-1">{m.curriculum_topic_name()}</label>
             <Input id="topic-name" name="name" value={data.topic.name} required />
           </div>
           <div>
-            <label for="topic-desc" class="block text-sm font-medium text-text mb-1">Description</label>
+            <label for="topic-desc" class="block text-sm font-medium text-text mb-1">{m.curriculum_description()}</label>
             <Input id="topic-desc" name="description" value={data.topic.description ?? ''} />
           </div>
           <div class="flex gap-2">
-            <Button type="submit" disabled={submitting}>{submitting ? 'Saving...' : 'Save'}</Button>
-            <Button variant="ghost" onclick={() => (editingTopic = false)}>Cancel</Button>
+            <Button type="submit" disabled={submitting}>{submitting ? m.curriculum_saving() : m.common_save()}</Button>
+            <Button variant="ghost" onclick={() => (editingTopic = false)}>{m.common_cancel()}</Button>
           </div>
         </div>
       </form>
@@ -110,8 +111,8 @@
         {/if}
       </div>
       <div class="flex gap-2">
-        <Button variant="outline" onclick={() => (editingTopic = true)}>Edit</Button>
-        <Button variant="danger" onclick={confirmDeleteTopic}>Delete</Button>
+        <Button variant="outline" onclick={() => (editingTopic = true)}>{m.common_edit()}</Button>
+        <Button variant="danger" onclick={confirmDeleteTopic}>{m.common_delete()}</Button>
       </div>
     </div>
   {/if}
@@ -125,9 +126,9 @@
   <!-- Learning Objectives Section -->
   <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-semibold text-text">Learning Objectives</h2>
+      <h2 class="text-xl font-semibold text-text">{m.curriculum_learning_objectives()}</h2>
       <Button onclick={() => (showLOForm = !showLOForm)}>
-        {showLOForm ? 'Cancel' : 'Add Objective'}
+        {showLOForm ? m.common_cancel() : m.curriculum_add_objective()}
       </Button>
     </div>
 
@@ -137,7 +138,7 @@
 
     {#if showLOForm}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-4">
-        <h3 class="text-base font-semibold text-text mb-3">New Learning Objective</h3>
+        <h3 class="text-base font-semibold text-text mb-3">{m.curriculum_new_objective()}</h3>
         <form
           method="POST"
           action="?/createLearningObjective"
@@ -151,20 +152,20 @@
         >
           <div class="space-y-3">
             <div>
-              <label for="lo-desc" class="block text-sm font-medium text-text mb-1">Description</label>
-              <Input id="lo-desc" name="description" placeholder="Students will be able to..." required />
+              <label for="lo-desc" class="block text-sm font-medium text-text mb-1">{m.curriculum_objective_desc()}</label>
+              <Input id="lo-desc" name="description" placeholder={m.curriculum_objective_desc_placeholder()} required />
             </div>
             <div>
               <label for="lo-threshold" class="block text-sm font-medium text-text mb-1">
-                Mastery Threshold (0–100)
+                {m.curriculum_mastery_threshold()}
               </label>
               <Input id="lo-threshold" name="masteryThreshold" type="number" min="0" max="100" value="70" required />
             </div>
             <div class="flex gap-2">
               <Button type="submit" disabled={loSubmitting}>
-                {loSubmitting ? 'Adding...' : 'Add Objective'}
+                {loSubmitting ? m.curriculum_adding() : m.curriculum_add_objective()}
               </Button>
-              <Button variant="ghost" onclick={() => (showLOForm = false)}>Cancel</Button>
+              <Button variant="ghost" onclick={() => (showLOForm = false)}>{m.common_cancel()}</Button>
             </div>
           </div>
         </form>
@@ -172,7 +173,7 @@
     {/if}
 
     {#if (data.topic.learningObjectives ?? []).length === 0}
-      <p class="text-text-muted text-sm py-4">No learning objectives yet.</p>
+      <p class="text-text-muted text-sm py-4">{m.curriculum_no_objectives()}</p>
     {:else}
       <div class="space-y-2">
         {#each data.topic.learningObjectives ?? [] as lo}
@@ -195,8 +196,8 @@
                   <Input name="description" value={lo.description} required />
                   <Input name="masteryThreshold" type="number" min="0" max="100" value={lo.masteryThreshold} required />
                   <div class="flex gap-2">
-                    <Button type="submit" size="sm">Save</Button>
-                    <Button variant="ghost" size="sm" onclick={() => (editingLOId = null)}>Cancel</Button>
+                  <Button type="submit" size="sm">{m.common_save()}</Button>
+                  <Button variant="ghost" size="sm" onclick={() => (editingLOId = null)}>{m.common_cancel()}</Button>
                   </div>
                 </div>
               </form>
@@ -242,10 +243,10 @@
 
   <!-- Exams Section -->
   <div>
-    <h2 class="text-xl font-semibold text-text mb-4">Exams</h2>
+      <h2 class="text-xl font-semibold text-text mb-4">{m.curriculum_exams_section()}</h2>
 
     {#if (data.topic.exams ?? []).length === 0}
-      <p class="text-text-muted text-sm py-4">No exams linked to this topic yet.</p>
+      <p class="text-text-muted text-sm py-4">{m.curriculum_no_topic_exams()}</p>
     {:else}
       <div class="space-y-2">
         {#each data.topic.exams ?? [] as exam}

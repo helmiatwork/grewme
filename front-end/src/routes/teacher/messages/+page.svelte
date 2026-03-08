@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import * as m from '$lib/paraglide/messages.js';
   import { createConsumer } from '@rails/actioncable';
   import { formatDate } from '$lib/utils/helpers';
   import { uploadFiles } from '$lib/api/upload';
@@ -356,18 +357,18 @@
   <aside class="w-80 flex-shrink-0 flex flex-col bg-white border-r border-gray-200">
     <!-- Header -->
     <div class="px-4 py-4 border-b border-gray-100">
-      <h1 class="text-xl font-bold text-text mb-3">Chats</h1>
+      <h1 class="text-xl font-bold text-text mb-3">{m.messages_chats()}</h1>
       <input
         type="text"
         bind:value={searchQuery}
-        placeholder="Search..."
+        placeholder={m.messages_search_placeholder()}
         class="w-full bg-gray-100 rounded-full px-4 py-2 text-sm text-text placeholder-text-muted outline-none focus:ring-2 focus:ring-primary/40 transition"
       />
       <button
         onclick={() => showNewChatModal = true}
         class="w-full mt-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-full px-4 py-2 transition-colors"
       >
-        + New Chat
+        {m.messages_new_chat()}
       </button>
     </div>
 
@@ -376,7 +377,7 @@
       <!-- Group Chats section -->
       {#if filteredGroupChats.length > 0}
         <div class="px-4 pt-4 pb-1">
-          <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">Group Chats</p>
+          <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">{m.messages_group_chats()}</p>
         </div>
         {#each filteredGroupChats as gc}
           {@const isActive = activeChat?.type === 'group' && activeChat.classroomId === gc.classroomId}
@@ -396,7 +397,7 @@
               {#if gc.lastMessage}
                 <p class="text-xs text-text-muted truncate mt-0.5">{gc.lastMessage.body}</p>
               {:else}
-                <p class="text-xs text-text-muted italic">No messages yet</p>
+                <p class="text-xs text-text-muted italic">{m.messages_no_messages_italic()}</p>
               {/if}
             </div>
             {#if gc.lastMessage}
@@ -412,7 +413,7 @@
       {#if filteredDirectChats.length > 0}
         <div class="px-4 pt-4 pb-1">
           <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">
-            Direct Messages
+            {m.messages_direct_messages()}
           </p>
         </div>
         {#each filteredDirectChats as conv}
@@ -459,7 +460,7 @@
 
       {#if filteredGroupChats.length === 0 && filteredDirectChats.length === 0}
         <div class="flex items-center justify-center py-16 text-text-muted text-sm">
-          No conversations found
+          {m.messages_no_conversations()}
         </div>
       {/if}
     </div>
@@ -484,7 +485,7 @@
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
           />
         </svg>
-        <p class="text-lg font-medium">Select a conversation to start chatting</p>
+        <p class="text-lg font-medium">{m.messages_select_conversation()}</p>
       </div>
     {:else}
       <!-- Chat header -->
@@ -507,11 +508,11 @@
           {#if activeChat.type === 'group'}
             {@const gc = groupChats.find((g: any) => g.classroomId === activeChat?.classroomId)}
             <p class="font-bold text-text">{gc?.classroomName ?? 'Group Chat'}</p>
-            <p class="text-sm text-text-muted">Group Chat</p>
+            <p class="text-sm text-text-muted">{m.messages_group_chat()}</p>
           {:else}
             {@const conv = (data.conversations ?? []).find((c: any) => c.id === activeChat?.id)}
             <p class="font-bold text-text">{conv?.parent?.name ?? 'Unknown'}</p>
-            <p class="text-sm text-text-muted">about {conv?.student?.name ?? ''}</p>
+            <p class="text-sm text-text-muted">{m.messages_about({ student: conv?.student?.name ?? '' })}</p>
           {/if}
         </div>
       </header>
@@ -520,10 +521,10 @@
       <div bind:this={scrollContainer} class="flex-1 overflow-y-auto px-6 py-4 space-y-3 bg-gray-50">
         {#if loading}
           <div class="flex items-center justify-center py-16 text-text-muted text-sm">
-            Loading messages...
+            {m.messages_loading()}
           </div>
         {:else if messages.length === 0}
-          <p class="text-center text-text-muted text-sm mt-8">No messages yet. Say hello! 👋</p>
+          <p class="text-center text-text-muted text-sm mt-8">{m.messages_no_messages_yet()}</p>
         {:else}
           {#each messages as message (message.id)}
             <div class="flex {message.mine ? 'justify-end' : 'justify-start'}">
@@ -685,7 +686,7 @@
             bind:value={inputValue}
             onkeydown={handleKeydown}
             disabled={uploading}
-            placeholder="Type a message..."
+            placeholder={m.messages_type_placeholder()}
             rows={1}
             class="flex-1 bg-gray-100 rounded-2xl px-4 py-2 text-sm text-text placeholder-text-muted outline-none focus:ring-2 focus:ring-primary/40 transition resize-none max-h-24 overflow-y-auto"
             oninput={(e) => {
@@ -794,7 +795,7 @@
     <div class="absolute inset-0" onclick={() => showNewChatModal = false}></div>
     <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-text">New Conversation</h2>
+        <h2 class="text-lg font-semibold text-text">{m.messages_new_conversation()}</h2>
         <button type="button" onclick={() => showNewChatModal = false} class="p-1 rounded-lg text-text-muted hover:text-text hover:bg-slate-100 transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -804,13 +805,13 @@
 
       <!-- Classroom selector -->
       <div class="mb-4">
-        <label for="new-chat-classroom" class="block text-sm font-medium text-text mb-1">Classroom</label>
+        <label for="new-chat-classroom" class="block text-sm font-medium text-text mb-1">{m.calendar_classroom_label()}</label>
         <select
           id="new-chat-classroom"
           bind:value={newChatClassroomId}
           class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
-          <option value="">Select a classroom...</option>
+          <option value="">{m.messages_select_classroom_hint()}</option>
           {#each data.classrooms ?? [] as classroom}
             <option value={classroom.id}>{classroom.name}</option>
           {/each}
@@ -832,16 +833,16 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-text truncate">{parent.name}</p>
-                  <p class="text-xs text-text-muted truncate">Parent of {student.name}</p>
+                  <p class="text-xs text-text-muted truncate">{m.messages_parent_of({ student: student.name })}</p>
                 </div>
               </button>
             {/each}
           {/each}
         </div>
       {:else if newChatClassroomId}
-        <p class="text-sm text-text-muted text-center py-4">No students found in this classroom</p>
+        <p class="text-sm text-text-muted text-center py-4">{m.messages_no_students()}</p>
       {:else}
-        <p class="text-sm text-text-muted text-center py-4">Select a classroom to see parents</p>
+        <p class="text-sm text-text-muted text-center py-4">{m.messages_select_classroom_hint()}</p>
       {/if}
     </div>
   </div>

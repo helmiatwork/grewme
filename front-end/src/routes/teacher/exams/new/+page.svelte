@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { Alert, Input, Button } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -92,7 +93,7 @@
 </script>
 
 <svelte:head>
-  <title>Create Exam — GrewMe</title>
+  <title>{m.exam_new_header()} — {m.app_name()}</title>
 </svelte:head>
 
 <div class="max-w-2xl">
@@ -100,10 +101,10 @@
   <nav class="text-sm text-text-muted mb-4">
     <a href="/teacher/exams" class="hover:text-primary">Exams</a>
     <span class="mx-2">›</span>
-    <span class="text-text">New Exam</span>
+    <span class="text-text">{m.exam_new_title()}</span>
   </nav>
 
-  <h1 class="text-2xl font-bold text-text mb-6">Create Exam</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.exam_new_header()}</h1>
 
   {#if form?.error}
     <div class="mb-4">
@@ -132,25 +133,25 @@
 
     <div class="bg-surface rounded-xl border border-slate-100 p-6 space-y-5 mb-6">
       <div>
-        <label for="title" class="block text-sm font-medium text-text mb-1">Title</label>
-        <Input id="title" name="title" placeholder="e.g. Chapter 3 Quiz" required />
+        <label for="title" class="block text-sm font-medium text-text mb-1">{m.exam_field_title()}</label>
+        <Input id="title" name="title" placeholder={m.exam_field_title_placeholder()} required />
       </div>
 
       <div>
         <label for="description" class="block text-sm font-medium text-text mb-1">
-          Description <span class="text-text-muted">(optional)</span>
+          {m.exam_field_description_optional()}
         </label>
         <textarea
           id="description"
           name="description"
           rows="3"
-          placeholder="Brief description..."
+          placeholder={m.curriculum_description_placeholder()}
           class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
         ></textarea>
       </div>
 
       <div>
-        <label for="examType" class="block text-sm font-medium text-text mb-1">Exam Type</label>
+        <label for="examType" class="block text-sm font-medium text-text mb-1">{m.exam_field_exam_type()}</label>
         <select
           id="examType"
           name="examType"
@@ -158,22 +159,22 @@
           onchange={(e) => handleTypeChange((e.target as HTMLSelectElement).value)}
           class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
-          <option value="SCORE_BASED">Score Based</option>
-          <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-          <option value="RUBRIC">Rubric</option>
-          <option value="PASS_FAIL">Pass/Fail</option>
+          <option value="SCORE_BASED">{m.exam_type_score_based()}</option>
+          <option value="MULTIPLE_CHOICE">{m.exam_type_multiple_choice()}</option>
+          <option value="RUBRIC">{m.exam_type_rubric()}</option>
+          <option value="PASS_FAIL">{m.exam_type_pass_fail()}</option>
         </select>
       </div>
 
       <div>
-        <label for="topicId" class="block text-sm font-medium text-text mb-1">Topic</label>
+        <label for="topicId" class="block text-sm font-medium text-text mb-1">{m.exam_field_topic()}</label>
         <select
           id="topicId"
           name="topicId"
           required
           class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
-          <option value="">Select a topic…</option>
+          <option value="">{m.exam_field_select_topic()}</option>
           {#each data.subjects as subject}
             <optgroup label={subject.name}>
               {#each subject.topics as topic}
@@ -186,14 +187,14 @@
 
       {#if examType === 'SCORE_BASED'}
         <div>
-          <label for="maxScore" class="block text-sm font-medium text-text mb-1">Max Score</label>
+          <label for="maxScore" class="block text-sm font-medium text-text mb-1">{m.exam_field_max_score()}</label>
           <Input id="maxScore" name="maxScore" type="number" min="0" placeholder="100" />
         </div>
       {/if}
 
       <div>
         <label for="durationMinutes" class="block text-sm font-medium text-text mb-1">
-          Duration (minutes) <span class="text-text-muted">(optional)</span>
+          {m.exam_field_duration_optional()}
         </label>
         <Input id="durationMinutes" name="durationMinutes" type="number" min="1" placeholder="60" />
       </div>
@@ -203,11 +204,11 @@
     {#if examType === 'MULTIPLE_CHOICE' || examType === 'SCORE_BASED'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-text">Questions</h2>
-          <Button type="button" variant="ghost" onclick={addQuestion}>+ Add Question</Button>
+          <h2 class="text-lg font-semibold text-text">{m.exam_questions_section()}</h2>
+          <Button type="button" variant="ghost" onclick={addQuestion}>{m.exam_add_question()}</Button>
         </div>
         {#if questions.length === 0}
-          <p class="text-sm text-text-muted">No questions added yet.</p>
+          <p class="text-sm text-text-muted">{m.exam_no_questions()}</p>
         {/if}
         {#each questions as question, qi}
           <div class="border border-slate-100 rounded-lg p-4 mb-4 space-y-3">
@@ -217,21 +218,21 @@
                 type="button"
                 onclick={() => removeQuestion(qi)}
                 class="text-xs text-red-500 hover:text-red-700"
-              >Remove</button>
+              >{m.exam_remove()}</button>
             </div>
             <div>
-              <label class="block text-xs font-medium text-text-muted mb-1">Question Text</label>
+              <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_question_text_label()}</label>
               <textarea
                 rows="2"
                 value={question.questionText}
                 oninput={(e) => { questions[qi].questionText = (e.target as HTMLTextAreaElement).value; }}
-                placeholder="Enter question..."
+                placeholder={m.exam_question_text_placeholder()}
                 class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               ></textarea>
             </div>
             {#if examType === 'MULTIPLE_CHOICE'}
               <div>
-                <label class="block text-xs font-medium text-text-muted mb-2">Options</label>
+                <label class="block text-xs font-medium text-text-muted mb-2">{m.exam_options_label()}</label>
                 {#each question.options as opt, oi}
                   <div class="flex gap-2 mb-2">
                     <input
@@ -254,16 +255,16 @@
                   type="button"
                   onclick={() => addOption(qi)}
                   class="text-xs text-primary hover:underline"
-                >+ Add option</button>
+                >{m.exam_add_option()}</button>
               </div>
               <div>
-                <label class="block text-xs font-medium text-text-muted mb-1">Correct Answer</label>
+                <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_correct_answer()}</label>
                 <select
                   value={question.correctAnswer}
                   onchange={(e) => { questions[qi].correctAnswer = (e.target as HTMLSelectElement).value; }}
                   class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="">Select correct answer…</option>
+                  <option value="">{m.exam_select_correct()}</option>
                   {#each question.options as opt, oi}
                     {#if opt}
                       <option value={opt}>{String.fromCharCode(65 + oi)}. {opt}</option>
@@ -273,7 +274,7 @@
               </div>
             {/if}
             <div>
-              <label class="block text-xs font-medium text-text-muted mb-1">Points</label>
+              <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_points_label()}</label>
               <input
                 type="number"
                 min="0"
@@ -290,11 +291,11 @@
     {#if examType === 'RUBRIC'}
       <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-text">Rubric Criteria</h2>
-          <Button type="button" variant="ghost" onclick={addCriterion}>+ Add Criterion</Button>
+          <h2 class="text-lg font-semibold text-text">{m.exam_rubric_section()}</h2>
+          <Button type="button" variant="ghost" onclick={addCriterion}>{m.exam_add_criterion()}</Button>
         </div>
         {#if rubricCriteria.length === 0}
-          <p class="text-sm text-text-muted">No criteria added yet.</p>
+          <p class="text-sm text-text-muted">{m.exam_no_criteria()}</p>
         {/if}
         {#each rubricCriteria as criterion, ci}
           <div class="border border-slate-100 rounded-lg p-4 mb-4 space-y-3">
@@ -304,10 +305,10 @@
                 type="button"
                 onclick={() => removeCriterion(ci)}
                 class="text-xs text-red-500 hover:text-red-700"
-              >Remove</button>
+              >{m.exam_remove()}</button>
             </div>
             <div>
-              <label class="block text-xs font-medium text-text-muted mb-1">Name</label>
+              <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_criterion_name()}</label>
               <input
                 type="text"
                 value={criterion.name}
@@ -317,19 +318,17 @@
               />
             </div>
             <div>
-              <label class="block text-xs font-medium text-text-muted mb-1">
-                Description <span class="text-text-muted/70">(optional)</span>
-              </label>
+              <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_criterion_desc_optional()}</label>
               <textarea
                 rows="2"
                 value={criterion.description}
                 oninput={(e) => { rubricCriteria[ci].description = (e.target as HTMLTextAreaElement).value; }}
-                placeholder="Describe the criterion..."
+                placeholder={m.exam_criterion_desc_placeholder()}
                 class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               ></textarea>
             </div>
             <div>
-              <label class="block text-xs font-medium text-text-muted mb-1">Max Score</label>
+              <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_field_max_score()}</label>
               <input
                 type="number"
                 min="0"
@@ -345,12 +344,12 @@
 
     <div class="flex gap-3">
       <Button type="submit" disabled={submitting}>
-        {submitting ? 'Creating…' : 'Create Exam'}
+        {submitting ? m.exam_creating() : m.exam_create_btn()}
       </Button>
       <a
         href="/teacher/exams"
         class="inline-flex items-center text-sm text-text-muted hover:text-text px-4 py-2"
-      >Cancel</a>
+      >{m.common_cancel()}</a>
     </div>
   </form>
 </div>
