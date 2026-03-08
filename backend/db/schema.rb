@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_022652) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_122913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -444,6 +444,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_022652) do
     t.datetime "updated_at", null: false
     t.index ["topic_id", "name"], name: "index_learning_objectives_on_topic_id_and_name", unique: true
     t.index ["topic_id"], name: "index_learning_objectives_on_topic_id"
+  end
+
+  create_table "leave_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "end_date", null: false
+    t.bigint "parent_id", null: false
+    t.text "reason", null: false
+    t.text "rejection_reason"
+    t.integer "request_type", default: 0, null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.date "start_date", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id", "status"], name: "index_leave_requests_on_parent_id_and_status"
+    t.index ["parent_id"], name: "index_leave_requests_on_parent_id"
+    t.index ["reviewed_by_id"], name: "index_leave_requests_on_reviewed_by_id"
+    t.index ["student_id", "status"], name: "index_leave_requests_on_student_id_and_status"
+    t.index ["student_id"], name: "index_leave_requests_on_student_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -884,6 +904,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_022652) do
   add_foreign_key "health_checkups", "teachers"
   add_foreign_key "invitations", "schools"
   add_foreign_key "learning_objectives", "topics"
+  add_foreign_key "leave_requests", "parents"
+  add_foreign_key "leave_requests", "students"
+  add_foreign_key "leave_requests", "teachers", column: "reviewed_by_id"
   add_foreign_key "messages", "conversations"
   add_foreign_key "objective_masteries", "learning_objectives"
   add_foreign_key "objective_masteries", "students"
