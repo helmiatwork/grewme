@@ -14,6 +14,8 @@ module Mutations
     def resolve(student_id:, request_type:, start_date:, end_date:, reason:)
       authenticate!
 
+      raise Pundit::NotAuthorizedError unless LeaveRequestPolicy.new(current_user, LeaveRequest.new).create?
+
       leave_request = LeaveRequest.new(
         student_id: student_id,
         parent: current_user,
@@ -22,8 +24,6 @@ module Mutations
         end_date: end_date,
         reason: reason
       )
-
-      raise Pundit::NotAuthorizedError unless LeaveRequestPolicy.new(current_user, leave_request).create?
 
       if leave_request.save
         AuditLogger.log(

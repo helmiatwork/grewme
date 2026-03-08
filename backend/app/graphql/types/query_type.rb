@@ -642,6 +642,142 @@ module Types
       )
     end
 
+    # ── Attendance ──────────────────────────────────────────────────────────────
+
+    field :classroom_attendance, [ Types::AttendanceType ], null: false,
+      description: "All attendance records for a classroom on a given date" do
+      argument :classroom_id, ID, required: true
+      argument :date, GraphQL::Types::ISO8601Date, required: true
+    end
+
+    def classroom_attendance(classroom_id:, date:)
+      authenticate!
+      classroom = Classroom.find(classroom_id)
+
+      if current_user.teacher?
+        raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).show?
+      elsif current_user.school_manager?
+        raise Pundit::NotAuthorizedError unless classroom.school_id == current_user.school_id
+      else
+        raise GraphQL::ExecutionError, "Not authorized"
+      end
+
+      AuditLogger.log(event_type: :ATTENDANCE_VIEW, action: "classroom_attendance", user: current_user, resource: classroom, request: context[:request])
+
+      Attendance.where(classroom_id: classroom_id, date: date).includes(:student)
+    end
+
+    field :student_attendance, [ Types::AttendanceType ], null: false,
+      description: "Attendance history for a student" do
+      argument :student_id, ID, required: true
+      argument :start_date, GraphQL::Types::ISO8601Date, required: false
+      argument :end_date, GraphQL::Types::ISO8601Date, required: false
+    end
+
+    def student_attendance(student_id:, start_date: nil, end_date: nil)
+      authenticate!
+      student = Student.find(student_id)
+
+      if current_user.teacher?
+        raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).show?
+      elsif current_user.parent?
+        unless current_user.children.exists?(id: student.id)
+          raise GraphQL::ExecutionError, "Not authorized"
+        end
+        unless Consent.active.exists?(student: student, parent: current_user)
+          raise GraphQL::ExecutionError, "Active consent required to view attendance data"
+        end
+      elsif current_user.school_manager?
+        raise Pundit::NotAuthorizedError unless student.classroom_students.current.joins(:classroom).exists?(classrooms: { school_id: current_user.school_id })
+      else
+        raise GraphQL::ExecutionError, "Not authorized"
+      end
+
+      AuditLogger.log(event_type: :ATTENDANCE_VIEW, action: "student_attendance", user: current_user, resource: student, request: context[:request])
+
+      scope = student.attendances.order(date: :desc)
+      scope = scope.where("date >= ?", start_date) if start_date
+      scope = scope.where("date <= ?", end_date) if end_date
+      scope
+    end
+
+    field :classroom_attendance_summary, GraphQL::Types::JSON, null: false,
+      description: "Attendance summary stats per student for a classroom and date range" do
+      argument :classroom_id, ID, required: true
+      argument :start_date, GraphQL::Types::ISO8601Date, required: true
+      argument :end_date, GraphQL::Types::ISO8601Date, required: true
+    end
+
+    def classroom_attendance_summary(classroom_id:, start_date:, end_date:)
+      authenticate!
+      classroom = Classroom.find(classroom_id)
+
+      if current_user.teacher?
+        raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).show?
+      elsif current_user.school_manager?
+        raise Pundit::NotAuthorizedError unless classroom.school_id == current_user.school_id
+      else
+        raise GraphQL::ExecutionError, "Not authorized"
+      end
+
+      students = classroom.students.order(:name)
+      records = Attendance.where(classroom_id: classroom_id, date: start_date..end_date)
+
+      students.map do |student|
+        student_records = records.select { |r| r.student_id == student.id }
+        {
+          studentId: student.id.to_s,
+          studentName: student.name,
+          totalDays: student_records.size,
+          presentCount: student_records.count { |r| r.present? },
+          sickCount: student_records.count { |r| r.sick? },
+          excusedCount: student_records.count { |r| r.excused? },
+          unexcusedCount: student_records.count { |r| r.unexcused? },
+          attendanceRate: student_records.any? ? (student_records.count { |r| r.present? }.to_f / student_records.size * 100).round(1) : nil
+        }
+      end
+    end
+
+    # ── Leave Requests ──────────────────────────────────────────────────────────
+
+    field :leave_requests, [ Types::LeaveRequestType ], null: false,
+      description: "Leave requests for teacher's classrooms" do
+      argument :classroom_id, ID, required: false
+      argument :status, Types::LeaveRequestStatusEnum, required: false
+    end
+
+    def leave_requests(classroom_id: nil, status: nil)
+      authenticate!
+
+      unless current_user.teacher?
+        raise GraphQL::ExecutionError, "Only teachers can view leave requests"
+      end
+
+      scope = LeaveRequestPolicy::Scope.new(current_user, LeaveRequest).resolve
+      scope = scope.pending_for_classroom(classroom_id) if classroom_id
+      scope = scope.where(status: status) if status
+      scope.order(created_at: :desc)
+    end
+
+    field :parent_leave_requests, [ Types::LeaveRequestType ], null: false,
+      description: "Parent's own submitted leave requests" do
+      argument :student_id, ID, required: false
+      argument :status, Types::LeaveRequestStatusEnum, required: false
+    end
+
+    def parent_leave_requests(student_id: nil, status: nil)
+      authenticate!
+
+      unless current_user.parent?
+        raise GraphQL::ExecutionError, "Only parents can view their leave requests"
+      end
+
+      scope = current_user.leave_requests.order(created_at: :desc)
+      scope = scope.where(student_id: student_id) if student_id
+      scope = scope.where(status: status) if status
+      scope
+    end
+
     private
 
     def deep_ostruct(data)
