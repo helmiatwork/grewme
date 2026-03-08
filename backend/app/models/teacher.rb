@@ -12,6 +12,7 @@ class Teacher < ApplicationRecord
   has_many :classroom_teachers, dependent: :destroy
   has_many :classrooms, through: :classroom_teachers
   has_many :daily_scores, foreign_key: :teacher_id, dependent: :destroy, inverse_of: :teacher
+  has_many :health_checkups, dependent: :destroy
   has_many :refresh_tokens, as: :authenticatable, dependent: :destroy
   has_many :permissions, as: :permissionable, dependent: :destroy
   has_many :feed_posts, dependent: :destroy

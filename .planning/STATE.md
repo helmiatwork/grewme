@@ -7,115 +7,97 @@
 | **Project** | GrewMe — Kids Learning Radar App |
 | **Core Value** | Make children's learning progress visible via MLBB-style radar charts |
 | **Location** | `/Users/theresiaputri/repo/grewme` |
-| **Stack** | Rails 8.1.2 + KMP + Compose Multiplatform |
+| **Stack** | Rails 8.1.2 (GraphQL API) + SvelteKit (web frontend) + KMP (mobile, deferred) |
 
 ## Current Position
 
 ```
-Phase:    Phase 1 — Security Foundation & Backend Core
-Plan:     All 9 plans complete (5 waves)
-Status:   COMPLETE ✅
+Phase:    Health Checkups Feature (between Phase 3 and Phase 4)
+Status:   Planning
 ```
 
 **Overall Progress:**
 ```
 Phase 1: ██████████ 100%  Security Foundation & Backend Core ✅
-Phase 2: ░░░░░░░░░░ 0%   KMP Monorepo & Mobile Foundation
-Phase 3: ░░░░░░░░░░ 0%   Compliance & Consent Engine
-Phase 4: ░░░░░░░░░░ 0%   Radar Chart & Core Mobile Features
+Phase 2: ░░░░░░░░░░ 0%   KMP Monorepo & Mobile Foundation (deferred — web-first)
+Phase 3: ██████████ 100%  COPPA Compliance & Consent Engine ✅
+Phase 4: ░░░░░░░░░░ 0%   Radar Chart & Core Features
 Phase 5: ░░░░░░░░░░ 0%   DevOps, CI/CD & Quality
 Phase 6: ░░░░░░░░░░ 0%   Polish & Advanced Features (v2)
 ```
 
 ## Phase Status
 
-| Phase | Status | Plans | Completed |
-|-------|--------|-------|-----------|
-| 1. Security Foundation & Backend Core | **Complete** ✅ | 9/9 | 2026-03-04 |
-| 2. KMP Monorepo & Mobile Foundation | Not started | 0/? | - |
-| 3. Compliance & Consent Engine | Not started | 0/? | - |
-| 4. Radar Chart & Core Mobile Features | Not started | 0/? | - |
-| 5. DevOps, CI/CD & Quality | Not started | 0/? | - |
-| 6. Polish & Advanced Features | Not started | 0/? | - |
+| Phase | Status | Completed |
+|-------|--------|-----------|
+| 1. Security Foundation & Backend Core | **Complete** ✅ | 2026-03-04 |
+| 2. KMP Monorepo & Mobile Foundation | Deferred (web-first) | - |
+| 3. COPPA Compliance & Consent Engine | **Complete** ✅ | 2026-03-08 |
+| 4. Radar Chart & Core Features | Not started | - |
+| 5. DevOps, CI/CD & Quality | Not started | - |
+| 6. Polish & Advanced Features | Not started | - |
 
-## Phase 1 — Execution Summary
+## Codebase Summary
 
-| Wave | Plan | Status | Description |
-|------|------|--------|-------------|
-| 1 | 01 | ✅ | JWT hardened (no fallback, 15-min expiry, jti/iat), role escalation fixed, auth chain wired, password min 8 |
-| 1 | 02 | ✅ | Fixtures valid (4 users, 1 school, 2 classrooms, 3 students, 3 scores), SimpleCov, AuthTestHelper |
-| 2 | 03 | ✅ | All API routes, BaseController with rescue_from, CORS, SSL/host config, Rack::Attack rate limiting |
-| 2 | 04 | ✅ | 33 model tests for all 6 models (User, School, Classroom, Student, DailyScore, ParentStudent) |
-| 3 | 05 | ✅ | RefreshToken model with rotation, updated auth controller (login/register/refresh return token pairs) |
-| 3 | 06 | ✅ | Pundit policies (Classroom, Student, DailyScore), Alba resources (User, Classroom, Student, DailyScore, RadarData, ProgressData) |
-| 4 | 07 | ✅ | All read controllers (Classrooms, Students, Parents::Children, nested controllers) |
-| 4 | 08 | ✅ | DailyScoresController (create/update), Scenic materialized view, RefreshRadarSummaryJob, seeds, strong_migrations |
-| 5 | 09 | ✅ | Integration tests: JWT (9), Auth (12), Classrooms (6), Students (7), DailyScores (5), Parents (2) |
+The codebase is far more complete than the original 6-phase roadmap suggests:
+- **44 models**, **50+ GraphQL mutations**, **19+ queries**
+- **45 SvelteKit pages** (exams, curriculum, social feed, messaging, calendar, notifications)
+- **454 tests, 1,146 assertions** (67.2% line coverage, 51.9% branch coverage)
+- Separate user models: Teacher, Parent, SchoolManager (each with Devise)
+- GraphQL is the primary API (single `/graphql` endpoint)
+- Avo admin panel at `/avo`
 
-## Performance Metrics
+## Phase 3 — Execution Summary (COPPA Compliance)
 
-| Metric | Value |
-|--------|-------|
-| Plans completed | 9/9 |
-| Plans failed | 0 |
-| Success rate | 100% |
-| Tests passing | 79 (159 assertions) |
-| Code coverage | 84.82% line / 60.26% branch |
+14 tasks across 9 waves, all complete:
 
-## Accumulated Context
+| Wave | Tasks | Description |
+|------|-------|-------------|
+| 1 | 1-3 | Invitation, Consent, AuditLog models + tests |
+| 2 | 4 | Active Record Encryption on all PII fields |
+| 3 | 5-6 | Invitation & Consent GraphQL mutations + mailers |
+| 4 | 7 | Registration locked to invitation/consent tokens |
+| 5 | 8 | Data rights: export, account deletion, child data deletion |
+| 6 | 9 | Audit logging integration across all mutations/queries |
+| 7 | 10-12 | Frontend: privacy policy, terms, consent pages, data rights dashboard |
+| 8 | 13 | Background jobs: consent reminder, consent expiry |
+| 9 | 14 | End-to-end integration tests |
 
-### Key Decisions
-1. School-first access model — COPPA school official exception applies
-2. Fixed 5 skill categories — not configurable
-3. Android-first — iOS deferred to Phase 6
-4. Alba for serialization, Pundit for authorization
-5. Custom Compose Canvas radar chart — core differentiator
-6. Email-Plus VPC for parental consent
-7. Polling first, WebSockets deferred to Phase 6
-8. Offline support deferred to Phase 6
-9. Avo for admin panel — deferred to v2 (V2-06)
+**87 files changed, ~3,900 lines added. Branch `feature/coppa-compliance` merged to main.**
 
-### Known Issues (Resolved in Phase 1)
-1. ~~**CRITICAL:** JWT fallback secret enables token forgery~~ → Fixed: no fallback, raises on missing secret
-2. ~~**CRITICAL:** Registration permits `role: "admin"` from user input~~ → Fixed: role stripped from params
-3. ~~**CRITICAL:** ApplicationController missing `include Authenticatable`~~ → Fixed: auth chain wired
-4. ~~Routes.rb empty~~ → Fixed: 15 API routes defined
-5. ~~9/10 API controllers missing~~ → Fixed: all controllers implemented
-6. ~~CORS disabled~~ → Fixed: rack-cors configured
-7. ~~Zero test coverage~~ → Fixed: 79 tests, 84.82% coverage
-8. ~~Broken fixtures~~ → Fixed: valid realistic data
+## Key Decisions
 
-### Remaining Issues
-9. Mobile apps are placeholder-only (Phase 2)
-10. Two separate Gradle projects — should be monorepo (Phase 2)
+1. **Web-first development** — No mobile/KMP due to disk space constraints. All features built as SvelteKit web app first, mobile later.
+2. School-first access model — COPPA school official exception applies
+3. Fixed 5 skill categories — not configurable
+4. GraphQL API (not REST) — single `/graphql` endpoint
+5. Separate user models (Teacher, Parent, SchoolManager) with Devise
+6. Active Record Encryption for all PII
+7. Token-based registration only (invitation or consent token required)
+8. Email-Plus VPC for parental consent
 
-### Technical Discoveries (Phase 1)
+## Technical Discoveries
+
+### Phase 1
 1. Ruby 4.0.1 — `OpenStruct` requires explicit `require "ostruct"`
-2. Rails 7.1+ — `after_action :verify_policy_scoped` causes `ActionNotFound` for controllers without matching actions
-3. Thread-based test parallelization breaks with PostgreSQL — use `parallelize(workers: 1)`
-4. SimpleCov reports 0% with parallel processes — single-process fixes it
-5. Rack::Attack must be disabled in test env to prevent rate-limit interference
-6. Cache store in test env needs `:memory_store` (not `:null_store`) for JTI-based token revocation
+2. Thread-based test parallelization breaks with PostgreSQL — use `parallelize(workers: 1)`
+3. Rack::Attack must be disabled in test env
 
-### Blockers
+### Phase 3
+1. Active Record Encryption fixtures must use `ciphertext_for()` ERB with single-quote YAML wrapping
+2. PostgreSQL `inet` type can't store encrypted ciphertext — use `text` instead
+3. `shoulda-context` gem has cosmetic `format_rerun_snippet` error with Rails 8.1.2 (doesn't affect tests)
+4. Parent model uses `children` association (not `students`) for has_many through
+5. Some mutations use `input:` wrapper, others standalone args
+
+## Next Up
+
+1. **Health Checkups feature** — Design complete at `docs/plans/2026-03-07-health-checkups-design.md`
+   - UKS (Indonesian school health) growth monitoring
+   - Weight, height, head circumference, auto-BMI
+   - Teachers record, parents view (with consent)
+2. Continue with Phase 4 (Radar Chart & Core Features)
+
+## Blockers
+
 - None
-
-### TODOs
-- [x] Plan Phase 1 (`/gsd-plan-phase 1`) — 9 plans created
-- [x] Execute Phase 1 — all 9 plans complete
-- [ ] Get legal review of COPPA consent flow before Phase 3
-- [ ] Plan Phase 2 (KMP Monorepo & Mobile Foundation)
-
-## Session Continuity
-
-### Last Session
-- **Date:** 2026-03-04
-- **Action:** Completed all 9 Phase 1 plans — security fixes, API infrastructure, authorization, serialization, controllers, tests
-- **Result:** 79 tests passing, 84.82% coverage, all critical security issues resolved
-- **Next:** Commit remaining changes, then plan Phase 2
-
-### Context for Next Session
-- Phase 1 is fully complete — backend API is functional with auth, CRUD, and tests
-- User wants to "finish backend first" before mobile — may want additional backend work before Phase 2
-- Phase 2 is KMP Monorepo & Mobile Foundation (Kotlin Multiplatform setup)
-- Admin panel decision: Avo (v2, documented in Outline)

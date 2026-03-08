@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_07_160452) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_022652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -391,6 +391,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_160452) do
     t.index ["group_conversation_id", "created_at"], name: "index_group_messages_on_group_conversation_id_and_created_at"
     t.index ["group_conversation_id"], name: "index_group_messages_on_group_conversation_id"
     t.index ["sender_type", "sender_id"], name: "index_group_messages_on_sender"
+  end
+
+  create_table "health_checkups", force: :cascade do |t|
+    t.decimal "bmi", precision: 4, scale: 1
+    t.datetime "created_at", null: false
+    t.decimal "head_circumference_cm", precision: 4, scale: 1
+    t.decimal "height_cm", precision: 5, scale: 1
+    t.date "measured_at", null: false
+    t.text "notes"
+    t.bigint "student_id", null: false
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "weight_kg", precision: 5, scale: 2
+    t.index ["student_id", "measured_at"], name: "index_health_checkups_on_student_id_and_measured_at", unique: true
+    t.index ["student_id"], name: "index_health_checkups_on_student_id"
+    t.index ["teacher_id"], name: "index_health_checkups_on_teacher_id"
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -864,6 +880,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_160452) do
   add_foreign_key "grade_curriculums", "academic_years"
   add_foreign_key "group_conversations", "classrooms"
   add_foreign_key "group_messages", "group_conversations"
+  add_foreign_key "health_checkups", "students"
+  add_foreign_key "health_checkups", "teachers"
   add_foreign_key "invitations", "schools"
   add_foreign_key "learning_objectives", "topics"
   add_foreign_key "messages", "conversations"

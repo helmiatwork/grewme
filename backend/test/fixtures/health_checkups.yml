@@ -1,0 +1,26 @@
+emma_checkup_jan:
+  student: student_emma
+  teacher: teacher_alice
+  measured_at: "2026-01-15"
+  weight_kg: 20.5
+  height_cm: 115.0
+  head_circumference_cm: 51.0
+  bmi: 15.5
+
+emma_checkup_feb:
+  student: student_emma
+  teacher: teacher_alice
+  measured_at: "2026-02-15"
+  weight_kg: 21.0
+  height_cm: 116.0
+  head_circumference_cm: 51.2
+  bmi: 15.6
+
+finn_checkup_jan:
+  student: student_finn
+  teacher: teacher_alice
+  measured_at: "2026-01-15"
+  weight_kg: 22.0
+  height_cm: 118.0
+  head_circumference_cm: 52.0
+  bmi: 15.8

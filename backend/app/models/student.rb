@@ -8,6 +8,7 @@ class Student < ApplicationRecord
   has_many :parent_students, dependent: :destroy
   has_many :parents, through: :parent_students, source: :parent
   has_many :daily_scores, dependent: :destroy
+  has_many :health_checkups, dependent: :destroy
   has_many :exam_submissions, dependent: :destroy
   has_many :objective_masteries, dependent: :destroy
 
