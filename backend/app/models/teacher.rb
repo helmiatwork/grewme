@@ -20,6 +20,7 @@ class Teacher < ApplicationRecord
   has_many :notifications, as: :recipient, dependent: :destroy
   has_many :push_devices, as: :user, dependent: :destroy
   has_many :conversations, dependent: :destroy
+  has_many :reviewed_leave_requests, class_name: "LeaveRequest", foreign_key: :reviewed_by_id, dependent: :nullify
 
   has_one_attached :avatar_image
 

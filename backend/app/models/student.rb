@@ -11,6 +11,8 @@ class Student < ApplicationRecord
   has_many :health_checkups, dependent: :destroy
   has_many :exam_submissions, dependent: :destroy
   has_many :objective_masteries, dependent: :destroy
+  has_many :attendances, dependent: :destroy
+  has_many :leave_requests, dependent: :destroy
 
   encrypts :name
 
