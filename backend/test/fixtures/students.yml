@@ -1,11 +1,11 @@
 student_emma:
-  name: Emma
+  name: '<%= Student.new.tap { |s| s.name = "Emma" }.ciphertext_for(:name) %>'
   avatar: ""
 
 student_finn:
-  name: Finn
+  name: '<%= Student.new.tap { |s| s.name = "Finn" }.ciphertext_for(:name) %>'
   avatar: ""
 
 student_grace:
-  name: Grace
+  name: '<%= Student.new.tap { |s| s.name = "Grace" }.ciphertext_for(:name) %>'
   avatar: ""

@@ -21,8 +21,22 @@ module Mutations
       user = klass.find_by(email: email)
 
       unless user&.valid_password?(password)
+        AuditLogger.log(
+          event_type: :LOGIN_FAILURE,
+          action: "login_failed",
+          metadata: { email: email, role: role },
+          severity: :warning,
+          request: context[:request]
+        )
         return { errors: [ { message: "Invalid email or password", path: [ "email" ] } ] }
       end
+
+      AuditLogger.log(
+        event_type: :LOGIN_SUCCESS,
+        action: "login",
+        user: user,
+        request: context[:request]
+      )
 
       access_token = generate_jwt_for(user)
       refresh = user.refresh_tokens.create!(

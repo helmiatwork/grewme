@@ -1,5 +1,5 @@
 <% require 'bcrypt' %>
 parent_carol:
-  name: Carol Parent
-  email: carol@parent.test
+  name: '<%= Parent.new.tap { |p| p.name = "Carol Parent" }.ciphertext_for(:name) %>'
+  email: '<%= Parent.new.tap { |p| p.email = "carol@parent.test" }.ciphertext_for(:email) %>'
   encrypted_password: <%= BCrypt::Password.create("password123") %>

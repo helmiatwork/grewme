@@ -47,6 +47,11 @@ module Types
     field :toggle_permission, mutation: Mutations::Admin::TogglePermission
     field :delete_permission, mutation: Mutations::Admin::DeletePermission
 
+    # Invitations
+    field :create_invitation, mutation: Mutations::CreateInvitation
+    field :accept_invitation, mutation: Mutations::AcceptInvitation
+    field :revoke_invitation, mutation: Mutations::RevokeInvitation
+
     # School Management
     field :assign_teacher_to_classroom, mutation: Mutations::AssignTeacherToClassroom
     field :remove_teacher_from_classroom, mutation: Mutations::RemoveTeacherFromClassroom
@@ -73,10 +78,21 @@ module Types
     field :set_current_academic_year, mutation: Mutations::SetCurrentAcademicYear
     field :save_grade_curriculum, mutation: Mutations::SaveGradeCurriculum
 
+    # Consent
+    field :request_consent, mutation: Mutations::RequestConsent
+    field :grant_consent, mutation: Mutations::GrantConsent
+    field :decline_consent, mutation: Mutations::DeclineConsent
+    field :revoke_consent, mutation: Mutations::RevokeConsent
+
     # Exams
     field :create_exam, mutation: Mutations::CreateExam
     field :assign_exam_to_classroom, mutation: Mutations::AssignExamToClassroom
     field :submit_exam_answers, mutation: Mutations::SubmitExamAnswers
     field :grade_exam_submission, mutation: Mutations::GradeExamSubmission
+
+    # Data Rights
+    field :export_child_data, mutation: Mutations::ExportChildData
+    field :request_account_deletion, mutation: Mutations::RequestAccountDeletion
+    field :request_child_data_deletion, mutation: Mutations::RequestChildDataDeletion
   end
 end

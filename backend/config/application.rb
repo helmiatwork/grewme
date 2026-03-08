@@ -29,5 +29,8 @@ module Grewme
     config.api_only = false
 
     config.middleware.use Rack::Attack
+
+    # Active Record Encryption: support reading unencrypted data during migration
+    config.active_record.encryption.support_unencrypted_data = true
   end
 end

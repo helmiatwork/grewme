@@ -22,6 +22,9 @@ class Teacher < ApplicationRecord
 
   has_one_attached :avatar_image
 
+  encrypts :name
+  encrypts :email, deterministic: true
+
   validates :name, presence: true
 
   def role

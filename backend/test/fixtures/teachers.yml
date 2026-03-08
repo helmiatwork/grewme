@@ -1,12 +1,12 @@
 <% require 'bcrypt' %>
 teacher_alice:
-  name: Alice Teacher
-  email: alice@school.test
+  name: '<%= Teacher.new.tap { |t| t.name = "Alice Teacher" }.ciphertext_for(:name) %>'
+  email: '<%= Teacher.new.tap { |t| t.email = "alice@school.test" }.ciphertext_for(:email) %>'
   encrypted_password: <%= BCrypt::Password.create("password123") %>
   school: greenwood
 
 teacher_bob:
-  name: Bob Teacher
-  email: bob@school.test
+  name: '<%= Teacher.new.tap { |t| t.name = "Bob Teacher" }.ciphertext_for(:name) %>'
+  email: '<%= Teacher.new.tap { |t| t.email = "bob@school.test" }.ciphertext_for(:email) %>'
   encrypted_password: <%= BCrypt::Password.create("password123") %>
   school: greenwood

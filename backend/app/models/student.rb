@@ -11,6 +11,8 @@ class Student < ApplicationRecord
   has_many :exam_submissions, dependent: :destroy
   has_many :objective_masteries, dependent: :destroy
 
+  encrypts :name
+
   validates :name, presence: true
 
   def current_classroom

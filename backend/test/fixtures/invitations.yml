@@ -1,0 +1,30 @@
+pending_invite:
+  email: newteacher@greenwood.test
+  role: teacher
+  token: validtoken123abc
+  status: pending
+  expires_at: <%= 7.days.from_now %>
+  inviter_type: SchoolManager
+  inviter_id: <%= ActiveRecord::FixtureSet.identify(:manager_pat) %>
+  school: greenwood
+
+expired_invite:
+  email: expiredteacher@greenwood.test
+  role: teacher
+  token: expiredtoken123abc
+  status: pending
+  expires_at: <%= 1.day.ago %>
+  inviter_type: SchoolManager
+  inviter_id: <%= ActiveRecord::FixtureSet.identify(:manager_pat) %>
+  school: greenwood
+
+accepted_invite:
+  email: accepted@greenwood.test
+  role: teacher
+  token: acceptedtoken123abc
+  status: accepted
+  expires_at: <%= 7.days.from_now %>
+  accepted_at: <%= 1.hour.ago %>
+  inviter_type: SchoolManager
+  inviter_id: <%= ActiveRecord::FixtureSet.identify(:manager_pat) %>
+  school: greenwood
