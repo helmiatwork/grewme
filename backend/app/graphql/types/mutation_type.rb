@@ -97,5 +97,14 @@ module Types
     field :export_child_data, mutation: Mutations::ExportChildData
     field :request_account_deletion, mutation: Mutations::RequestAccountDeletion
     field :request_child_data_deletion, mutation: Mutations::RequestChildDataDeletion
+
+    # Attendance
+    field :bulk_record_attendance, mutation: Mutations::BulkRecordAttendance
+    field :update_attendance, mutation: Mutations::UpdateAttendance
+
+    # Leave Requests
+    field :create_leave_request, mutation: Mutations::CreateLeaveRequest
+    field :delete_leave_request, mutation: Mutations::DeleteLeaveRequest
+    field :review_leave_request, mutation: Mutations::ReviewLeaveRequest
   end
 end
