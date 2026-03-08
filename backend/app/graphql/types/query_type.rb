@@ -528,6 +528,46 @@ module Types
       GradeCurriculum.find_by(academic_year_id: academic_year_id, grade: grade)
     end
 
+    # === Health Checkups ===
+
+    field :student_health_checkups, [ Types::HealthCheckupType ], null: false,
+      description: "Health checkup history for a student" do
+      argument :student_id, ID, required: true
+      argument :start_date, GraphQL::Types::ISO8601Date, required: false
+      argument :end_date, GraphQL::Types::ISO8601Date, required: false
+    end
+
+    def student_health_checkups(student_id:, start_date: nil, end_date: nil)
+      authenticate!
+      student = Student.find(student_id)
+
+      if current_user.is_a?(Teacher)
+        raise Pundit::NotAuthorizedError unless StudentPolicy.new(current_user, student).show?
+      elsif current_user.is_a?(Parent)
+        unless current_user.children.exists?(id: student.id)
+          raise GraphQL::ExecutionError, "Not authorized"
+        end
+        unless Consent.active.exists?(student: student, parent: current_user)
+          raise GraphQL::ExecutionError, "Active consent required to view health data"
+        end
+      else
+        raise GraphQL::ExecutionError, "Not authorized"
+      end
+
+      AuditLogger.log(
+        event_type: :HEALTH_CHECKUP_VIEW,
+        action: "student_health_checkups",
+        user: current_user,
+        resource: student,
+        request: context[:request]
+      )
+
+      scope = student.health_checkups.order(measured_at: :desc)
+      scope = scope.where("measured_at >= ?", start_date) if start_date
+      scope = scope.where("measured_at <= ?", end_date) if end_date
+      scope
+    end
+
     # === Consent ===
 
     field :consent_status, [ Types::ConsentType ], null: false, description: "Consent status for parent's children" do

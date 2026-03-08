@@ -90,6 +90,9 @@ module Types
     field :submit_exam_answers, mutation: Mutations::SubmitExamAnswers
     field :grade_exam_submission, mutation: Mutations::GradeExamSubmission
 
+    # Health Checkups
+    field :create_health_checkup, mutation: Mutations::CreateHealthCheckup
+
     # Data Rights
     field :export_child_data, mutation: Mutations::ExportChildData
     field :request_account_deletion, mutation: Mutations::RequestAccountDeletion
