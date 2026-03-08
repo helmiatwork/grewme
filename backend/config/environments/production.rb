@@ -79,5 +79,6 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts << "grewme.app"
   config.hosts << /.*\.grewme\.app/
+  config.hosts << /.*\.railway\.app/
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

@@ -271,8 +271,44 @@ puts "  lisa@parent.com / password123 (Caleb in 3B)"
 puts "  mike@parent.com / password123 (Felix + Stella in 4A)"
 puts "  nina@parent.com / password123 (Oscar in 4A)"
 
+# Invitations — school manager invites teachers
+Invitation.create!(inviter: SchoolManager.first, school: school, email: "alice@greenwood.edu", role: "teacher", status: "accepted", accepted_at: 30.days.ago, expires_at: 30.days.from_now)
+Invitation.create!(inviter: SchoolManager.first, school: school, email: "bob@greenwood.edu", role: "teacher", status: "accepted", accepted_at: 28.days.ago, expires_at: 30.days.from_now)
+
+# Consents — parents grant consent for their children
+[ carol, dan, eve, frank, grace_p, hana, ivan, julia, kevin, lisa, mike, nina ].each do |parent|
+  parent.children.each do |child|
+    Consent.create!(
+      student: child,
+      parent: parent,
+      parent_email: parent.email,
+      consent_method: "email_plus",
+      status: :granted,
+      granted_at: 20.days.ago
+    )
+  end
+end
+
+# Health checkups — 3 months of data for students in Alice's classes
+[ class1a, class3a, class3b, class4a ].each do |classroom|
+  classroom.students.each do |student|
+    3.downto(1) do |months_ago|
+      HealthCheckup.create!(
+        student: student,
+        teacher: alice,
+        measured_at: months_ago.months.ago.to_date,
+        weight_kg: (rand(18..26) + rand(0.0..0.9)).round(1),
+        height_cm: (rand(105..125) + rand(0.0..0.9)).round(1),
+        head_circumference_cm: (rand(49..53) + rand(0.0..0.9)).round(1)
+      )
+    end
+  end
+end
+
 # Refresh materialized view
 if ActiveRecord::Base.connection.view_exists?(:student_radar_summaries)
   StudentRadarSummary.refresh
   puts "Refreshed radar summaries"
 end
+
+puts "Seeded: #{Invitation.count} invitations, #{Consent.count} consents, #{HealthCheckup.count} health checkups"

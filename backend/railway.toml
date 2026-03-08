@@ -1,0 +1,16 @@
+[build]
+builder = "nixpacks"
+buildCommand = "bundle install && bundle exec rails assets:precompile && bundle exec rails db:migrate"
+
+[deploy]
+startCommand = "bundle exec thrust bin/rails server -b 0.0.0.0 -p ${PORT:-3000}"
+healthcheckPath = "/up"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[deploy.env]
+RAILS_ENV = "production"
+RAILS_LOG_TO_STDOUT = "true"
+RAILS_SERVE_STATIC_FILES = "true"
+SOLID_QUEUE_IN_PUMA = "true"
