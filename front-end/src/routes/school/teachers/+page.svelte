@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { Card, Button, Alert } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
   let assignTeacherId = $state('');
@@ -13,18 +14,18 @@
 </svelte:head>
 
 <div>
-  <h1 class="text-2xl font-bold text-text mb-6">Teachers</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.school_teachers_title()}</h1>
 
   {#if form?.error}
     <div class="mb-4"><Alert variant="error">{form.error}</Alert></div>
   {/if}
   {#if form?.success}
-    <div class="mb-4"><Alert variant="success">Action completed successfully</Alert></div>
+    <div class="mb-4"><Alert variant="success">{m.school_teachers_action_success()}</Alert></div>
   {/if}
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2">
-      <h2 class="text-lg font-semibold text-text mb-3">All Teachers</h2>
+      <h2 class="text-lg font-semibold text-text mb-3">{m.school_teachers_all()}</h2>
       <div class="space-y-3">
         {#each data.teachers as teacher}
           <Card>
@@ -47,7 +48,7 @@
                       {/each}
                     </div>
                   {:else}
-                    <p class="text-xs text-text-muted mt-1">No classrooms assigned</p>
+                    <p class="text-xs text-text-muted mt-1">{m.school_teachers_no_classrooms()}</p>
                   {/if}
                 </div>
               </div>
@@ -58,7 +59,7 @@
     </div>
 
     <div>
-      <h2 class="text-lg font-semibold text-text mb-3">Assign Teacher</h2>
+      <h2 class="text-lg font-semibold text-text mb-3">{m.school_teachers_assign()}</h2>
       <Card>
         {#snippet children()}
           <form method="POST" action="?/assign" use:enhance class="space-y-3">
@@ -81,14 +82,14 @@
               </select>
             </div>
             <div>
-              <label for="role" class="block text-sm font-medium text-text mb-1">Role</label>
+              <label for="role" class="block text-sm font-medium text-text mb-1">{m.school_teachers_role()}</label>
               <select name="role" id="role" bind:value={assignRole} class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
-                <option value="primary">Primary</option>
-                <option value="assistant">Assistant</option>
-                <option value="substitute">Substitute</option>
+                <option value="primary">{m.school_teachers_role_primary()}</option>
+                <option value="assistant">{m.school_teachers_role_assistant()}</option>
+                <option value="substitute">{m.school_teachers_role_substitute()}</option>
               </select>
             </div>
-            <Button type="submit" class="w-full">Assign</Button>
+            <Button type="submit" class="w-full">{m.school_teachers_assign_btn()}</Button>
           </form>
         {/snippet}
       </Card>

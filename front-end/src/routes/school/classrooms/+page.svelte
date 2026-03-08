@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -9,11 +10,11 @@
 </svelte:head>
 
 <div>
-  <h1 class="text-2xl font-bold text-text mb-6">Classrooms</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.nav_classrooms()}</h1>
 
   {#if data.classrooms.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No classrooms found</p>
+      <p class="text-lg">{m.school_classrooms_no_classrooms()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

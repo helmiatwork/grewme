@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { Card, Button, Input, Alert } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -22,9 +23,9 @@
 
 <div>
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-text">School Curriculum</h1>
+    <h1 class="text-2xl font-bold text-text">{m.curriculum_title()}</h1>
     <Button onclick={() => (showNewSubjectForm = !showNewSubjectForm)}>
-      {showNewSubjectForm ? 'Cancel' : 'New Subject'}
+      {showNewSubjectForm ? m.common_cancel() : m.curriculum_new_subject()}
     </Button>
   </div>
 
@@ -36,7 +37,7 @@
 
   {#if showNewSubjectForm}
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
-      <h2 class="text-lg font-semibold text-text mb-4">New Subject</h2>
+      <h2 class="text-lg font-semibold text-text mb-4">{m.curriculum_new_subject()}</h2>
       <form
         method="POST"
         action="?/createSubject"
@@ -51,20 +52,20 @@
         <input type="hidden" name="schoolId" value={data.schoolId ?? ''} />
         <div class="space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium text-text mb-1">Subject Name</label>
-            <Input id="name" name="name" placeholder="e.g. Mathematics" required />
+            <label for="name" class="block text-sm font-medium text-text mb-1">{m.curriculum_subject_name()}</label>
+            <Input id="name" name="name" placeholder={m.curriculum_subject_name_placeholder()} required />
           </div>
           <div>
             <label for="description" class="block text-sm font-medium text-text mb-1">
-              Description <span class="text-text-muted">(optional)</span>
+              {m.curriculum_description()} <span class="text-text-muted">({m.feed_optional()})</span>
             </label>
-            <Input id="description" name="description" placeholder="Brief description..." />
+            <Input id="description" name="description" placeholder={m.curriculum_description_placeholder()} />
           </div>
           <div class="flex gap-2">
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Creating...' : 'Create Subject'}
+              {submitting ? m.curriculum_creating() : m.curriculum_create_subject()}
             </Button>
-            <Button variant="ghost" onclick={() => (showNewSubjectForm = false)}>Cancel</Button>
+            <Button variant="ghost" onclick={() => (showNewSubjectForm = false)}>{m.common_cancel()}</Button>
           </div>
         </div>
       </form>
@@ -73,13 +74,13 @@
 
   {#if !data.schoolId}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No school found</p>
-      <p class="text-sm mt-1">Your account is not linked to a school.</p>
+      <p class="text-lg">{m.curriculum_no_school()}</p>
+      <p class="text-sm mt-1">{m.curriculum_no_school_hint()}</p>
     </div>
   {:else if data.subjects.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No subjects yet</p>
-      <p class="text-sm mt-1">Create the first subject for your school's curriculum.</p>
+      <p class="text-lg">{m.curriculum_no_subjects()}</p>
+      <p class="text-sm mt-1">{m.curriculum_no_subjects_hint()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

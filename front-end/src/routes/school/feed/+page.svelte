@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -9,11 +10,11 @@
 </svelte:head>
 
 <div>
-  <h1 class="text-2xl font-bold text-text mb-6">School Feed</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.feed_title()}</h1>
 
   {#if data.feedPosts.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No posts yet</p>
+      <p class="text-lg">{m.feed_no_posts()}</p>
     </div>
   {:else}
     <div class="space-y-4 max-w-2xl">

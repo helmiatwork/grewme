@@ -1,4 +1,6 @@
 <script lang="ts">
+  import * as m from '$lib/paraglide/messages.js';
+
   let { data } = $props();
 
   const examTypeBadge: Record<string, string> = {
@@ -9,10 +11,10 @@
   };
 
   const examTypeLabels: Record<string, string> = {
-    SCORE_BASED: 'Score Based',
-    MULTIPLE_CHOICE: 'Multiple Choice',
-    RUBRIC: 'Rubric',
-    PASS_FAIL: 'Pass/Fail'
+    SCORE_BASED: m.exam_type_score_based(),
+    MULTIPLE_CHOICE: m.exam_type_multiple_choice(),
+    RUBRIC: m.exam_type_rubric(),
+    PASS_FAIL: m.exam_type_pass_fail()
   };
 
   const statusBadge: Record<string, string> = {
@@ -51,7 +53,7 @@
 <div>
   <!-- Breadcrumb -->
   <nav class="text-sm text-text-muted mb-4">
-    <a href="/school/exams" class="hover:text-text">Exams</a>
+    <a href="/school/exams" class="hover:text-text">{m.nav_exams()}</a>
     <span class="mx-2">›</span>
     <span class="text-text">{exam?.title}</span>
   </nav>
@@ -77,10 +79,10 @@
       </div>
       <div class="flex flex-col gap-1 text-sm text-text-muted text-right">
         {#if exam?.maxScore}
-          <span>Max score: <strong class="text-text">{exam?.maxScore}</strong></span>
+          <span>{m.exam_max_score_label()} <strong class="text-text">{exam?.maxScore}</strong></span>
         {/if}
         {#if exam?.durationMinutes}
-          <span>Duration: <strong class="text-text">{exam?.durationMinutes} min</strong></span>
+          <span>{m.exam_duration_label()} <strong class="text-text">{exam?.durationMinutes} min</strong></span>
         {/if}
       </div>
     </div>
@@ -89,7 +91,7 @@
   <!-- Questions / Criteria -->
   {#if exam?.examType === 'RUBRIC' && exam?.rubricCriteria?.length > 0}
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-6">
-      <h2 class="text-lg font-semibold text-text mb-4">Rubric Criteria</h2>
+      <h2 class="text-lg font-semibold text-text mb-4">{m.exam_rubric_criteria()}</h2>
       <div class="space-y-3">
         {#each exam.rubricCriteria as criterion}
           <div class="flex items-start justify-between p-3 bg-slate-50 rounded-lg">
@@ -149,7 +151,7 @@
               <span>Scheduled: {formatDate(ce.scheduledAt)}</span>
             {/if}
             {#if ce.dueAt}
-              <span>Due: {formatDate(ce.dueAt)}</span>
+              <span>{m.exam_due_label()} {formatDate(ce.dueAt)}</span>
             {/if}
           </div>
 

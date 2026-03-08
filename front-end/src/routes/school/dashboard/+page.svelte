@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -16,7 +17,7 @@
       {#snippet children()}
         <div class="text-center">
           <p class="text-3xl font-bold text-primary">{data.overview.classroomCount}</p>
-          <p class="text-sm text-text-muted mt-1">Classrooms</p>
+          <p class="text-sm text-text-muted mt-1">{m.school_dashboard_classrooms_label()}</p>
         </div>
       {/snippet}
     </Card>
@@ -24,7 +25,7 @@
       {#snippet children()}
         <div class="text-center">
           <p class="text-3xl font-bold text-secondary">{data.overview.studentCount}</p>
-          <p class="text-sm text-text-muted mt-1">Students</p>
+          <p class="text-sm text-text-muted mt-1">{m.school_dashboard_students_label()}</p>
         </div>
       {/snippet}
     </Card>
@@ -32,17 +33,17 @@
       {#snippet children()}
         <div class="text-center">
           <p class="text-3xl font-bold text-amber-600">{data.overview.teacherCount}</p>
-          <p class="text-sm text-text-muted mt-1">Teachers</p>
+          <p class="text-sm text-text-muted mt-1">{m.school_dashboard_teachers_label()}</p>
         </div>
       {/snippet}
     </Card>
   </div>
 
-  <h2 class="text-xl font-semibold text-text mb-4">All Classrooms</h2>
+  <h2 class="text-xl font-semibold text-text mb-4">{m.school_dashboard_all_classrooms()}</h2>
 
   {#if data.classrooms.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No classrooms yet</p>
+      <p class="text-lg">{m.school_dashboard_no_classrooms()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

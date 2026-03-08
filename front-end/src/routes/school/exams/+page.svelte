@@ -1,4 +1,6 @@
 <script lang="ts">
+  import * as m from '$lib/paraglide/messages.js';
+
   let { data } = $props();
 
   let filterSubject = $state('');
@@ -11,15 +13,14 @@
     PASS_FAIL: 'bg-amber-100 text-amber-700'
   };
 
-  const examTypeLabels: Record<string, string> = {
-    SCORE_BASED: 'Score Based',
-    MULTIPLE_CHOICE: 'Multiple Choice',
-    RUBRIC: 'Rubric',
-    PASS_FAIL: 'Pass/Fail'
-  };
-
   function examTypeLabel(type: string) {
-    return examTypeLabels[type] ?? type;
+    const labels: Record<string, string> = {
+      SCORE_BASED: m.exam_type_score_based(),
+      MULTIPLE_CHOICE: m.exam_type_multiple_choice(),
+      RUBRIC: m.exam_type_rubric(),
+      PASS_FAIL: m.exam_type_pass_fail()
+    };
+    return labels[type] ?? type;
   }
 
   const filteredExams = $derived(
@@ -39,7 +40,7 @@
 
 <div>
   <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-text">School Exams</h1>
+    <h1 class="text-2xl font-bold text-text">{m.exam_school_title()}</h1>
   </div>
 
   <!-- Filters -->
@@ -48,7 +49,7 @@
       bind:value={filterSubject}
       class="rounded-lg border border-slate-200 px-3 py-2 text-sm text-text bg-white"
     >
-      <option value="">All Subjects</option>
+      <option value="">{m.exam_filter_all_subjects()}</option>
       {#each data.subjects as subject}
         <option value={subject.id}>{subject.name}</option>
       {/each}
@@ -58,7 +59,7 @@
       bind:value={filterType}
       class="rounded-lg border border-slate-200 px-3 py-2 text-sm text-text bg-white"
     >
-      <option value="">All Types</option>
+      <option value="">{m.exam_filter_all_types()}</option>
       {#each examTypes as type}
         <option value={type}>{examTypeLabel(type)}</option>
       {/each}
@@ -67,8 +68,8 @@
 
   {#if filteredExams.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No exams found</p>
-      <p class="text-sm mt-1">Exams are created by teachers within topics.</p>
+      <p class="text-lg">{m.exam_school_no_exams()}</p>
+      <p class="text-sm mt-1">{m.exam_school_no_exams_hint()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

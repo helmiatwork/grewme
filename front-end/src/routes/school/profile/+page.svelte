@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -9,7 +10,7 @@
 </svelte:head>
 
 <div>
-  <h1 class="text-2xl font-bold text-text mb-6">My Profile</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.profile_title()}</h1>
 
   <div class="max-w-lg">
     <Card>
@@ -26,7 +27,7 @@
             <div>
               <h2 class="text-xl font-semibold text-text">{data.profile.name}</h2>
               <p class="text-sm text-text-muted">{data.profile.email}</p>
-              <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">School Manager</span>
+              <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">{m.profile_school_manager()}</span>
             </div>
           </div>
         </div>

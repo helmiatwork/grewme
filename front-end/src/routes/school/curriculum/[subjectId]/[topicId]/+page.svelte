@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { Card, Button, Input, Alert, Badge } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -54,7 +55,7 @@
 <div>
   <!-- Breadcrumb -->
   <nav class="text-sm text-text-muted mb-4">
-    <a href="/school/curriculum" class="hover:text-text">Curriculum</a>
+    <a href="/school/curriculum" class="hover:text-text">{m.curriculum_title()}</a>
     <span class="mx-2">›</span>
     <a href="/school/curriculum/{data.topic?.subject?.id}" class="hover:text-text">
       {data.topic?.subject?.name}
@@ -87,18 +88,18 @@
       >
         <div class="space-y-4">
           <div>
-            <label for="name" class="block text-sm font-medium text-text mb-1">Topic Name</label>
+            <label for="name" class="block text-sm font-medium text-text mb-1">{m.curriculum_topic_name()}</label>
             <Input id="name" name="name" value={data.topic?.name} required />
           </div>
           <div>
-            <label for="description" class="block text-sm font-medium text-text mb-1">Description</label>
+            <label for="description" class="block text-sm font-medium text-text mb-1">{m.curriculum_description()}</label>
             <Input id="description" name="description" value={data.topic?.description ?? ''} />
           </div>
           <div class="flex gap-2">
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Saving...' : 'Save Changes'}
+              {submitting ? m.curriculum_saving() : m.common_save()}
             </Button>
-            <Button variant="ghost" onclick={() => (showEditTopic = false)}>Cancel</Button>
+            <Button variant="ghost" onclick={() => (showEditTopic = false)}>{m.common_cancel()}</Button>
           </div>
         </div>
       </form>
@@ -111,10 +112,10 @@
           {/if}
         </div>
         <div class="flex gap-2">
-          <Button variant="ghost" onclick={() => (showEditTopic = true)}>Edit</Button>
+          <Button variant="ghost" onclick={() => (showEditTopic = true)}>{m.common_edit()}</Button>
           <form method="POST" action="?/deleteTopic" use:enhance>
             <Button type="submit" variant="ghost" class="text-red-600 hover:text-red-700">
-              Delete
+              {m.common_delete()}
             </Button>
           </form>
         </div>
@@ -126,13 +127,13 @@
   <div class="flex items-center justify-between mb-4">
     <h2 class="text-xl font-semibold text-text">Learning Objectives</h2>
     <Button onclick={() => (showNewLOForm = !showNewLOForm)}>
-      {showNewLOForm ? 'Cancel' : 'Add Objective'}
+      {showNewLOForm ? m.common_cancel() : m.curriculum_add_objective()}
     </Button>
   </div>
 
   {#if showNewLOForm}
     <div class="bg-surface rounded-xl border border-slate-100 p-6 mb-4">
-      <h3 class="text-lg font-semibold text-text mb-4">New Learning Objective</h3>
+      <h3 class="text-lg font-semibold text-text mb-4">{m.curriculum_new_objective()}</h3>
       <form
         method="POST"
         action="?/createLO"
@@ -146,8 +147,8 @@
       >
         <div class="space-y-4">
           <div>
-            <label for="loDesc" class="block text-sm font-medium text-text mb-1">Description</label>
-            <Input id="loDesc" name="description" placeholder="Students will be able to..." required />
+            <label for="loDesc" class="block text-sm font-medium text-text mb-1">{m.curriculum_objective_desc()}</label>
+            <Input id="loDesc" name="description" placeholder={m.curriculum_objective_desc_placeholder()} required />
           </div>
           <div>
             <label for="masteryThreshold" class="block text-sm font-medium text-text mb-1">
@@ -157,9 +158,9 @@
           </div>
           <div class="flex gap-2">
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Adding...' : 'Add Objective'}
+              {submitting ? m.curriculum_adding() : m.curriculum_add_objective()}
             </Button>
-            <Button variant="ghost" onclick={() => (showNewLOForm = false)}>Cancel</Button>
+            <Button variant="ghost" onclick={() => (showNewLOForm = false)}>{m.common_cancel()}</Button>
           </div>
         </div>
       </form>
@@ -168,7 +169,7 @@
 
   {#if !data.topic?.learningObjectives || data.topic.learningObjectives.length === 0}
     <div class="text-center py-8 text-text-muted mb-6">
-      <p>No learning objectives yet.</p>
+      <p>{m.curriculum_no_objectives()}</p>
     </div>
   {:else}
     <div class="space-y-3 mb-8">
@@ -191,8 +192,8 @@
                 <Input name="description" value={lo.description} required />
                 <Input name="masteryThreshold" type="number" min="0" max="1" step="0.05" value={lo.masteryThreshold} />
                 <div class="flex gap-2">
-                  <Button type="submit" disabled={submitting} class="text-sm">Save</Button>
-                  <Button variant="ghost" onclick={() => (editingLO = null)} class="text-sm">Cancel</Button>
+                  <Button type="submit" disabled={submitting} class="text-sm">{m.common_save()}</Button>
+                  <Button variant="ghost" onclick={() => (editingLO = null)} class="text-sm">{m.common_cancel()}</Button>
                 </div>
               </div>
             </form>
@@ -203,17 +204,17 @@
                 <p class="text-xs text-text-muted mt-1">Mastery: {Math.round(lo.masteryThreshold * 100)}%</p>
               </div>
               <div class="flex gap-2 ml-4">
-                <button
-                  type="button"
-                  onclick={() => (editingLO = lo.id)}
-                  class="text-sm text-text-muted hover:text-text"
-                >
-                  Edit
-                </button>
-                <form method="POST" action="?/deleteLO" use:enhance>
-                  <input type="hidden" name="id" value={lo.id} />
-                  <button type="submit" class="text-sm text-red-500 hover:text-red-700">Remove</button>
-                </form>
+                  <button
+                    type="button"
+                    onclick={() => (editingLO = lo.id)}
+                    class="text-sm text-text-muted hover:text-text"
+                  >
+                    {m.common_edit()}
+                  </button>
+                  <form method="POST" action="?/deleteLO" use:enhance>
+                    <input type="hidden" name="id" value={lo.id} />
+                    <button type="submit" class="text-sm text-red-500 hover:text-red-700">{m.exam_remove()}</button>
+                  </form>
               </div>
             </div>
           {/if}
@@ -223,11 +224,11 @@
   {/if}
 
   <!-- Exams Section -->
-  <h2 class="text-xl font-semibold text-text mb-4">Exams</h2>
+  <h2 class="text-xl font-semibold text-text mb-4">{m.curriculum_exams_section()}</h2>
 
   {#if !data.topic?.exams || data.topic.exams.length === 0}
     <div class="text-center py-8 text-text-muted">
-      <p>No exams for this topic yet.</p>
+      <p>{m.curriculum_no_topic_exams()}</p>
     </div>
   {:else}
     <div class="space-y-3">
