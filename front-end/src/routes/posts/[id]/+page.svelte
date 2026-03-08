@@ -2,6 +2,7 @@
   import { Card, Badge } from '$lib/components/ui';
   import { MediaGallery } from '$lib/components/feed';
   import { formatDate } from '$lib/utils/helpers';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
   const post = data.post;
@@ -16,7 +17,7 @@
 
 <div class="max-w-2xl mx-auto py-8 px-4">
   <div class="mb-4">
-    <a href="/" class="text-sm text-primary hover:underline">← Back to GrewMe</a>
+    <a href="/" class="text-sm text-primary hover:underline">{m.post_back()}</a>
   </div>
 
   <Card>
