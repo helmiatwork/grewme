@@ -151,9 +151,9 @@ Plans:
 | 1. Security Foundation & Backend Core | **Complete** ✅ (9/9 plans) | 2026-03-04 |
 | 2. KMP Monorepo & Mobile Foundation | Deferred (web-first) | - |
 | 3. Compliance & Consent Engine | **Complete** ✅ (14 tasks, 9 waves) | 2026-03-08 |
-| 4. Radar Chart & Core Features | Not started | - |
-| 5. DevOps, CI/CD & Quality | Not started | - |
-| 6. Polish & Advanced Features | Not started | - |
+| 4. Radar Chart & Core Features | **Complete** ✅ (web equivalents already built) | 2026-03-08 |
+| 5. DevOps, CI/CD & Quality | **Complete** ✅ (Sentry, Lograge, Railway, Vercel) | 2026-03-08 |
+| 6. Polish & Advanced Features | Not started (v2 scope) | - |
 
 ---
 
