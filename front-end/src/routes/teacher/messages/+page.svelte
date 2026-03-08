@@ -341,7 +341,7 @@
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   onMount(() => {
-    consumer = createConsumer(`ws://localhost:3004/cable?token=${data.accessToken}`);
+    consumer = createConsumer(`${data.cableUrl}?token=${data.accessToken}`);
     import('emoji-picker-element');
   });
 
