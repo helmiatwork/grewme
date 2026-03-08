@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card, Badge } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -11,7 +12,7 @@
 <div>
   <div class="mb-6">
     <nav class="text-sm text-text-muted mb-2">
-      <a href="/parent/curriculum" class="hover:text-primary transition-colors">Curriculum</a>
+      <a href="/parent/curriculum" class="hover:text-primary transition-colors">{m.curriculum_title()}</a>
       <span class="mx-2">›</span>
       <a href="/parent/curriculum/{data.topic.subject.id}" class="hover:text-primary transition-colors">
         {data.topic.subject.name}
@@ -27,16 +28,16 @@
 
   <!-- Learning Objectives -->
   <div class="mb-8">
-    <h2 class="text-lg font-semibold text-text mb-4">Learning Objectives</h2>
+    <h2 class="text-lg font-semibold text-text mb-4">{m.curriculum_learning_objectives()}</h2>
     {#if data.topic.learningObjectives.length === 0}
-      <p class="text-text-muted text-sm">No learning objectives yet.</p>
+      <p class="text-text-muted text-sm">{m.curriculum_no_objectives()}</p>
     {:else}
       <div class="space-y-3">
         {#each data.topic.learningObjectives as lo (lo.id)}
           <Card>
             <p class="text-sm text-text">{lo.description}</p>
             <p class="text-xs text-text-muted mt-2">
-              Mastery threshold: <span class="font-medium text-text">{lo.masteryThreshold}%</span>
+              {m.curriculum_mastery_label({ threshold: lo.masteryThreshold })}
             </p>
           </Card>
         {/each}
@@ -46,9 +47,9 @@
 
   <!-- Exams -->
   <div>
-    <h2 class="text-lg font-semibold text-text mb-4">Exams</h2>
+    <h2 class="text-lg font-semibold text-text mb-4">{m.curriculum_exams_section()}</h2>
     {#if data.topic.exams.length === 0}
-      <p class="text-text-muted text-sm">No exams assigned yet.</p>
+      <p class="text-text-muted text-sm">{m.curriculum_no_topic_exams()}</p>
     {:else}
       <div class="space-y-3">
         {#each data.topic.exams as exam (exam.id)}

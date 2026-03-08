@@ -3,6 +3,7 @@
   import { FilePicker } from '$lib/components/feed';
   import { uploadFile } from '$lib/api/upload';
   import { UPDATE_PROFILE_MUTATION, CHANGE_PASSWORD_MUTATION } from '$lib/api/queries/profile';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -106,15 +107,15 @@
       if (payload?.errors?.length) {
         profileAlert = { variant: 'error', message: payload.errors[0].message };
       } else if (payload?.user) {
-        profileAlert = { variant: 'success', message: 'Profile updated successfully!' };
+        profileAlert = { variant: 'success', message: m.profile_updated() };
         if (payload.user.avatarUrl) avatarUrl = payload.user.avatarUrl;
         avatarBlobId = null;
         avatarFiles = [];
       } else {
-        profileAlert = { variant: 'error', message: 'Something went wrong. Please try again.' };
+        profileAlert = { variant: 'error', message: m.profile_something_wrong() };
       }
     } catch {
-      profileAlert = { variant: 'error', message: 'Network error. Please try again.' };
+      profileAlert = { variant: 'error', message: m.profile_something_wrong() };
     } finally {
       profileLoading = false;
     }
@@ -126,7 +127,7 @@
     passwordAlert = null;
 
     if (newPassword !== newPasswordConfirmation) {
-      passwordAlert = { variant: 'error', message: 'New passwords do not match.' };
+      passwordAlert = { variant: 'error', message: m.profile_passwords_not_match() };
       passwordLoading = false;
       return;
     }
@@ -147,15 +148,15 @@
       if (payload?.errors?.length) {
         passwordAlert = { variant: 'error', message: payload.errors[0].message };
       } else if (payload?.success) {
-        passwordAlert = { variant: 'success', message: 'Password changed successfully!' };
+        passwordAlert = { variant: 'success', message: m.profile_password_updated() };
         currentPassword = '';
         newPassword = '';
         newPasswordConfirmation = '';
       } else {
-        passwordAlert = { variant: 'error', message: 'Something went wrong. Please try again.' };
+        passwordAlert = { variant: 'error', message: m.profile_something_wrong() };
       }
     } catch {
-      passwordAlert = { variant: 'error', message: 'Network error. Please try again.' };
+      passwordAlert = { variant: 'error', message: m.profile_something_wrong() };
     } finally {
       passwordLoading = false;
     }
@@ -163,7 +164,7 @@
 </script>
 
 <svelte:head>
-  <title>My Profile — GrewMe</title>
+  <title>{m.profile_title()} — GrewMe</title>
 </svelte:head>
 
 <div class="max-w-2xl mx-auto space-y-6 pb-12">
@@ -175,8 +176,8 @@
     <div class="absolute -bottom-12 -left-6 w-56 h-56 rounded-full bg-white/5"></div>
 
     <div class="relative text-center">
-      <h1 class="text-2xl font-bold tracking-tight">My Profile</h1>
-      <p class="text-white/70 text-sm mt-1">Manage your account information</p>
+      <h1 class="text-2xl font-bold tracking-tight">{m.profile_title()}</h1>
+      <p class="text-white/70 text-sm mt-1">{m.profile_personal_info_hint()}</p>
     </div>
   </div>
 
@@ -223,7 +224,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
-      {uploadingAvatar ? 'Uploading…' : 'Change Photo'}
+      {uploadingAvatar ? m.profile_uploading() : m.profile_change_photo()}
     </label>
     <!-- Real file input with matching id -->
     <input
@@ -240,7 +241,7 @@
     />
 
     <div class="text-center">
-      <p class="font-semibold text-text text-lg">{name || 'Your Name'}</p>
+      <p class="font-semibold text-text text-lg">{name || m.profile_your_name()}</p>
       <p class="text-sm text-text-muted">{email}</p>
     </div>
   </div>
@@ -253,7 +254,7 @@
       {#snippet header()}
         <div class="flex items-center gap-2">
           <span class="text-lg">👤</span>
-          <h2 class="font-semibold text-text">Personal Information</h2>
+          <h2 class="font-semibold text-text">{m.profile_personal_info()}</h2>
         </div>
       {/snippet}
 
@@ -261,61 +262,61 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             id="name"
-            label="Full Name"
-            placeholder="Your full name"
+            label={m.profile_full_name()}
+            placeholder={m.profile_full_name_placeholder()}
             required
             bind:value={name}
           />
           <Input
             id="email"
-            label="Email Address"
+            label={m.common_email()}
             type="email"
-            placeholder="you@example.com"
+            placeholder={m.profile_email_placeholder()}
             required
             bind:value={email}
           />
           <Input
             id="phone"
-            label="Phone Number"
+            label={m.profile_phone()}
             type="tel"
-            placeholder="+1 234 567 8900"
+            placeholder={m.profile_phone_placeholder()}
             bind:value={phone}
           />
           <Input
             id="qualification"
-            label="Qualification"
-            placeholder="e.g. Bachelor's in Education"
+            label={m.profile_qualification()}
+            placeholder={m.profile_qualification_placeholder()}
             bind:value={qualification}
           />
           <Input
             id="birthdate"
-            label="Date of Birth"
+            label={m.profile_birthdate()}
             type="date"
             bind:value={birthdate}
           />
           <div class="space-y-1">
-            <label class="block text-sm font-medium text-text" for="gender">Gender</label>
+            <label class="block text-sm font-medium text-text" for="gender">{m.profile_gender()}</label>
             <select
               id="gender"
               bind:value={gender}
               class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white transition-colors
                      focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
             >
-              <option value="">Prefer not to say</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="">{m.profile_gender_prefer_not()}</option>
+              <option value="male">{m.profile_gender_male()}</option>
+              <option value="female">{m.profile_gender_female()}</option>
+              <option value="other">{m.profile_gender_other()}</option>
             </select>
           </div>
         </div>
 
         <!-- Bio spans full width -->
         <div class="space-y-1">
-          <label class="block text-sm font-medium text-text" for="bio">Bio</label>
+          <label class="block text-sm font-medium text-text" for="bio">{m.profile_bio()}</label>
           <textarea
             id="bio"
             rows="3"
-            placeholder="Tell us a little about yourself…"
+            placeholder={m.profile_bio_placeholder()}
             bind:value={bio}
             class="w-full px-3 py-2 rounded-lg border border-slate-200 transition-colors resize-none
                    focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
@@ -329,49 +330,49 @@
       {#snippet header()}
         <div class="flex items-center gap-2">
           <span class="text-lg">🏠</span>
-          <h2 class="font-semibold text-text">Address</h2>
+          <h2 class="font-semibold text-text">{m.profile_address()}</h2>
         </div>
       {/snippet}
 
       <div class="space-y-4">
-        <Input
-          id="addressLine1"
-          label="Address Line 1"
-          placeholder="Street address"
-          bind:value={addressLine1}
-        />
-        <Input
-          id="addressLine2"
-          label="Address Line 2"
-          placeholder="Apartment, suite, etc. (optional)"
-          bind:value={addressLine2}
-        />
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            id="city"
-            label="City"
-            placeholder="City"
-            bind:value={city}
+            id="addressLine1"
+            label={m.profile_address_line1()}
+            placeholder={m.profile_address_line1_placeholder()}
+            bind:value={addressLine1}
           />
           <Input
-            id="stateProvince"
-            label="State / Province"
-            placeholder="State or Province"
-            bind:value={stateProvince}
+            id="addressLine2"
+            label={m.profile_address_line2()}
+            placeholder={m.profile_address_line2_placeholder()}
+            bind:value={addressLine2}
           />
-          <Input
-            id="postalCode"
-            label="Postal Code"
-            placeholder="12345"
-            bind:value={postalCode}
-          />
-          <Input
-            id="countryCode"
-            label="Country Code"
-            placeholder="US"
-            maxlength={2}
-            bind:value={countryCode}
-          />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              id="city"
+              label={m.profile_city()}
+              placeholder={m.profile_city_placeholder()}
+              bind:value={city}
+            />
+            <Input
+              id="stateProvince"
+              label={m.profile_state()}
+              placeholder={m.profile_state_placeholder()}
+              bind:value={stateProvince}
+            />
+            <Input
+              id="postalCode"
+              label={m.profile_postal()}
+              placeholder={m.profile_postal_placeholder()}
+              bind:value={postalCode}
+            />
+            <Input
+              id="countryCode"
+              label={m.profile_country()}
+              placeholder={m.profile_country_placeholder()}
+              maxlength={2}
+              bind:value={countryCode}
+            />
         </div>
       </div>
     </Card>
@@ -389,7 +390,7 @@
     <div class="flex justify-end">
       <Button type="submit" size="lg" loading={profileLoading}>
         {#snippet children()}
-          Save Changes
+          {m.profile_save_btn()}
         {/snippet}
       </Button>
     </div>
@@ -402,37 +403,37 @@
       {#snippet header()}
         <div class="flex items-center gap-2">
           <span class="text-lg">🔒</span>
-          <h2 class="font-semibold text-text">Change Password</h2>
+          <h2 class="font-semibold text-text">{m.profile_change_password()}</h2>
         </div>
       {/snippet}
 
       <div class="space-y-4">
-        <Input
-          id="currentPassword"
-          label="Current Password"
-          type="password"
-          placeholder="Enter your current password"
-          required
-          bind:value={currentPassword}
-        />
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            id="newPassword"
-            label="New Password"
+            id="currentPassword"
+            label={m.profile_current_password()}
             type="password"
-            placeholder="At least 8 characters"
+            placeholder={m.profile_current_password()}
             required
-            minlength={8}
-            bind:value={newPassword}
+            bind:value={currentPassword}
           />
-          <Input
-            id="newPasswordConfirmation"
-            label="Confirm New Password"
-            type="password"
-            placeholder="Repeat new password"
-            required
-            bind:value={newPasswordConfirmation}
-          />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              id="newPassword"
+              label={m.profile_new_password()}
+              type="password"
+              placeholder={m.profile_new_password()}
+              required
+              minlength={8}
+              bind:value={newPassword}
+            />
+            <Input
+              id="newPasswordConfirmation"
+              label={m.profile_confirm_new_password()}
+              type="password"
+              placeholder={m.profile_confirm_new_password()}
+              required
+              bind:value={newPasswordConfirmation}
+            />
         </div>
 
         {#if passwordAlert}
@@ -446,7 +447,7 @@
         <div class="flex justify-end pt-2">
           <Button type="submit" variant="outline" size="lg" loading={passwordLoading}>
             {#snippet children()}
-              Update Password
+              {m.profile_update_password()}
             {/snippet}
           </Button>
         </div>

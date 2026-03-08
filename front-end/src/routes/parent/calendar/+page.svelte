@@ -2,6 +2,7 @@
   import { Card, Button, Alert, Badge } from '$lib/components/ui';
   import { CREATE_CLASSROOM_EVENT_MUTATION, DELETE_CLASSROOM_EVENT_MUTATION } from '$lib/api/queries/calendar';
   import type { ClassroomEvent } from '$lib/api/types';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -212,11 +213,11 @@
 </script>
 
 <svelte:head>
-  <title>Calendar — GrewMe</title>
+  <title>{m.calendar_title()} — GrewMe</title>
 </svelte:head>
 
 <div>
-  <h1 class="text-2xl font-bold text-text mb-6">Calendar</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.calendar_title()}</h1>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- ── Left column: Calendar Grid ──────────────────────────────────── -->
@@ -228,10 +229,10 @@
               {MONTH_NAMES[viewMonth]} {viewYear}
             </h2>
             <div class="flex gap-1">
-              <Button variant="ghost" size="sm" onclick={goPrevMonth} disabled={isCurrentMonth}>← Prev</Button>
-              <Button variant="ghost" size="sm" onclick={goToday}>Today</Button>
-              <Button variant="ghost" size="sm" onclick={goNextMonth}>Next →</Button>
-              <Button size="sm" onclick={openModal}>+ Add Event</Button>
+              <Button variant="ghost" size="sm" onclick={goPrevMonth} disabled={isCurrentMonth}>{m.calendar_prev()}</Button>
+              <Button variant="ghost" size="sm" onclick={goToday}>{m.calendar_today()}</Button>
+              <Button variant="ghost" size="sm" onclick={goNextMonth}>{m.calendar_next()}</Button>
+              <Button size="sm" onclick={openModal}>{m.calendar_add_event()}</Button>
             </div>
           </div>
         {/snippet}
@@ -279,23 +280,23 @@
     <div>
       <h2 class="text-lg font-semibold text-text mb-3">
         {#if selectedDay !== null}
-          Events for {MONTH_NAMES[viewMonth]} {selectedDay}
+          {m.calendar_events_for({ month: MONTH_NAMES[viewMonth], day: selectedDay })}
           <button
             type="button"
             onclick={() => selectedDay = null}
             class="ml-2 text-sm font-normal text-text-muted hover:text-text underline"
           >
-            Show all
+            {m.calendar_show_all()}
           </button>
         {:else}
-          All Events
+          {m.calendar_all_events()}
         {/if}
       </h2>
 
       {#if visibleEvents.length === 0}
         <div class="text-center py-10 text-text-muted bg-slate-50 rounded-xl border border-slate-100">
           <p class="text-4xl mb-2">📅</p>
-          <p class="text-sm">No events{selectedDay !== null ? ' on this day' : ''}</p>
+          <p class="text-sm">{selectedDay !== null ? m.calendar_no_events_day() : m.calendar_no_events()}</p>
         </div>
       {:else}
         <div class="space-y-3">
@@ -368,7 +369,7 @@
     <!-- Modal content -->
     <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-text">Add Event</h2>
+        <h2 class="text-lg font-semibold text-text">{m.calendar_add_modal_title()}</h2>
         <button
           type="button"
           onclick={closeModal}
@@ -388,7 +389,7 @@
 
       <form onsubmit={handleCreate} class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="sm:col-span-2">
-          <label for="modal-classroomId" class="block text-sm font-medium text-text mb-1">Classroom</label>
+          <label for="modal-classroomId" class="block text-sm font-medium text-text mb-1">{m.calendar_classroom_label()}</label>
           <select
             id="modal-classroomId"
             bind:value={formClassroomId}
@@ -396,7 +397,7 @@
             disabled={submitting}
             class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">Select classroom…</option>
+              <option value="">{m.calendar_select_classroom()}</option>
             {#each data.classrooms as classroom}
               <option value={classroom.id}>{classroom.name}</option>
             {/each}
@@ -404,20 +405,20 @@
         </div>
 
         <div class="sm:col-span-2">
-          <label for="modal-title" class="block text-sm font-medium text-text mb-1">Title</label>
+          <label for="modal-title" class="block text-sm font-medium text-text mb-1">{m.calendar_event_title_label()}</label>
           <input
             id="modal-title"
             type="text"
             bind:value={formTitle}
             required
             disabled={submitting}
-            placeholder="e.g. School Trip Permission Due"
+            placeholder={m.calendar_event_title_placeholder()}
             class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 
         <div>
-          <label for="modal-eventDate" class="block text-sm font-medium text-text mb-1">Date</label>
+          <label for="modal-eventDate" class="block text-sm font-medium text-text mb-1">{m.calendar_date_label()}</label>
           <input
             id="modal-eventDate"
             type="date"
@@ -430,7 +431,7 @@
 
         <div>
           <label for="modal-startTime" class="block text-sm font-medium text-text mb-1">
-            Start Time <span class="text-text-muted font-normal">(optional)</span>
+            {m.calendar_start_time()}
           </label>
           <input
             id="modal-startTime"
@@ -443,7 +444,7 @@
 
         <div>
           <label for="modal-endTime" class="block text-sm font-medium text-text mb-1">
-            End Time <span class="text-text-muted font-normal">(optional)</span>
+            {m.calendar_end_time()}
           </label>
           <input
             id="modal-endTime"
@@ -456,22 +457,22 @@
 
         <div class="sm:col-span-2">
           <label for="modal-description" class="block text-sm font-medium text-text mb-1">
-            Description <span class="text-text-muted font-normal">(optional)</span>
+            {m.calendar_description_label()}
           </label>
           <textarea
             id="modal-description"
             bind:value={formDescription}
             disabled={submitting}
             rows={2}
-            placeholder="Add details…"
+            placeholder={m.calendar_description_placeholder()}
             class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           ></textarea>
         </div>
 
         <div class="sm:col-span-2 flex gap-3 justify-end">
-          <Button variant="ghost" type="button" onclick={closeModal} disabled={submitting}>Cancel</Button>
+          <Button variant="ghost" type="button" onclick={closeModal} disabled={submitting}>{m.common_cancel()}</Button>
           <Button type="submit" disabled={submitting}>
-            {submitting ? 'Saving…' : 'Add Event'}
+            {submitting ? m.calendar_saving_event() : m.calendar_save_event()}
           </Button>
         </div>
       </form>

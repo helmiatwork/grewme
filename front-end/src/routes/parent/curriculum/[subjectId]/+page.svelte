@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -11,7 +12,7 @@
 <div>
   <div class="mb-6">
     <nav class="text-sm text-text-muted mb-2">
-      <a href="/parent/curriculum" class="hover:text-primary transition-colors">Curriculum</a>
+      <a href="/parent/curriculum" class="hover:text-primary transition-colors">{m.curriculum_title()}</a>
       <span class="mx-2">›</span>
       <span class="text-text">{data.subject.name}</span>
     </nav>
@@ -23,7 +24,7 @@
 
   {#if data.subject.topics.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No topics yet.</p>
+      <p class="text-lg">{m.curriculum_no_topics()}</p>
     </div>
   {:else}
     <div class="space-y-4">

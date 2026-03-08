@@ -2,6 +2,7 @@
   import { Card } from '$lib/components/ui';
   import { RadarChart } from '$lib/components/charts';
   import { FeedCard } from '$lib/components/feed';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -67,16 +68,16 @@
 </script>
 
 <svelte:head>
-  <title>My Children — GrewMe</title>
+  <title>{m.parent_dashboard_title()} — GrewMe</title>
 </svelte:head>
 
 <div>
-  <h1 class="text-2xl font-bold text-text mb-6">My Children</h1>
+  <h1 class="text-2xl font-bold text-text mb-6">{m.parent_dashboard_title()}</h1>
 
   {#if data.children.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">No children linked yet</p>
-      <p class="text-sm mt-1">Ask your child's teacher to link your account.</p>
+      <p class="text-lg">{m.parent_no_children()}</p>
+      <p class="text-sm mt-1">{m.parent_no_children_hint()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -87,7 +88,7 @@
             {#if child.radar}
               <RadarChart skills={child.radar} label={child.name} size="sm" />
             {:else}
-              <p class="text-sm text-text-muted text-center py-8">No data yet</p>
+              <p class="text-sm text-text-muted text-center py-8">{m.parent_no_data_yet()}</p>
             {/if}
           </Card>
         </a>
@@ -96,7 +97,7 @@
 
     <!-- Feed Section -->
     <div class="mt-8">
-      <h2 class="text-xl font-bold text-text mb-4">Class Feed</h2>
+      <h2 class="text-xl font-bold text-text mb-4">{m.parent_class_feed()}</h2>
 
       <!-- Child filter tabs -->
       <div class="flex gap-2 mb-4 overflow-x-auto">
@@ -104,7 +105,7 @@
           class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors {selectedChildId === null ? 'bg-primary text-white' : 'bg-slate-100 text-text-muted hover:bg-slate-200'}"
           onclick={() => selectedChildId = null}
         >
-          All
+          {m.parent_feed_all()}
         </button>
         {#each data.children as child}
           <button
@@ -119,8 +120,8 @@
       <!-- Feed posts -->
       {#if filteredPosts.length === 0}
         <div class="text-center py-12 text-text-muted">
-          <p class="text-lg">No posts yet</p>
-          <p class="text-sm mt-1">Your child's teacher will post updates here.</p>
+          <p class="text-lg">{m.parent_no_feed()}</p>
+          <p class="text-sm mt-1">{m.parent_no_feed_hint()}</p>
         </div>
       {:else}
         <div class="space-y-4">

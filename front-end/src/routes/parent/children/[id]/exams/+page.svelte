@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card, Badge } from '$lib/components/ui';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -47,9 +48,9 @@
   }
 
   function masteryBadgeLabel(status: string) {
-    if (status === 'mastered') return 'Mastered';
-    if (status === 'partial') return 'In Progress';
-    return 'Not Started';
+    if (status === 'mastered') return m.parent_exams_mastered();
+    if (status === 'partial') return m.parent_exams_in_progress();
+    return m.parent_exams_not_started();
   }
 
   function submissionStatusVariant(status: string): 'warning' | 'primary' | 'success' | 'default' {
@@ -90,11 +91,11 @@
 
   <!-- Mastery Overview -->
   <div class="mb-8">
-    <h2 class="text-lg font-semibold text-text mb-4">Mastery Overview</h2>
+    <h2 class="text-lg font-semibold text-text mb-4">{m.parent_exams_mastery_overview()}</h2>
 
     {#if data.masteries.length === 0}
       <div class="text-center py-8 text-text-muted">
-        <p>No mastery data yet.</p>
+        <p>{m.parent_exams_no_mastery()}</p>
       </div>
     {:else}
       <div class="space-y-6">
@@ -129,11 +130,11 @@
 
   <!-- Exam Results -->
   <div>
-    <h2 class="text-lg font-semibold text-text mb-4">Exam Results</h2>
+    <h2 class="text-lg font-semibold text-text mb-4">{m.parent_exams_results()}</h2>
 
     {#if data.examResults.length === 0}
       <div class="text-center py-8 text-text-muted">
-        <p>No exam submissions yet.</p>
+        <p>{m.parent_exams_no_results()}</p>
       </div>
     {:else}
       <Card>
@@ -141,12 +142,12 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-slate-100">
-                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Exam</th>
-                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Type</th>
-                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Classroom</th>
-                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Status</th>
-                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Score</th>
-                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">Date</th>
+                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.parent_exams_col_exam()}</th>
+                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.parent_exams_col_type()}</th>
+                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.parent_exams_col_classroom()}</th>
+                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.parent_exams_col_status()}</th>
+                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.parent_exams_col_score()}</th>
+                <th class="text-left px-6 py-3 text-sm font-medium text-text-muted">{m.parent_exams_col_date()}</th>
               </tr>
             </thead>
             <tbody>
