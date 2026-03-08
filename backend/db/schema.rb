@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_122913) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_123028) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -96,6 +96,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_122913) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "attendances", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.bigint "leave_request_id"
+    t.text "notes"
+    t.bigint "recorded_by_id"
+    t.string "recorded_by_type"
+    t.integer "status", default: 0, null: false
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["classroom_id", "date"], name: "index_attendances_on_classroom_id_and_date"
+    t.index ["classroom_id"], name: "index_attendances_on_classroom_id"
+    t.index ["leave_request_id"], name: "index_attendances_on_leave_request_id"
+    t.index ["recorded_by_type", "recorded_by_id"], name: "index_attendances_on_recorded_by_type_and_recorded_by_id"
+    t.index ["student_id", "classroom_id", "date"], name: "idx_attendances_unique", unique: true
+    t.index ["student_id"], name: "index_attendances_on_student_id"
   end
 
   create_table "audit_logs", force: :cascade do |t|
@@ -867,6 +886,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_122913) do
   add_foreign_key "academic_years", "schools"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "attendances", "classrooms"
+  add_foreign_key "attendances", "leave_requests"
+  add_foreign_key "attendances", "students"
   add_foreign_key "classroom_events", "classrooms"
   add_foreign_key "classroom_exams", "classrooms"
   add_foreign_key "classroom_exams", "exams"
