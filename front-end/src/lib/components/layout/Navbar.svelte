@@ -2,6 +2,7 @@
   import { Badge } from '$lib/components/ui';
   import type { SessionUser } from '$lib/api/types';
   import { getNotifications } from '$lib/stores/notifications.svelte';
+  import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
 
   interface Props {
     user: SessionUser;
@@ -91,6 +92,15 @@
         {/if}
       </div>
     {/if}
+
+    <select
+      value={getLocale()}
+      onchange={(e) => setLocale(e.currentTarget.value as "en" | "id")}
+      class="text-sm bg-transparent border border-slate-200 rounded-lg px-2 py-1 text-text-muted hover:text-text cursor-pointer"
+    >
+      <option value="en">🇬🇧 EN</option>
+      <option value="id">🇮🇩 ID</option>
+    </select>
 
     <Badge variant={user.type === 'Teacher' ? 'primary' : user.type === 'SchoolManager' ? 'warning' : 'success'}>
       {user.type === 'SchoolManager' ? 'School Manager' : user.type}

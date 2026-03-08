@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
+import { paraglideMiddleware } from '$lib/paraglide/server.js';
 import {
   getAccessToken,
   getRefreshToken,
@@ -15,6 +16,15 @@ import { REFRESH_TOKEN_MUTATION } from '$lib/api/queries/auth';
 const PUBLIC_PATHS = ['/login', '/register', '/api/'];
 
 export const handle: Handle = async ({ event, resolve }) => {
+  return paraglideMiddleware(event.request, ({ request, locale }) => {
+    // Update the event request with the (potentially delocalized) request
+    event.request = request;
+
+    return handleAuth({ event, resolve });
+  });
+};
+
+async function handleAuth({ event, resolve }: { event: any; resolve: any }) {
   const { cookies, url } = event;
   const isPublic = PUBLIC_PATHS.some((p) => url.pathname.startsWith(p));
 
@@ -102,4 +112,4 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   return resolve(event);
-};
+}

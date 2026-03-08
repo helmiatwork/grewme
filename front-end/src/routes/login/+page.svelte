@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { Button, Input, Alert } from '$lib/components/ui';
+  import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
   let { form } = $props();
   let loading = $state(false);
@@ -114,6 +115,16 @@
         <a href="/privacy" class="hover:underline">Privacy Policy</a>
         <span class="mx-2">·</span>
         <a href="/terms" class="hover:underline">Terms of Service</a>
+      </div>
+      <div class="mt-2 text-center">
+        <select
+          value={getLocale()}
+          onchange={(e) => setLocale(e.currentTarget.value as "en" | "id")}
+          class="text-xs bg-transparent border border-slate-200 rounded px-2 py-0.5 text-text-muted"
+        >
+          <option value="en">🇬🇧 EN</option>
+          <option value="id">🇮🇩 ID</option>
+        </select>
       </div>
     </div>
   </div>
