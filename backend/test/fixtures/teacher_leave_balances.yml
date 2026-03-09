@@ -1,0 +1,17 @@
+alice_balance:
+  teacher: teacher_alice
+  academic_year: current_year
+  max_annual_leave: 12
+  max_sick_leave: 14
+  used_annual: 0
+  used_sick: 0
+  used_personal: 0
+
+bob_balance:
+  teacher: teacher_bob
+  academic_year: current_year
+  max_annual_leave: 12
+  max_sick_leave: 14
+  used_annual: 3
+  used_sick: 0
+  used_personal: 0

@@ -106,5 +106,11 @@ module Types
     field :create_leave_request, mutation: Mutations::CreateLeaveRequest
     field :delete_leave_request, mutation: Mutations::DeleteLeaveRequest
     field :review_leave_request, mutation: Mutations::ReviewLeaveRequest
+
+    # Teacher Leave Requests
+    field :create_teacher_leave_request, mutation: Mutations::CreateTeacherLeaveRequest
+    field :review_teacher_leave_request, mutation: Mutations::ReviewTeacherLeaveRequest
+    field :delete_teacher_leave_request, mutation: Mutations::DeleteTeacherLeaveRequest
+    field :update_school_leave_settings, mutation: Mutations::UpdateSchoolLeaveSettings
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_123028) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -660,7 +660,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_123028) do
     t.string "email"
     t.decimal "latitude", precision: 10, scale: 7
     t.decimal "longitude", precision: 10, scale: 7
+    t.integer "max_annual_leave_days", default: 12, null: false
     t.integer "max_grade", default: 6, null: false
+    t.integer "max_sick_leave_days", default: 14, null: false
     t.integer "min_grade", default: 1, null: false
     t.string "name", null: false
     t.string "phone"
@@ -844,6 +846,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_123028) do
     t.index ["school_id"], name: "index_subjects_on_school_id"
   end
 
+  create_table "teacher_leave_balances", force: :cascade do |t|
+    t.bigint "academic_year_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "max_annual_leave", default: 12, null: false
+    t.integer "max_sick_leave", default: 14, null: false
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "used_annual", default: 0, null: false
+    t.integer "used_personal", default: 0, null: false
+    t.integer "used_sick", default: 0, null: false
+    t.index ["academic_year_id"], name: "index_teacher_leave_balances_on_academic_year_id"
+    t.index ["teacher_id", "academic_year_id"], name: "idx_on_teacher_id_academic_year_id_92d490e14f", unique: true
+    t.index ["teacher_id"], name: "index_teacher_leave_balances_on_teacher_id"
+  end
+
+  create_table "teacher_leave_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "end_date", null: false
+    t.text "reason", null: false
+    t.text "rejection_reason"
+    t.integer "request_type", default: 0, null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.bigint "school_id", null: false
+    t.date "start_date", null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "substitute_id"
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reviewed_by_id"], name: "index_teacher_leave_requests_on_reviewed_by_id"
+    t.index ["school_id", "status"], name: "index_teacher_leave_requests_on_school_id_and_status"
+    t.index ["school_id"], name: "index_teacher_leave_requests_on_school_id"
+    t.index ["substitute_id"], name: "index_teacher_leave_requests_on_substitute_id"
+    t.index ["teacher_id", "status"], name: "index_teacher_leave_requests_on_teacher_id_and_status"
+    t.index ["teacher_id"], name: "index_teacher_leave_requests_on_teacher_id"
+  end
+
   create_table "teachers", force: :cascade do |t|
     t.string "address_line1"
     t.string "address_line2"
@@ -945,6 +984,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_123028) do
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "subjects", "schools"
+  add_foreign_key "teacher_leave_balances", "academic_years"
+  add_foreign_key "teacher_leave_balances", "teachers"
+  add_foreign_key "teacher_leave_requests", "school_managers", column: "reviewed_by_id"
+  add_foreign_key "teacher_leave_requests", "schools"
+  add_foreign_key "teacher_leave_requests", "teachers"
+  add_foreign_key "teacher_leave_requests", "teachers", column: "substitute_id"
   add_foreign_key "teachers", "schools"
   add_foreign_key "topics", "subjects"
 

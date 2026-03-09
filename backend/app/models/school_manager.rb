@@ -11,6 +11,7 @@ class SchoolManager < ApplicationRecord
   has_many :refresh_tokens, as: :authenticatable, dependent: :destroy
   has_many :permissions, as: :permissionable, dependent: :destroy
   has_many :classroom_events, as: :creator, dependent: :nullify
+  has_many :reviewed_teacher_leaves, class_name: "TeacherLeaveRequest", foreign_key: :reviewed_by_id, dependent: :nullify
   has_one_attached :avatar_image
 
   encrypts :name

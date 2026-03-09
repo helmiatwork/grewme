@@ -1,0 +1,20 @@
+pending_sick:
+  teacher: teacher_alice
+  school: greenwood
+  request_type: 0
+  status: 0
+  start_date: "2026-03-15"
+  end_date: "2026-03-16"
+  reason: '<%= TeacherLeaveRequest.new.tap { |r| r.reason = "Flu symptoms" }.ciphertext_for(:reason) %>'
+
+approved_annual:
+  teacher: teacher_bob
+  school: greenwood
+  request_type: 2
+  status: 1
+  start_date: "2026-03-10"
+  end_date: "2026-03-12"
+  reason: '<%= TeacherLeaveRequest.new.tap { |r| r.reason = "Family vacation" }.ciphertext_for(:reason) %>'
+  reviewed_by: manager_pat
+  reviewed_at: "2026-03-09 10:00:00"
+  substitute: teacher_alice

@@ -9,6 +9,7 @@ class School < ApplicationRecord
   has_many :school_managers, dependent: :destroy
   has_many :academic_years, dependent: :destroy
   has_many :invitations, dependent: :destroy
+  has_many :teacher_leave_requests, dependent: :destroy
 
   validates :name, presence: true
   validates :min_grade, :max_grade, presence: true,

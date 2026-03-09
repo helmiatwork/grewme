@@ -1,0 +1,61 @@
+# frozen_string_literal: true
+
+module Mutations
+  class CreateTeacherLeaveRequest < BaseMutation
+    argument :request_type, Types::TeacherLeaveRequestTypeEnum, required: true
+    argument :start_date, GraphQL::Types::ISO8601Date, required: true
+    argument :end_date, GraphQL::Types::ISO8601Date, required: true
+    argument :reason, String, required: true
+
+    field :teacher_leave_request, Types::TeacherLeaveRequestType
+    field :errors, [ Types::UserErrorType ], null: false
+
+    def resolve(request_type:, start_date:, end_date:, reason:)
+      authenticate!
+
+      unless current_user.teacher?
+        raise GraphQL::ExecutionError, "Only teachers can create leave requests"
+      end
+
+      unless current_user.school_id
+        raise GraphQL::ExecutionError, "Teacher must belong to a school"
+      end
+
+      leave_request = TeacherLeaveRequest.new(
+        teacher: current_user,
+        school_id: current_user.school_id,
+        request_type: request_type,
+        start_date: start_date,
+        end_date: end_date,
+        reason: reason
+      )
+
+      if leave_request.save
+        AuditLogger.log(
+          event_type: :TEACHER_LEAVE_REQUEST_CREATE,
+          action: "create_teacher_leave_request",
+          user: current_user,
+          resource: leave_request,
+          request: context[:request]
+        )
+
+        # Notify school managers
+        current_user.school.school_managers.each do |manager|
+          Notification.create!(
+            recipient: manager,
+            notifiable: leave_request,
+            title: "New Teacher Leave Request",
+            body: "#{current_user.name} requested #{request_type} leave (#{start_date} - #{end_date})"
+          )
+        end
+
+        { teacher_leave_request: leave_request, errors: [] }
+      else
+        {
+          teacher_leave_request: nil,
+          errors: leave_request.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } }
+        }
+      end
+    end
+  end
+end

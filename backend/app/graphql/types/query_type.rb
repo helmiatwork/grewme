@@ -738,6 +738,74 @@ module Types
       end
     end
 
+    # ── Teacher Leave Requests ────────────────────────────────────────────────
+
+    field :my_teacher_leave_requests, [ Types::TeacherLeaveRequestType ], null: false,
+      description: "Teacher's own leave requests" do
+      argument :status, Types::LeaveRequestStatusEnum, required: false
+    end
+
+    def my_teacher_leave_requests(status: nil)
+      authenticate!
+      unless current_user.teacher?
+        raise GraphQL::ExecutionError, "Only teachers can view their leave requests"
+      end
+
+      scope = current_user.teacher_leave_requests.order(created_at: :desc)
+      scope = scope.where(status: status) if status
+      scope
+    end
+
+    field :my_teacher_leave_balance, Types::TeacherLeaveBalanceType, null: true,
+      description: "Teacher's current leave balance"
+
+    def my_teacher_leave_balance
+      authenticate!
+      unless current_user.teacher?
+        raise GraphQL::ExecutionError, "Only teachers can view their leave balance"
+      end
+
+      return nil unless current_user.school_id
+      academic_year = School.find(current_user.school_id).academic_years.current_year.first
+      return nil unless academic_year
+
+      TeacherLeaveBalance.find_or_create_for(current_user, academic_year)
+    end
+
+    field :school_teacher_leave_requests, [ Types::TeacherLeaveRequestType ], null: false,
+      description: "All teacher leave requests in the school (manager only)" do
+      argument :status, Types::LeaveRequestStatusEnum, required: false
+      argument :teacher_id, ID, required: false
+    end
+
+    def school_teacher_leave_requests(status: nil, teacher_id: nil)
+      authenticate!
+      unless current_user.school_manager?
+        raise GraphQL::ExecutionError, "Only school managers can view school leave requests"
+      end
+
+      scope = TeacherLeaveRequest.where(school_id: current_user.school_id).order(created_at: :desc)
+      scope = scope.where(status: status) if status
+      scope = scope.where(teacher_id: teacher_id) if teacher_id
+      scope
+    end
+
+    field :school_leave_settings, GraphQL::Types::JSON, null: false,
+      description: "School leave day limits"
+
+    def school_leave_settings
+      authenticate!
+      unless current_user.school_manager?
+        raise GraphQL::ExecutionError, "Only school managers can view leave settings"
+      end
+
+      school = current_user.school
+      {
+        maxAnnualLeaveDays: school.max_annual_leave_days,
+        maxSickLeaveDays: school.max_sick_leave_days
+      }
+    end
+
     # ── Leave Requests ──────────────────────────────────────────────────────────
 
     field :leave_requests, [ Types::LeaveRequestType ], null: false,
