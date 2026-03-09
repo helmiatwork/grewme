@@ -1,0 +1,23 @@
+emma_present_mar1:
+  student: student_emma
+  classroom: alice_class
+  date: "2026-03-01"
+  status: 0
+  recorded_by_type: "Teacher"
+  recorded_by_id: 1
+
+emma_sick_mar2:
+  student: student_emma
+  classroom: alice_class
+  date: "2026-03-02"
+  status: 1
+  recorded_by_type: "Teacher"
+  recorded_by_id: 1
+
+finn_present_mar1:
+  student: student_finn
+  classroom: alice_class
+  date: "2026-03-01"
+  status: 0
+  recorded_by_type: "Teacher"
+  recorded_by_id: 1

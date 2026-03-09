@@ -12,6 +12,7 @@
     { label: m.nav_calendar(), href: '/parent/calendar', icon: '📅' },
     { label: m.nav_curriculum(), href: '/parent/curriculum', icon: '📚' },
     { label: m.nav_yearly_plan(), href: '/parent/curriculum/yearly', icon: '📋' },
+    { label: m.leave_title(), href: '/parent/leave-requests', icon: '📝' },
     { label: m.nav_profile(), href: '/parent/profile', icon: '👤' },
     { label: m.nav_data_rights(), href: '/parent/data-rights', icon: '🔒' }
   ]);

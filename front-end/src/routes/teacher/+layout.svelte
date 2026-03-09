@@ -14,6 +14,8 @@
     { label: m.nav_curriculum(), href: '/teacher/curriculum', icon: '📚' },
     { label: m.nav_yearly_plan(), href: '/teacher/curriculum/yearly', icon: '📋' },
     { label: m.nav_exams(), href: '/teacher/exams', icon: '📝' },
+    { label: m.nav_attendance(), href: '/teacher/attendance', icon: '✅' },
+    { label: m.leave_requests_title(), href: '/teacher/leave-requests', icon: '📋' },
     { label: m.nav_profile(), href: '/teacher/profile', icon: '👤' }
   ]);
 
