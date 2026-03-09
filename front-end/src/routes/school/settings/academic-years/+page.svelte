@@ -162,4 +162,38 @@
       {/each}
     </div>
   {/if}
+
+  <!-- Leave Settings -->
+  {#if data.schoolId}
+    <div class="mt-8">
+      <h2 class="text-xl font-bold text-text mb-2">{m.school_leave_settings_title?.() ?? 'Leave Settings'}</h2>
+      <p class="text-sm text-text-muted mb-4">{m.school_leave_settings_subtitle?.() ?? 'Configure leave day limits for teachers'}</p>
+      <div class="bg-surface rounded-xl border border-slate-100 p-6">
+        <form
+          method="POST"
+          action="?/updateLeaveSettings"
+          use:enhance={() => {
+            submitting = true;
+            return async ({ update }) => { submitting = false; await update(); };
+          }}
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="maxAnnualLeaveDays" class="block text-sm font-medium text-text mb-1">{m.school_leave_max_annual?.() ?? 'Max Annual Leave Days'}</label>
+              <input type="number" id="maxAnnualLeaveDays" name="maxAnnualLeaveDays" value={data.leaveSettings?.maxAnnualLeaveDays ?? 12} min="0" max="365" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            </div>
+            <div>
+              <label for="maxSickLeaveDays" class="block text-sm font-medium text-text mb-1">{m.school_leave_max_sick?.() ?? 'Max Sick Leave Days'}</label>
+              <input type="number" id="maxSickLeaveDays" name="maxSickLeaveDays" value={data.leaveSettings?.maxSickLeaveDays ?? 14} min="0" max="365" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            </div>
+          </div>
+          <div class="mt-4">
+            <Button type="submit" disabled={submitting}>
+              {submitting ? m.school_leave_settings_saving?.() ?? 'Saving...' : m.school_leave_settings_save?.() ?? 'Save Leave Settings'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {/if}
 </div>

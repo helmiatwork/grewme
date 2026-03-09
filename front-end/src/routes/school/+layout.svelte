@@ -15,6 +15,7 @@
     { label: m.nav_exams(), href: '/school/exams', icon: '📝' },
     { label: m.nav_calendar(), href: '/school/calendar', icon: '📅' },
     { label: m.nav_attendance(), href: '/school/attendance', icon: '✅' },
+    { label: m.nav_teacher_leave?.() ?? 'Teacher Leave', href: '/school/teacher-leave', icon: '🏖️' },
     { label: m.nav_settings(), href: '/school/settings/academic-years', icon: '⚙️' },
     { label: m.nav_profile(), href: '/school/profile', icon: '👤' }
   ]);

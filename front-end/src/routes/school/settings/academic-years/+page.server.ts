@@ -8,6 +8,10 @@ import {
   UPDATE_ACADEMIC_YEAR_MUTATION,
   SET_CURRENT_ACADEMIC_YEAR_MUTATION
 } from '$lib/api/queries/yearly-curriculum';
+import {
+  SCHOOL_LEAVE_SETTINGS_QUERY,
+  UPDATE_SCHOOL_LEAVE_SETTINGS_MUTATION
+} from '$lib/api/queries/teacher-leave';
 import type { AcademicYear } from '$lib/api/types';
 
 const ME_QUERY = `
@@ -29,18 +33,22 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
 
     const school = meData.me?.school;
     if (!school) {
-      return { academicYears: [], schoolId: null };
+      return { academicYears: [], schoolId: null, leaveSettings: { maxAnnualLeaveDays: 12, maxSickLeaveDays: 14 } };
     }
 
-    const data = await graphql<{ academicYears: AcademicYear[] }>(
-      ACADEMIC_YEARS_QUERY,
-      { schoolId: school.id },
-      locals.accessToken!
-    );
+    const [yearsData, settingsData] = await Promise.all([
+      graphql<{ academicYears: AcademicYear[] }>(
+        ACADEMIC_YEARS_QUERY,
+        { schoolId: school.id },
+        locals.accessToken!
+      ),
+      graphql<any>(SCHOOL_LEAVE_SETTINGS_QUERY, {}, locals.accessToken!)
+    ]);
 
     return {
-      academicYears: data.academicYears,
-      schoolId: school.id
+      academicYears: yearsData.academicYears,
+      schoolId: school.id,
+      leaveSettings: settingsData.schoolLeaveSettings ?? { maxAnnualLeaveDays: 12, maxSickLeaveDays: 14 }
     };
   } catch (err) {
     if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
@@ -141,6 +149,34 @@ export const actions: Actions = {
         throw redirect(303, '/login?force');
       }
       return fail(500, { error: 'Failed to set current academic year' });
+    }
+  },
+
+  updateLeaveSettings: async ({ request, locals, cookies }) => {
+    const formData = await request.formData();
+    const maxAnnualLeaveDays = parseInt(formData.get('maxAnnualLeaveDays') as string, 10);
+    const maxSickLeaveDays = parseInt(formData.get('maxSickLeaveDays') as string, 10);
+
+    if (isNaN(maxAnnualLeaveDays) || isNaN(maxSickLeaveDays)) {
+      return fail(400, { error: 'Valid numbers are required' });
+    }
+
+    try {
+      const data = await graphql<any>(
+        UPDATE_SCHOOL_LEAVE_SETTINGS_MUTATION,
+        { maxAnnualLeaveDays, maxSickLeaveDays },
+        locals.accessToken!
+      );
+      if (data.updateSchoolLeaveSettings.errors?.length) {
+        return fail(422, { error: data.updateSchoolLeaveSettings.errors.map((e: any) => e.message).join(', ') });
+      }
+      return { success: true };
+    } catch (err) {
+      if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
+        clearAuthCookies(cookies);
+        throw redirect(303, '/login?force');
+      }
+      return fail(500, { error: 'Failed to update leave settings' });
     }
   }
 };
