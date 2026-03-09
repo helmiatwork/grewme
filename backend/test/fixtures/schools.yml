@@ -5,3 +5,5 @@ greenwood:
   state_province: Oregon
   postal_code: "97201"
   country_code: US
+  max_annual_leave_days: 12
+  max_sick_leave_days: 14
