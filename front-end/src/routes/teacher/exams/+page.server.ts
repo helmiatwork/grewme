@@ -2,8 +2,19 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { graphql, GraphQLError } from '$lib/api/client';
 import { clearAuthCookies } from '$lib/api/auth';
-import { CLASSROOMS_QUERY } from '$lib/api/queries/classrooms';
-import type { Classroom } from '$lib/api/types';
+import { ACADEMIC_YEARS_QUERY, GRADE_CURRICULUM_QUERY } from '$lib/api/queries/yearly-curriculum';
+import type { Classroom, AcademicYear, GradeCurriculum } from '$lib/api/types';
+
+const CLASSROOMS_WITH_GRADE_QUERY = `
+  query {
+    classrooms {
+      id
+      name
+      grade
+      school { id name minGrade maxGrade }
+    }
+  }
+`;
 
 const SUBJECTS_WITH_EXAMS_QUERY = `
   query SubjectsWithExams($schoolId: ID!) {
@@ -38,41 +49,57 @@ interface ExamListItem {
   classroomCount: number;
 }
 
-export const load: PageServerLoad = async ({ locals, cookies }) => {
+export const load: PageServerLoad = async ({ locals, cookies, url }) => {
   try {
     const token = locals.accessToken!;
 
-    const classroomsData = await graphql<{ classrooms: Classroom[] }>(
-      CLASSROOMS_QUERY,
-      {},
-      token
-    );
+    const classroomsData = await graphql<{
+      classrooms: Array<{ id: string; name: string; grade: number | null; school: { id: string; name: string; minGrade: number; maxGrade: number } }>;
+    }>(CLASSROOMS_WITH_GRADE_QUERY, {}, token);
 
     const classrooms = classroomsData.classrooms;
-    const schoolId = classrooms[0]?.school?.id;
+    const school = classrooms[0]?.school;
 
-    if (!schoolId) {
-      return { exams: [], classrooms, schoolId: null };
+    if (!school) {
+      return { exams: [], classrooms: [], schoolId: null, teacherGrades: [], selectedGrade: null, gradeCurriculum: null };
     }
 
-    const subjectsData = await graphql<{
-      subjects: Array<{
-        id: string;
-        name: string;
-        topics: Array<{
+    const teacherGrades = [...new Set(classrooms.map(c => c.grade).filter((g): g is number => g !== null))].sort((a, b) => a - b);
+
+    const [subjectsData, yearsData] = await Promise.all([
+      graphql<{
+        subjects: Array<{
           id: string;
           name: string;
-          exams: Array<{
+          topics: Array<{
             id: string;
-            title: string;
-            examType: string;
-            maxScore: number | null;
-            durationMinutes: number | null;
-            classroomExams: Array<{ id: string }>;
+            name: string;
+            exams: Array<{
+              id: string;
+              title: string;
+              examType: string;
+              maxScore: number | null;
+              durationMinutes: number | null;
+              classroomExams: Array<{ id: string }>;
+            }>;
           }>;
         }>;
-      }>;
-    }>(SUBJECTS_WITH_EXAMS_QUERY, { schoolId }, token);
+      }>(SUBJECTS_WITH_EXAMS_QUERY, { schoolId: school.id }, token),
+      graphql<{ academicYears: AcademicYear[] }>(ACADEMIC_YEARS_QUERY, { schoolId: school.id }, token)
+    ]);
+
+    const currentYear = yearsData.academicYears.find(y => y.current) ?? yearsData.academicYears[0] ?? null;
+    const selectedGrade = url.searchParams.get('grade') ? Number(url.searchParams.get('grade')) : null;
+
+    let gradeCurriculum: GradeCurriculum | null = null;
+    if (selectedGrade && currentYear) {
+      const gcData = await graphql<{ gradeCurriculum: GradeCurriculum | null }>(
+        GRADE_CURRICULUM_QUERY,
+        { academicYearId: currentYear.id, grade: selectedGrade },
+        token
+      );
+      gradeCurriculum = gcData.gradeCurriculum;
+    }
 
     const exams: ExamListItem[] = [];
     for (const subject of subjectsData.subjects) {
@@ -93,7 +120,7 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
       }
     }
 
-    return { exams, classrooms, schoolId };
+    return { exams, classrooms, schoolId: school.id, teacherGrades, selectedGrade, gradeCurriculum };
   } catch (err) {
     if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
       clearAuthCookies(cookies);

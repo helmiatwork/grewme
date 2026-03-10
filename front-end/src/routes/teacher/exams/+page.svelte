@@ -1,11 +1,24 @@
 <script lang="ts">
   import { Card, Badge } from '$lib/components/ui';
   import * as m from '$lib/paraglide/messages.js';
+  import { goto } from '$app/navigation';
+  import { gradeDisplayName } from '$lib/utils/grade';
 
   let { data } = $props();
 
   let filterSubject = $state('');
   let filterType = $state('');
+  let selectedGrade = $state(data.selectedGrade ?? 0);
+
+  $effect(() => {
+    selectedGrade = data.selectedGrade ?? 0;
+  });
+
+  function onGradeChange() {
+    const params = new URLSearchParams();
+    if (selectedGrade) params.set('grade', String(selectedGrade));
+    goto(`/teacher/exams${params.toString() ? '?' + params.toString() : ''}`);
+  }
 
   const examTypeLabels: Record<string, string> = {
     SCORE_BASED: 'Score Based',
@@ -21,14 +34,26 @@
     PASS_FAIL: 'bg-amber-100 text-amber-700'
   };
 
+  // Filter exams by grade's curriculum subjects
+  let gradeFilteredExams = $derived.by(() => {
+    if (!selectedGrade || !data.gradeCurriculum) return data.exams;
+    const gcItems = data.gradeCurriculum.gradeCurriculumItems ?? [];
+    const subjectIds = new Set<string>();
+    for (const item of gcItems) {
+      if (item.subject) subjectIds.add(item.subject.id);
+      if (item.topic?.subject) subjectIds.add(item.topic.subject.id);
+    }
+    return data.exams.filter((e: any) => subjectIds.has(e.subjectId));
+  });
+
   const subjects = $derived(
-    [...new Map(data.exams.map((e: any) => [e.subjectId, e.subjectName])).entries()].map(
+    [...new Map(gradeFilteredExams.map((e: any) => [e.subjectId, e.subjectName])).entries()].map(
       ([id, name]) => ({ id, name })
     )
   );
 
   const filteredExams = $derived(
-    data.exams.filter((exam: any) => {
+    gradeFilteredExams.filter((exam: any) => {
       if (filterSubject && exam.subjectId !== filterSubject) return false;
       if (filterType && exam.examType !== filterType) return false;
       return true;
@@ -53,6 +78,18 @@
 
   <!-- Filter bar -->
   <div class="flex flex-wrap gap-3 mb-6">
+    {#if data.teacherGrades?.length}
+      <select
+        bind:value={selectedGrade}
+        onchange={onGradeChange}
+        class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
+      >
+        <option value={0}>{m.curriculum_all_subjects()}</option>
+        {#each data.teacherGrades as grade}
+          <option value={grade}>{gradeDisplayName(grade)}</option>
+        {/each}
+      </select>
+    {/if}
     <select
       bind:value={filterSubject}
       class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -76,8 +113,13 @@
 
   {#if filteredExams.length === 0}
     <div class="text-center py-12 text-text-muted">
-      <p class="text-lg">{m.exam_no_exams()}</p>
-      <p class="text-sm mt-1">{m.exam_no_exams_hint()}</p>
+      {#if selectedGrade}
+        <p class="text-lg">{m.exam_no_exams()}</p>
+        <p class="text-sm mt-1">No exams found for {gradeDisplayName(selectedGrade)}</p>
+      {:else}
+        <p class="text-lg">{m.exam_no_exams()}</p>
+        <p class="text-sm mt-1">{m.exam_no_exams_hint()}</p>
+      {/if}
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
