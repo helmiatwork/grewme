@@ -57,6 +57,51 @@ export const REGISTER_MUTATION = `
   }
 `;
 
+export const REGISTER_SCHOOL_MANAGER_MUTATION = `
+  mutation RegisterSchoolManager(
+    $name: String!
+    $email: String!
+    $password: String!
+    $passwordConfirmation: String!
+    $schoolName: String!
+    $minGrade: Int!
+    $maxGrade: Int!
+    $addressLine1: String!
+    $city: String!
+    $stateProvince: String!
+    $postalCode: String!
+    $countryCode: String!
+  ) {
+    registerSchoolManager(
+      name: $name
+      email: $email
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+      schoolName: $schoolName
+      minGrade: $minGrade
+      maxGrade: $maxGrade
+      addressLine1: $addressLine1
+      city: $city
+      stateProvince: $stateProvince
+      postalCode: $postalCode
+      countryCode: $countryCode
+    ) {
+      accessToken
+      refreshToken
+      expiresIn
+      user {
+        ... on SchoolManager {
+          id
+          name
+          email
+        }
+      }
+      school { id name }
+      errors { message path }
+    }
+  }
+`;
+
 export const REFRESH_TOKEN_MUTATION = `
   mutation RefreshToken($refreshToken: String!, $role: String!) {
     refreshToken(refreshToken: $refreshToken, role: $role) {

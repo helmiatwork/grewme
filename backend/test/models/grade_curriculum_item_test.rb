@@ -3,7 +3,7 @@ require "test_helper"
 class GradeCurriculumItemTest < ActiveSupport::TestCase
   setup do
     @school = schools(:greenwood)
-    @year = AcademicYear.create!(school: @school, label: "2025/2026", start_date: "2025-07-01", end_date: "2026-06-30")
+    @year = academic_years(:current_year)
     @gc = GradeCurriculum.create!(academic_year: @year, grade: 1)
     @subject = Subject.first || Subject.create!(name: "Math", school: @school)
     @topic = @subject.topics.first || Topic.create!(name: "Numbers", subject: @subject, position: 1)

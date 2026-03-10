@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_10_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,8 +22,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "school_id", null: false
     t.date "start_date", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_id", "label"], name: "index_academic_years_on_school_id_and_label", unique: true
-    t.index ["school_id"], name: "index_academic_years_on_school_id"
+    t.index [ "school_id", "label" ], name: "index_academic_years_on_school_id_and_label", unique: true
+    t.index [ "school_id" ], name: "index_academic_years_on_school_id"
   end
 
   create_table "account_deletion_requests", force: :cascade do |t|
@@ -35,9 +35,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "user_type", null: false
-    t.index ["grace_period_ends_at"], name: "index_account_deletion_requests_on_grace_period_ends_at"
-    t.index ["status"], name: "index_account_deletion_requests_on_status"
-    t.index ["user_type", "user_id"], name: "index_account_deletion_requests_on_user_type_and_user_id", unique: true, where: "((status)::text = 'pending'::text)"
+    t.index [ "grace_period_ends_at" ], name: "index_account_deletion_requests_on_grace_period_ends_at"
+    t.index [ "status" ], name: "index_account_deletion_requests_on_status"
+    t.index [ "user_type", "user_id" ], name: "index_account_deletion_requests_on_user_type_and_user_id", unique: true, where: "((status)::text = 'pending'::text)"
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -46,8 +46,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "name", null: false
     t.bigint "record_id", null: false
     t.string "record_type", null: false
-    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+    t.index [ "blob_id" ], name: "index_active_storage_attachments_on_blob_id"
+    t.index [ "record_type", "record_id", "name", "blob_id" ], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
@@ -59,13 +59,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "key", null: false
     t.text "metadata"
     t.string "service_name", null: false
-    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+    t.index [ "key" ], name: "index_active_storage_blobs_on_key", unique: true
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
-    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+    t.index [ "blob_id", "variation_digest" ], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "activities", force: :cascade do |t|
@@ -79,11 +79,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "trackable_id"
     t.string "trackable_type"
     t.datetime "updated_at", null: false
-    t.index ["created_at"], name: "index_activities_on_created_at"
-    t.index ["key"], name: "index_activities_on_key"
-    t.index ["owner_type", "owner_id"], name: "index_activities_on_owner"
-    t.index ["recipient_type", "recipient_id"], name: "index_activities_on_recipient"
-    t.index ["trackable_type", "trackable_id"], name: "index_activities_on_trackable"
+    t.index [ "created_at" ], name: "index_activities_on_created_at"
+    t.index [ "key" ], name: "index_activities_on_key"
+    t.index [ "owner_type", "owner_id" ], name: "index_activities_on_owner"
+    t.index [ "recipient_type", "recipient_id" ], name: "index_activities_on_recipient"
+    t.index [ "trackable_type", "trackable_id" ], name: "index_activities_on_trackable"
   end
 
   create_table "admin_users", force: :cascade do |t|
@@ -94,8 +94,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_admin_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+    t.index [ "email" ], name: "index_admin_users_on_email", unique: true
+    t.index [ "reset_password_token" ], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
   create_table "attendances", force: :cascade do |t|
@@ -109,12 +109,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "status", default: 0, null: false
     t.bigint "student_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id", "date"], name: "index_attendances_on_classroom_id_and_date"
-    t.index ["classroom_id"], name: "index_attendances_on_classroom_id"
-    t.index ["leave_request_id"], name: "index_attendances_on_leave_request_id"
-    t.index ["recorded_by_type", "recorded_by_id"], name: "index_attendances_on_recorded_by_type_and_recorded_by_id"
-    t.index ["student_id", "classroom_id", "date"], name: "idx_attendances_unique", unique: true
-    t.index ["student_id"], name: "index_attendances_on_student_id"
+    t.index [ "classroom_id", "date" ], name: "index_attendances_on_classroom_id_and_date"
+    t.index [ "classroom_id" ], name: "index_attendances_on_classroom_id"
+    t.index [ "leave_request_id" ], name: "index_attendances_on_leave_request_id"
+    t.index [ "recorded_by_type", "recorded_by_id" ], name: "index_attendances_on_recorded_by_type_and_recorded_by_id"
+    t.index [ "student_id", "classroom_id", "date" ], name: "idx_attendances_unique", unique: true
+    t.index [ "student_id" ], name: "index_attendances_on_student_id"
   end
 
   create_table "audit_logs", force: :cascade do |t|
@@ -131,11 +131,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "user_id"
     t.string "user_role"
     t.string "user_type"
-    t.index ["created_at"], name: "index_audit_logs_on_created_at"
-    t.index ["event_type"], name: "index_audit_logs_on_event_type"
-    t.index ["resource_type", "resource_id"], name: "index_audit_logs_on_resource_type_and_resource_id"
-    t.index ["severity"], name: "index_audit_logs_on_severity"
-    t.index ["user_type", "user_id"], name: "index_audit_logs_on_user_type_and_user_id"
+    t.index [ "created_at" ], name: "index_audit_logs_on_created_at"
+    t.index [ "event_type" ], name: "index_audit_logs_on_event_type"
+    t.index [ "resource_type", "resource_id" ], name: "index_audit_logs_on_resource_type_and_resource_id"
+    t.index [ "severity" ], name: "index_audit_logs_on_severity"
+    t.index [ "user_type", "user_id" ], name: "index_audit_logs_on_user_type_and_user_id"
   end
 
   create_table "classroom_events", force: :cascade do |t|
@@ -149,9 +149,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.time "start_time"
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id", "event_date"], name: "index_classroom_events_on_classroom_id_and_event_date"
-    t.index ["classroom_id"], name: "index_classroom_events_on_classroom_id"
-    t.index ["creator_type", "creator_id"], name: "index_classroom_events_on_creator_type_and_creator_id"
+    t.index [ "classroom_id", "event_date" ], name: "index_classroom_events_on_classroom_id_and_event_date"
+    t.index [ "classroom_id" ], name: "index_classroom_events_on_classroom_id"
+    t.index [ "creator_type", "creator_id" ], name: "index_classroom_events_on_creator_type_and_creator_id"
   end
 
   create_table "classroom_exams", force: :cascade do |t|
@@ -164,11 +164,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "scheduled_at"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["assigned_by_type", "assigned_by_id"], name: "index_classroom_exams_on_assigned_by"
-    t.index ["classroom_id", "exam_id"], name: "index_classroom_exams_on_classroom_id_and_exam_id", unique: true
-    t.index ["classroom_id", "status"], name: "index_classroom_exams_on_classroom_id_and_status"
-    t.index ["classroom_id"], name: "index_classroom_exams_on_classroom_id"
-    t.index ["exam_id"], name: "index_classroom_exams_on_exam_id"
+    t.index [ "assigned_by_type", "assigned_by_id" ], name: "index_classroom_exams_on_assigned_by"
+    t.index [ "classroom_id", "exam_id" ], name: "index_classroom_exams_on_classroom_id_and_exam_id", unique: true
+    t.index [ "classroom_id", "status" ], name: "index_classroom_exams_on_classroom_id_and_status"
+    t.index [ "classroom_id" ], name: "index_classroom_exams_on_classroom_id"
+    t.index [ "exam_id" ], name: "index_classroom_exams_on_exam_id"
   end
 
   create_table "classroom_students", force: :cascade do |t|
@@ -180,9 +180,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "status", default: 0, null: false
     t.bigint "student_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id"], name: "index_classroom_students_on_classroom_id"
-    t.index ["student_id", "status"], name: "index_classroom_students_on_student_active", unique: true, where: "(status = 0)"
-    t.index ["student_id"], name: "index_classroom_students_on_student_id"
+    t.index [ "classroom_id" ], name: "index_classroom_students_on_classroom_id"
+    t.index [ "student_id", "status" ], name: "index_classroom_students_on_student_active", unique: true, where: "(status = 0)"
+    t.index [ "student_id" ], name: "index_classroom_students_on_student_id"
   end
 
   create_table "classroom_teachers", force: :cascade do |t|
@@ -191,9 +191,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "role", default: "primary", null: false
     t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id", "teacher_id"], name: "index_classroom_teachers_on_classroom_id_and_teacher_id", unique: true
-    t.index ["classroom_id"], name: "index_classroom_teachers_on_classroom_id"
-    t.index ["teacher_id"], name: "index_classroom_teachers_on_teacher_id"
+    t.index [ "classroom_id", "teacher_id" ], name: "index_classroom_teachers_on_classroom_id_and_teacher_id", unique: true
+    t.index [ "classroom_id" ], name: "index_classroom_teachers_on_classroom_id"
+    t.index [ "teacher_id" ], name: "index_classroom_teachers_on_teacher_id"
   end
 
   create_table "classrooms", force: :cascade do |t|
@@ -202,7 +202,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "name", null: false
     t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_id"], name: "index_classrooms_on_school_id"
+    t.index [ "school_id" ], name: "index_classrooms_on_school_id"
   end
 
   create_table "consents", force: :cascade do |t|
@@ -219,11 +219,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "student_id", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
-    t.index ["parent_id"], name: "index_consents_on_parent_id"
-    t.index ["status"], name: "index_consents_on_status"
-    t.index ["student_id", "parent_email"], name: "index_consents_on_student_id_and_parent_email", unique: true
-    t.index ["student_id"], name: "index_consents_on_student_id"
-    t.index ["token"], name: "index_consents_on_token", unique: true
+    t.index [ "parent_id" ], name: "index_consents_on_parent_id"
+    t.index [ "status" ], name: "index_consents_on_status"
+    t.index [ "student_id", "parent_email" ], name: "index_consents_on_student_id_and_parent_email", unique: true
+    t.index [ "student_id" ], name: "index_consents_on_student_id"
+    t.index [ "token" ], name: "index_consents_on_token", unique: true
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -232,10 +232,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "student_id", null: false
     t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["parent_id"], name: "index_conversations_on_parent_id"
-    t.index ["student_id", "parent_id", "teacher_id"], name: "idx_conversations_unique_trio", unique: true
-    t.index ["student_id"], name: "index_conversations_on_student_id"
-    t.index ["teacher_id"], name: "index_conversations_on_teacher_id"
+    t.index [ "parent_id" ], name: "index_conversations_on_parent_id"
+    t.index [ "student_id", "parent_id", "teacher_id" ], name: "idx_conversations_unique_trio", unique: true
+    t.index [ "student_id" ], name: "index_conversations_on_student_id"
+    t.index [ "teacher_id" ], name: "index_conversations_on_teacher_id"
   end
 
   create_table "daily_scores", force: :cascade do |t|
@@ -247,9 +247,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "student_id", null: false
     t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["student_id", "date", "skill_category"], name: "idx_daily_scores_unique", unique: true
-    t.index ["student_id"], name: "index_daily_scores_on_student_id"
-    t.index ["teacher_id"], name: "index_daily_scores_on_teacher_id"
+    t.index [ "student_id", "date", "skill_category" ], name: "idx_daily_scores_unique", unique: true
+    t.index [ "student_id" ], name: "index_daily_scores_on_student_id"
+    t.index [ "teacher_id" ], name: "index_daily_scores_on_teacher_id"
   end
 
   create_table "exam_answers", force: :cascade do |t|
@@ -260,9 +260,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "points_awarded", default: 0
     t.string "selected_answer"
     t.datetime "updated_at", null: false
-    t.index ["exam_question_id"], name: "index_exam_answers_on_exam_question_id"
-    t.index ["exam_submission_id", "exam_question_id"], name: "index_exam_answers_on_exam_submission_id_and_exam_question_id", unique: true
-    t.index ["exam_submission_id"], name: "index_exam_answers_on_exam_submission_id"
+    t.index [ "exam_question_id" ], name: "index_exam_answers_on_exam_question_id"
+    t.index [ "exam_submission_id", "exam_question_id" ], name: "index_exam_answers_on_exam_submission_id_and_exam_question_id", unique: true
+    t.index [ "exam_submission_id" ], name: "index_exam_answers_on_exam_submission_id"
   end
 
   create_table "exam_questions", force: :cascade do |t|
@@ -274,8 +274,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "position", default: 0, null: false
     t.text "question_text", null: false
     t.datetime "updated_at", null: false
-    t.index ["exam_id", "position"], name: "index_exam_questions_on_exam_id_and_position"
-    t.index ["exam_id"], name: "index_exam_questions_on_exam_id"
+    t.index [ "exam_id", "position" ], name: "index_exam_questions_on_exam_id_and_position"
+    t.index [ "exam_id" ], name: "index_exam_questions_on_exam_id"
   end
 
   create_table "exam_submissions", force: :cascade do |t|
@@ -290,9 +290,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "submitted_at"
     t.text "teacher_notes"
     t.datetime "updated_at", null: false
-    t.index ["classroom_exam_id"], name: "index_exam_submissions_on_classroom_exam_id"
-    t.index ["student_id", "classroom_exam_id"], name: "index_exam_submissions_on_student_id_and_classroom_exam_id", unique: true
-    t.index ["student_id"], name: "index_exam_submissions_on_student_id"
+    t.index [ "classroom_exam_id" ], name: "index_exam_submissions_on_classroom_exam_id"
+    t.index [ "student_id", "classroom_exam_id" ], name: "index_exam_submissions_on_student_id_and_classroom_exam_id", unique: true
+    t.index [ "student_id" ], name: "index_exam_submissions_on_student_id"
   end
 
   create_table "exams", force: :cascade do |t|
@@ -306,9 +306,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "title", null: false
     t.bigint "topic_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["created_by_type", "created_by_id"], name: "index_exams_on_created_by"
-    t.index ["topic_id", "exam_type"], name: "index_exams_on_topic_id_and_exam_type"
-    t.index ["topic_id"], name: "index_exams_on_topic_id"
+    t.index [ "created_by_type", "created_by_id" ], name: "index_exams_on_created_by"
+    t.index [ "topic_id", "exam_type" ], name: "index_exams_on_topic_id_and_exam_type"
+    t.index [ "topic_id" ], name: "index_exams_on_topic_id"
   end
 
   create_table "feed_post_comments", force: :cascade do |t|
@@ -318,8 +318,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "created_at", null: false
     t.bigint "feed_post_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["feed_post_id", "created_at"], name: "index_feed_post_comments_on_feed_post_id_and_created_at"
-    t.index ["feed_post_id"], name: "index_feed_post_comments_on_feed_post_id"
+    t.index [ "feed_post_id", "created_at" ], name: "index_feed_post_comments_on_feed_post_id_and_created_at"
+    t.index [ "feed_post_id" ], name: "index_feed_post_comments_on_feed_post_id"
   end
 
   create_table "feed_post_likes", force: :cascade do |t|
@@ -327,9 +327,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "feed_post_id", null: false
     t.bigint "liker_id", null: false
     t.string "liker_type", null: false
-    t.index ["feed_post_id", "liker_type", "liker_id"], name: "idx_feed_post_likes_unique", unique: true
-    t.index ["feed_post_id"], name: "index_feed_post_likes_on_feed_post_id"
-    t.index ["liker_type", "liker_id"], name: "index_feed_post_likes_on_liker_type_and_liker_id"
+    t.index [ "feed_post_id", "liker_type", "liker_id" ], name: "idx_feed_post_likes_unique", unique: true
+    t.index [ "feed_post_id" ], name: "index_feed_post_likes_on_feed_post_id"
+    t.index [ "liker_type", "liker_id" ], name: "index_feed_post_likes_on_liker_type_and_liker_id"
   end
 
   create_table "feed_post_students", force: :cascade do |t|
@@ -337,9 +337,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "feed_post_id", null: false
     t.bigint "student_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["feed_post_id", "student_id"], name: "index_feed_post_students_on_feed_post_id_and_student_id", unique: true
-    t.index ["feed_post_id"], name: "index_feed_post_students_on_feed_post_id"
-    t.index ["student_id"], name: "index_feed_post_students_on_student_id"
+    t.index [ "feed_post_id", "student_id" ], name: "index_feed_post_students_on_feed_post_id_and_student_id", unique: true
+    t.index [ "feed_post_id" ], name: "index_feed_post_students_on_feed_post_id"
+    t.index [ "student_id" ], name: "index_feed_post_students_on_student_id"
   end
 
   create_table "feed_posts", force: :cascade do |t|
@@ -350,16 +350,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "likes_count", default: 0, null: false
     t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id", "created_at"], name: "index_feed_posts_on_classroom_id_and_created_at"
-    t.index ["classroom_id"], name: "index_feed_posts_on_classroom_id"
-    t.index ["teacher_id"], name: "index_feed_posts_on_teacher_id"
+    t.index [ "classroom_id", "created_at" ], name: "index_feed_posts_on_classroom_id_and_created_at"
+    t.index [ "classroom_id" ], name: "index_feed_posts_on_classroom_id"
+    t.index [ "teacher_id" ], name: "index_feed_posts_on_teacher_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key", null: false
     t.datetime "updated_at", null: false
-    t.index ["key"], name: "index_flipper_features_on_key", unique: true
+    t.index [ "key" ], name: "index_flipper_features_on_key", unique: true
   end
 
   create_table "flipper_gates", force: :cascade do |t|
@@ -368,7 +368,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "key", null: false
     t.datetime "updated_at", null: false
     t.text "value"
-    t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
+    t.index [ "feature_key", "key", "value" ], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
   end
 
   create_table "grade_curriculum_items", force: :cascade do |t|
@@ -378,10 +378,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "subject_id"
     t.bigint "topic_id"
     t.datetime "updated_at", null: false
-    t.index ["grade_curriculum_id", "subject_id", "topic_id"], name: "idx_grade_curriculum_items_unique", unique: true
-    t.index ["grade_curriculum_id"], name: "index_grade_curriculum_items_on_grade_curriculum_id"
-    t.index ["subject_id"], name: "index_grade_curriculum_items_on_subject_id"
-    t.index ["topic_id"], name: "index_grade_curriculum_items_on_topic_id"
+    t.index [ "grade_curriculum_id", "subject_id", "topic_id" ], name: "idx_grade_curriculum_items_unique", unique: true
+    t.index [ "grade_curriculum_id" ], name: "index_grade_curriculum_items_on_grade_curriculum_id"
+    t.index [ "subject_id" ], name: "index_grade_curriculum_items_on_subject_id"
+    t.index [ "topic_id" ], name: "index_grade_curriculum_items_on_topic_id"
   end
 
   create_table "grade_curriculums", force: :cascade do |t|
@@ -389,15 +389,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "created_at", null: false
     t.integer "grade", null: false
     t.datetime "updated_at", null: false
-    t.index ["academic_year_id", "grade"], name: "index_grade_curriculums_on_academic_year_id_and_grade", unique: true
-    t.index ["academic_year_id"], name: "index_grade_curriculums_on_academic_year_id"
+    t.index [ "academic_year_id", "grade" ], name: "index_grade_curriculums_on_academic_year_id_and_grade", unique: true
+    t.index [ "academic_year_id" ], name: "index_grade_curriculums_on_academic_year_id"
   end
 
   create_table "group_conversations", force: :cascade do |t|
     t.bigint "classroom_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id"], name: "index_group_conversations_on_classroom_id", unique: true
+    t.index [ "classroom_id" ], name: "index_group_conversations_on_classroom_id", unique: true
   end
 
   create_table "group_messages", force: :cascade do |t|
@@ -407,9 +407,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "sender_id", null: false
     t.string "sender_type", null: false
     t.datetime "updated_at", null: false
-    t.index ["group_conversation_id", "created_at"], name: "index_group_messages_on_group_conversation_id_and_created_at"
-    t.index ["group_conversation_id"], name: "index_group_messages_on_group_conversation_id"
-    t.index ["sender_type", "sender_id"], name: "index_group_messages_on_sender"
+    t.index [ "group_conversation_id", "created_at" ], name: "index_group_messages_on_group_conversation_id_and_created_at"
+    t.index [ "group_conversation_id" ], name: "index_group_messages_on_group_conversation_id"
+    t.index [ "sender_type", "sender_id" ], name: "index_group_messages_on_sender"
   end
 
   create_table "health_checkups", force: :cascade do |t|
@@ -423,9 +423,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
     t.decimal "weight_kg", precision: 5, scale: 2
-    t.index ["student_id", "measured_at"], name: "index_health_checkups_on_student_id_and_measured_at", unique: true
-    t.index ["student_id"], name: "index_health_checkups_on_student_id"
-    t.index ["teacher_id"], name: "index_health_checkups_on_teacher_id"
+    t.index [ "student_id", "measured_at" ], name: "index_health_checkups_on_student_id_and_measured_at", unique: true
+    t.index [ "student_id" ], name: "index_health_checkups_on_student_id"
+    t.index [ "teacher_id" ], name: "index_health_checkups_on_teacher_id"
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -440,16 +440,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "status", default: "pending", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
-    t.index ["email", "school_id"], name: "index_invitations_on_email_and_school_id", unique: true, where: "((status)::text = 'pending'::text)"
-    t.index ["inviter_type", "inviter_id"], name: "index_invitations_on_inviter_type_and_inviter_id"
-    t.index ["school_id"], name: "index_invitations_on_school_id"
-    t.index ["token"], name: "index_invitations_on_token", unique: true
+    t.index [ "email", "school_id" ], name: "index_invitations_on_email_and_school_id", unique: true, where: "((status)::text = 'pending'::text)"
+    t.index [ "inviter_type", "inviter_id" ], name: "index_invitations_on_inviter_type_and_inviter_id"
+    t.index [ "school_id" ], name: "index_invitations_on_school_id"
+    t.index [ "token" ], name: "index_invitations_on_token", unique: true
   end
 
   create_table "jwt_denylist", force: :cascade do |t|
     t.datetime "exp", null: false
     t.string "jti", null: false
-    t.index ["jti"], name: "index_jwt_denylist_on_jti"
+    t.index [ "jti" ], name: "index_jwt_denylist_on_jti"
   end
 
   create_table "learning_objectives", force: :cascade do |t|
@@ -461,8 +461,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "position", default: 0, null: false
     t.bigint "topic_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["topic_id", "name"], name: "index_learning_objectives_on_topic_id_and_name", unique: true
-    t.index ["topic_id"], name: "index_learning_objectives_on_topic_id"
+    t.index [ "topic_id", "name" ], name: "index_learning_objectives_on_topic_id_and_name", unique: true
+    t.index [ "topic_id" ], name: "index_learning_objectives_on_topic_id"
   end
 
   create_table "leave_requests", force: :cascade do |t|
@@ -478,11 +478,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "status", default: 0, null: false
     t.bigint "student_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["parent_id", "status"], name: "index_leave_requests_on_parent_id_and_status"
-    t.index ["parent_id"], name: "index_leave_requests_on_parent_id"
-    t.index ["reviewed_by_id"], name: "index_leave_requests_on_reviewed_by_id"
-    t.index ["student_id", "status"], name: "index_leave_requests_on_student_id_and_status"
-    t.index ["student_id"], name: "index_leave_requests_on_student_id"
+    t.index [ "parent_id", "status" ], name: "index_leave_requests_on_parent_id_and_status"
+    t.index [ "parent_id" ], name: "index_leave_requests_on_parent_id"
+    t.index [ "reviewed_by_id" ], name: "index_leave_requests_on_reviewed_by_id"
+    t.index [ "student_id", "status" ], name: "index_leave_requests_on_student_id_and_status"
+    t.index [ "student_id" ], name: "index_leave_requests_on_student_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -493,9 +493,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "sender_id", null: false
     t.string "sender_type", null: false
     t.datetime "updated_at", null: false
-    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
-    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
-    t.index ["sender_type", "sender_id"], name: "index_messages_on_sender"
+    t.index [ "conversation_id", "created_at" ], name: "index_messages_on_conversation_id_and_created_at"
+    t.index [ "conversation_id" ], name: "index_messages_on_conversation_id"
+    t.index [ "sender_type", "sender_id" ], name: "index_messages_on_sender"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -508,9 +508,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "recipient_type", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
-    t.index ["recipient_type", "recipient_id", "read_at"], name: "idx_on_recipient_type_recipient_id_read_at_50191a301d"
-    t.index ["recipient_type", "recipient_id"], name: "index_notifications_on_recipient"
+    t.index [ "notifiable_type", "notifiable_id" ], name: "index_notifications_on_notifiable_type_and_notifiable_id"
+    t.index [ "recipient_type", "recipient_id", "read_at" ], name: "idx_on_recipient_type_recipient_id_read_at_50191a301d"
+    t.index [ "recipient_type", "recipient_id" ], name: "index_notifications_on_recipient"
   end
 
   create_table "objective_masteries", force: :cascade do |t|
@@ -521,9 +521,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "mastered_at"
     t.bigint "student_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["learning_objective_id"], name: "index_objective_masteries_on_learning_objective_id"
-    t.index ["student_id", "learning_objective_id"], name: "idx_objective_masteries_unique", unique: true
-    t.index ["student_id"], name: "index_objective_masteries_on_student_id"
+    t.index [ "learning_objective_id" ], name: "index_objective_masteries_on_learning_objective_id"
+    t.index [ "student_id", "learning_objective_id" ], name: "idx_objective_masteries_unique", unique: true
+    t.index [ "student_id" ], name: "index_objective_masteries_on_student_id"
   end
 
   create_table "parent_students", force: :cascade do |t|
@@ -531,9 +531,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "parent_id", null: false
     t.bigint "student_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["parent_id", "student_id"], name: "index_parent_students_on_parent_id_and_student_id", unique: true
-    t.index ["parent_id"], name: "index_parent_students_on_parent_id"
-    t.index ["student_id"], name: "index_parent_students_on_student_id"
+    t.index [ "parent_id", "student_id" ], name: "index_parent_students_on_parent_id_and_student_id", unique: true
+    t.index [ "parent_id" ], name: "index_parent_students_on_parent_id"
+    t.index [ "student_id" ], name: "index_parent_students_on_student_id"
   end
 
   create_table "parents", force: :cascade do |t|
@@ -557,8 +557,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "reset_password_token"
     t.string "state_province"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_parents_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_parents_on_reset_password_token", unique: true
+    t.index [ "email" ], name: "index_parents_on_email", unique: true
+    t.index [ "reset_password_token" ], name: "index_parents_on_reset_password_token", unique: true
   end
 
   create_table "permissions", force: :cascade do |t|
@@ -569,8 +569,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "permissionable_type", null: false
     t.string "resource", null: false
     t.datetime "updated_at", null: false
-    t.index ["permissionable_type", "permissionable_id", "resource", "action"], name: "index_permissions_on_permissionable_resource_action", unique: true
-    t.index ["permissionable_type", "permissionable_id"], name: "index_permissions_on_permissionable"
+    t.index [ "permissionable_type", "permissionable_id", "resource", "action" ], name: "index_permissions_on_permissionable_resource_action", unique: true
+    t.index [ "permissionable_type", "permissionable_id" ], name: "index_permissions_on_permissionable"
   end
 
   create_table "push_devices", force: :cascade do |t|
@@ -582,8 +582,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "user_type", null: false
-    t.index ["token"], name: "index_push_devices_on_token", unique: true
-    t.index ["user_type", "user_id"], name: "index_push_devices_on_user_type_and_user_id"
+    t.index [ "token" ], name: "index_push_devices_on_token", unique: true
+    t.index [ "user_type", "user_id" ], name: "index_push_devices_on_user_type_and_user_id"
   end
 
   create_table "refresh_tokens", force: :cascade do |t|
@@ -596,9 +596,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "token_digest", null: false
     t.datetime "updated_at", null: false
     t.string "user_agent"
-    t.index ["authenticatable_type", "authenticatable_id", "revoked_at"], name: "index_refresh_tokens_on_auth_revoked"
-    t.index ["authenticatable_type", "authenticatable_id"], name: "index_refresh_tokens_on_authenticatable"
-    t.index ["token_digest"], name: "index_refresh_tokens_on_token_digest", unique: true
+    t.index [ "authenticatable_type", "authenticatable_id", "revoked_at" ], name: "index_refresh_tokens_on_auth_revoked"
+    t.index [ "authenticatable_type", "authenticatable_id" ], name: "index_refresh_tokens_on_authenticatable"
+    t.index [ "token_digest" ], name: "index_refresh_tokens_on_token_digest", unique: true
   end
 
   create_table "rubric_criteria", force: :cascade do |t|
@@ -609,8 +609,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "name", null: false
     t.integer "position", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["exam_id", "position"], name: "index_rubric_criteria_on_exam_id_and_position"
-    t.index ["exam_id"], name: "index_rubric_criteria_on_exam_id"
+    t.index [ "exam_id", "position" ], name: "index_rubric_criteria_on_exam_id_and_position"
+    t.index [ "exam_id" ], name: "index_rubric_criteria_on_exam_id"
   end
 
   create_table "rubric_scores", force: :cascade do |t|
@@ -620,9 +620,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "rubric_criteria_id", null: false
     t.integer "score", null: false
     t.datetime "updated_at", null: false
-    t.index ["exam_submission_id", "rubric_criteria_id"], name: "idx_rubric_scores_unique", unique: true
-    t.index ["exam_submission_id"], name: "index_rubric_scores_on_exam_submission_id"
-    t.index ["rubric_criteria_id"], name: "index_rubric_scores_on_rubric_criteria_id"
+    t.index [ "exam_submission_id", "rubric_criteria_id" ], name: "idx_rubric_scores_unique", unique: true
+    t.index [ "exam_submission_id" ], name: "index_rubric_scores_on_exam_submission_id"
+    t.index [ "rubric_criteria_id" ], name: "index_rubric_scores_on_rubric_criteria_id"
   end
 
   create_table "school_managers", force: :cascade do |t|
@@ -646,9 +646,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "school_id", null: false
     t.string "state_province"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_school_managers_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_school_managers_on_reset_password_token", unique: true
-    t.index ["school_id"], name: "index_school_managers_on_school_id"
+    t.index [ "email" ], name: "index_school_managers_on_email", unique: true
+    t.index [ "reset_password_token" ], name: "index_school_managers_on_reset_password_token", unique: true
+    t.index [ "school_id" ], name: "index_school_managers_on_school_id"
   end
 
   create_table "schools", force: :cascade do |t|
@@ -665,6 +665,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "max_sick_leave_days", default: 14, null: false
     t.integer "min_grade", default: 1, null: false
     t.string "name", null: false
+    t.datetime "onboarding_completed_at"
+    t.integer "onboarding_step", default: 0, null: false
     t.string "phone"
     t.string "postal_code"
     t.string "state_province"
@@ -677,9 +679,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "channel_hash", null: false
     t.datetime "created_at", null: false
     t.binary "payload", null: false
-    t.index ["channel"], name: "index_solid_cable_messages_on_channel"
-    t.index ["channel_hash"], name: "index_solid_cable_messages_on_channel_hash"
-    t.index ["created_at"], name: "index_solid_cable_messages_on_created_at"
+    t.index [ "channel" ], name: "index_solid_cable_messages_on_channel"
+    t.index [ "channel_hash" ], name: "index_solid_cable_messages_on_channel_hash"
+    t.index [ "created_at" ], name: "index_solid_cable_messages_on_created_at"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -688,9 +690,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.binary "key", null: false
     t.bigint "key_hash", null: false
     t.binary "value", null: false
-    t.index ["byte_size"], name: "index_solid_cache_entries_on_byte_size"
-    t.index ["key_hash", "byte_size"], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
-    t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
+    t.index [ "byte_size" ], name: "index_solid_cache_entries_on_byte_size"
+    t.index [ "key_hash", "byte_size" ], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
+    t.index [ "key_hash" ], name: "index_solid_cache_entries_on_key_hash", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -700,24 +702,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "job_id", null: false
     t.integer "priority", default: 0, null: false
     t.string "queue_name", null: false
-    t.index ["concurrency_key", "priority", "job_id"], name: "index_solid_queue_blocked_executions_for_release"
-    t.index ["expires_at", "concurrency_key"], name: "index_solid_queue_blocked_executions_for_maintenance"
-    t.index ["job_id"], name: "index_solid_queue_blocked_executions_on_job_id", unique: true
+    t.index [ "concurrency_key", "priority", "job_id" ], name: "index_solid_queue_blocked_executions_for_release"
+    t.index [ "expires_at", "concurrency_key" ], name: "index_solid_queue_blocked_executions_for_maintenance"
+    t.index [ "job_id" ], name: "index_solid_queue_blocked_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_claimed_executions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "job_id", null: false
     t.bigint "process_id"
-    t.index ["job_id"], name: "index_solid_queue_claimed_executions_on_job_id", unique: true
-    t.index ["process_id", "job_id"], name: "index_solid_queue_claimed_executions_on_process_id_and_job_id"
+    t.index [ "job_id" ], name: "index_solid_queue_claimed_executions_on_job_id", unique: true
+    t.index [ "process_id", "job_id" ], name: "index_solid_queue_claimed_executions_on_process_id_and_job_id"
   end
 
   create_table "solid_queue_failed_executions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error"
     t.bigint "job_id", null: false
-    t.index ["job_id"], name: "index_solid_queue_failed_executions_on_job_id", unique: true
+    t.index [ "job_id" ], name: "index_solid_queue_failed_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_jobs", force: :cascade do |t|
@@ -731,17 +733,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "queue_name", null: false
     t.datetime "scheduled_at"
     t.datetime "updated_at", null: false
-    t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
-    t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
-    t.index ["finished_at"], name: "index_solid_queue_jobs_on_finished_at"
-    t.index ["queue_name", "finished_at"], name: "index_solid_queue_jobs_for_filtering"
-    t.index ["scheduled_at", "finished_at"], name: "index_solid_queue_jobs_for_alerting"
+    t.index [ "active_job_id" ], name: "index_solid_queue_jobs_on_active_job_id"
+    t.index [ "class_name" ], name: "index_solid_queue_jobs_on_class_name"
+    t.index [ "finished_at" ], name: "index_solid_queue_jobs_on_finished_at"
+    t.index [ "queue_name", "finished_at" ], name: "index_solid_queue_jobs_for_filtering"
+    t.index [ "scheduled_at", "finished_at" ], name: "index_solid_queue_jobs_for_alerting"
   end
 
   create_table "solid_queue_pauses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "queue_name", null: false
-    t.index ["queue_name"], name: "index_solid_queue_pauses_on_queue_name", unique: true
+    t.index [ "queue_name" ], name: "index_solid_queue_pauses_on_queue_name", unique: true
   end
 
   create_table "solid_queue_processes", force: :cascade do |t|
@@ -753,9 +755,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "name", null: false
     t.integer "pid", null: false
     t.bigint "supervisor_id"
-    t.index ["last_heartbeat_at"], name: "index_solid_queue_processes_on_last_heartbeat_at"
-    t.index ["name", "supervisor_id"], name: "index_solid_queue_processes_on_name_and_supervisor_id", unique: true
-    t.index ["supervisor_id"], name: "index_solid_queue_processes_on_supervisor_id"
+    t.index [ "last_heartbeat_at" ], name: "index_solid_queue_processes_on_last_heartbeat_at"
+    t.index [ "name", "supervisor_id" ], name: "index_solid_queue_processes_on_name_and_supervisor_id", unique: true
+    t.index [ "supervisor_id" ], name: "index_solid_queue_processes_on_supervisor_id"
   end
 
   create_table "solid_queue_ready_executions", force: :cascade do |t|
@@ -763,9 +765,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "job_id", null: false
     t.integer "priority", default: 0, null: false
     t.string "queue_name", null: false
-    t.index ["job_id"], name: "index_solid_queue_ready_executions_on_job_id", unique: true
-    t.index ["priority", "job_id"], name: "index_solid_queue_poll_all"
-    t.index ["queue_name", "priority", "job_id"], name: "index_solid_queue_poll_by_queue"
+    t.index [ "job_id" ], name: "index_solid_queue_ready_executions_on_job_id", unique: true
+    t.index [ "priority", "job_id" ], name: "index_solid_queue_poll_all"
+    t.index [ "queue_name", "priority", "job_id" ], name: "index_solid_queue_poll_by_queue"
   end
 
   create_table "solid_queue_recurring_executions", force: :cascade do |t|
@@ -773,8 +775,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "job_id", null: false
     t.datetime "run_at", null: false
     t.string "task_key", null: false
-    t.index ["job_id"], name: "index_solid_queue_recurring_executions_on_job_id", unique: true
-    t.index ["task_key", "run_at"], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true
+    t.index [ "job_id" ], name: "index_solid_queue_recurring_executions_on_job_id", unique: true
+    t.index [ "task_key", "run_at" ], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true
   end
 
   create_table "solid_queue_recurring_tasks", force: :cascade do |t|
@@ -789,8 +791,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "schedule", null: false
     t.boolean "static", default: true, null: false
     t.datetime "updated_at", null: false
-    t.index ["key"], name: "index_solid_queue_recurring_tasks_on_key", unique: true
-    t.index ["static"], name: "index_solid_queue_recurring_tasks_on_static"
+    t.index [ "key" ], name: "index_solid_queue_recurring_tasks_on_key", unique: true
+    t.index [ "static" ], name: "index_solid_queue_recurring_tasks_on_static"
   end
 
   create_table "solid_queue_scheduled_executions", force: :cascade do |t|
@@ -799,8 +801,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "priority", default: 0, null: false
     t.string "queue_name", null: false
     t.datetime "scheduled_at", null: false
-    t.index ["job_id"], name: "index_solid_queue_scheduled_executions_on_job_id", unique: true
-    t.index ["scheduled_at", "priority", "job_id"], name: "index_solid_queue_dispatch_all"
+    t.index [ "job_id" ], name: "index_solid_queue_scheduled_executions_on_job_id", unique: true
+    t.index [ "scheduled_at", "priority", "job_id" ], name: "index_solid_queue_dispatch_all"
   end
 
   create_table "solid_queue_semaphores", force: :cascade do |t|
@@ -809,9 +811,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "key", null: false
     t.datetime "updated_at", null: false
     t.integer "value", default: 1, null: false
-    t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
-    t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
-    t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+    t.index [ "expires_at" ], name: "index_solid_queue_semaphores_on_expires_at"
+    t.index [ "key", "value" ], name: "index_solid_queue_semaphores_on_key_and_value"
+    t.index [ "key" ], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
   create_table "students", force: :cascade do |t|
@@ -842,8 +844,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.string "name", null: false
     t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_id", "name"], name: "index_subjects_on_school_id_and_name", unique: true
-    t.index ["school_id"], name: "index_subjects_on_school_id"
+    t.index [ "school_id", "name" ], name: "index_subjects_on_school_id_and_name", unique: true
+    t.index [ "school_id" ], name: "index_subjects_on_school_id"
   end
 
   create_table "teacher_leave_balances", force: :cascade do |t|
@@ -856,9 +858,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "used_annual", default: 0, null: false
     t.integer "used_personal", default: 0, null: false
     t.integer "used_sick", default: 0, null: false
-    t.index ["academic_year_id"], name: "index_teacher_leave_balances_on_academic_year_id"
-    t.index ["teacher_id", "academic_year_id"], name: "idx_on_teacher_id_academic_year_id_92d490e14f", unique: true
-    t.index ["teacher_id"], name: "index_teacher_leave_balances_on_teacher_id"
+    t.index [ "academic_year_id" ], name: "index_teacher_leave_balances_on_academic_year_id"
+    t.index [ "teacher_id", "academic_year_id" ], name: "idx_on_teacher_id_academic_year_id_92d490e14f", unique: true
+    t.index [ "teacher_id" ], name: "index_teacher_leave_balances_on_teacher_id"
   end
 
   create_table "teacher_leave_requests", force: :cascade do |t|
@@ -875,12 +877,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "substitute_id"
     t.bigint "teacher_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["reviewed_by_id"], name: "index_teacher_leave_requests_on_reviewed_by_id"
-    t.index ["school_id", "status"], name: "index_teacher_leave_requests_on_school_id_and_status"
-    t.index ["school_id"], name: "index_teacher_leave_requests_on_school_id"
-    t.index ["substitute_id"], name: "index_teacher_leave_requests_on_substitute_id"
-    t.index ["teacher_id", "status"], name: "index_teacher_leave_requests_on_teacher_id_and_status"
-    t.index ["teacher_id"], name: "index_teacher_leave_requests_on_teacher_id"
+    t.index [ "reviewed_by_id" ], name: "index_teacher_leave_requests_on_reviewed_by_id"
+    t.index [ "school_id", "status" ], name: "index_teacher_leave_requests_on_school_id_and_status"
+    t.index [ "school_id" ], name: "index_teacher_leave_requests_on_school_id"
+    t.index [ "substitute_id" ], name: "index_teacher_leave_requests_on_substitute_id"
+    t.index [ "teacher_id", "status" ], name: "index_teacher_leave_requests_on_teacher_id_and_status"
+    t.index [ "teacher_id" ], name: "index_teacher_leave_requests_on_teacher_id"
   end
 
   create_table "teachers", force: :cascade do |t|
@@ -906,9 +908,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.bigint "school_id"
     t.string "state_province"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_teachers_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_teachers_on_reset_password_token", unique: true
-    t.index ["school_id"], name: "index_teachers_on_school_id"
+    t.index [ "email" ], name: "index_teachers_on_email", unique: true
+    t.index [ "reset_password_token" ], name: "index_teachers_on_reset_password_token", unique: true
+    t.index [ "school_id" ], name: "index_teachers_on_school_id"
   end
 
   create_table "topics", force: :cascade do |t|
@@ -918,8 +920,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
     t.integer "position", default: 0, null: false
     t.bigint "subject_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["subject_id", "name"], name: "index_topics_on_subject_id_and_name", unique: true
-    t.index ["subject_id"], name: "index_topics_on_subject_id"
+    t.index [ "subject_id", "name" ], name: "index_topics_on_subject_id_and_name", unique: true
+    t.index [ "subject_id" ], name: "index_topics_on_subject_id"
   end
 
   add_foreign_key "academic_years", "schools"
@@ -1030,7 +1032,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_100002) do
        LEFT JOIN daily_scores ds ON ((ds.student_id = s.id)))
     GROUP BY s.id, s.name, cs.classroom_id;
   SQL
-  add_index "student_radar_summaries", ["classroom_id"], name: "index_student_radar_summaries_on_classroom_id"
-  add_index "student_radar_summaries", ["student_id"], name: "index_student_radar_summaries_on_student_id", unique: true
-
+  add_index "student_radar_summaries", [ "classroom_id" ], name: "index_student_radar_summaries_on_classroom_id"
+  add_index "student_radar_summaries", [ "student_id" ], name: "index_student_radar_summaries_on_student_id", unique: true
 end

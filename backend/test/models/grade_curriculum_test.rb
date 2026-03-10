@@ -3,7 +3,7 @@ require "test_helper"
 class GradeCurriculumTest < ActiveSupport::TestCase
   setup do
     @school = schools(:greenwood)
-    @year = AcademicYear.create!(school: @school, label: "2025/2026", start_date: "2025-07-01", end_date: "2026-06-30")
+    @year = academic_years(:current_year)
   end
 
   test "validates grade uniqueness per academic year" do

@@ -112,5 +112,10 @@ module Types
     field :review_teacher_leave_request, mutation: Mutations::ReviewTeacherLeaveRequest
     field :delete_teacher_leave_request, mutation: Mutations::DeleteTeacherLeaveRequest
     field :update_school_leave_settings, mutation: Mutations::UpdateSchoolLeaveSettings
+
+    # School Onboarding
+    field :register_school_manager, mutation: Mutations::RegisterSchoolManager
+    field :update_school_profile, mutation: Mutations::UpdateSchoolProfile
+    field :complete_onboarding, mutation: Mutations::CompleteOnboarding
   end
 end
