@@ -97,6 +97,14 @@
                 {m.role_parent()}
               </div>
             </label>
+            <label class="flex-1">
+              <input type="radio" name="role" value="school_manager" bind:group={role} class="peer sr-only" />
+              <div class="text-center py-2 px-4 rounded-lg border-2 border-slate-200 cursor-pointer
+                peer-checked:border-amber-600 peer-checked:bg-amber-50 peer-checked:text-amber-600
+                transition-colors text-sm font-medium">
+                {m.role_school_manager?.() ?? 'School'}
+              </div>
+            </label>
           </div>
         </div>
 
@@ -108,6 +116,76 @@
             id="phone"
             placeholder="+62 812 3456 7890"
           />
+        {/if}
+
+        {#if role === 'school_manager'}
+          <div class="border-t border-slate-100 pt-4 mt-2">
+            <p class="text-sm font-medium text-text mb-3">{m.register_school_details?.() ?? 'School Details'}</p>
+            <div class="space-y-3">
+              <Input
+                label={m.register_school_name?.() ?? 'School Name'}
+                type="text"
+                name="schoolName"
+                id="schoolName"
+                placeholder={m.register_school_name_placeholder?.() ?? 'e.g. Greenwood Elementary'}
+                required
+              />
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="minGrade" class="block text-sm font-medium text-text mb-1">{m.register_min_grade?.() ?? 'Min Grade'}</label>
+                  <input type="number" id="minGrade" name="minGrade" min="1" max="12" value="1" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                </div>
+                <div>
+                  <label for="maxGrade" class="block text-sm font-medium text-text mb-1">{m.register_max_grade?.() ?? 'Max Grade'}</label>
+                  <input type="number" id="maxGrade" name="maxGrade" min="1" max="12" value="6" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                </div>
+              </div>
+              <Input
+                label={m.register_address?.() ?? 'Address'}
+                type="text"
+                name="addressLine1"
+                id="addressLine1"
+                placeholder={m.register_address_placeholder?.() ?? '123 Main Street'}
+                required
+              />
+              <div class="grid grid-cols-2 gap-3">
+                <Input
+                  label={m.register_city?.() ?? 'City'}
+                  type="text"
+                  name="city"
+                  id="city"
+                  required
+                />
+                <Input
+                  label={m.register_state?.() ?? 'State/Province'}
+                  type="text"
+                  name="stateProvince"
+                  id="stateProvince"
+                  required
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <Input
+                  label={m.register_postal_code?.() ?? 'Postal Code'}
+                  type="text"
+                  name="postalCode"
+                  id="postalCode"
+                  required
+                />
+                <div>
+                  <label for="countryCode" class="block text-sm font-medium text-text mb-1">{m.register_country?.() ?? 'Country'}</label>
+                  <select id="countryCode" name="countryCode" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option value="ID">Indonesia</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                    <option value="SG">Singapore</option>
+                    <option value="MY">Malaysia</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
         {/if}
 
         <Button type="submit" {loading} class="w-full">
