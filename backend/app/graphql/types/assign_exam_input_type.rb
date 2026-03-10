@@ -6,5 +6,7 @@ module Types
     argument :classroom_id, ID, required: true
     argument :scheduled_at, GraphQL::Types::ISO8601DateTime, required: false
     argument :due_at, GraphQL::Types::ISO8601DateTime, required: false
+    argument :duration_minutes, Integer, required: false
+    argument :show_results, Boolean, required: false
   end
 end

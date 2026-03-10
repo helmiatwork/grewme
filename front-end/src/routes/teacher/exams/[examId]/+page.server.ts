@@ -35,6 +35,8 @@ export const actions: Actions = {
     const classroomId = formData.get('classroomId') as string;
     const scheduledAt = formData.get('scheduledAt') as string;
     const dueAt = formData.get('dueAt') as string;
+    const durationMinutes = formData.get('durationMinutes') as string;
+    const showResults = formData.get('showResults') === 'true';
 
     if (!classroomId) return fail(400, { assignError: 'Please select a classroom' });
 
@@ -48,7 +50,9 @@ export const actions: Actions = {
             examId,
             classroomId,
             scheduledAt: scheduledAt || null,
-            dueAt: dueAt || null
+            dueAt: dueAt || null,
+            durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
+            showResults: showResults || null
           }
         },
         locals.accessToken!

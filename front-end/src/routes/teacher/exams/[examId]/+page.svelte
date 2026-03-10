@@ -214,28 +214,52 @@
                 {/each}
               </select>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm font-medium text-text mb-1">
-                  {m.exam_scheduled_at()}
-                </label>
-                <input
-                  type="datetime-local"
-                  name="scheduledAt"
-                  class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-text mb-1">
-                  {m.exam_due_at()}
-                </label>
-                <input
-                  type="datetime-local"
-                  name="dueAt"
-                  class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-            </div>
+             <div class="grid grid-cols-2 gap-3">
+               <div>
+                 <label class="block text-sm font-medium text-text mb-1">
+                   {m.exam_scheduled_at()}
+                 </label>
+                 <input
+                   type="datetime-local"
+                   name="scheduledAt"
+                   class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                 />
+               </div>
+               <div>
+                 <label class="block text-sm font-medium text-text mb-1">
+                   {m.exam_due_at()}
+                 </label>
+                 <input
+                   type="datetime-local"
+                   name="dueAt"
+                   class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                 />
+               </div>
+             </div>
+             <div class="grid grid-cols-2 gap-3">
+               <div>
+                 <label class="block text-sm font-medium text-text mb-1">
+                   Duration (minutes)
+                 </label>
+                 <input
+                   type="number"
+                   name="durationMinutes"
+                   min="1"
+                   class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                 />
+               </div>
+               <div class="flex items-end">
+                 <label class="flex items-center gap-2 cursor-pointer">
+                   <input
+                     type="checkbox"
+                     name="showResults"
+                     value="true"
+                     class="w-4 h-4 border border-slate-200 rounded focus:ring-2 focus:ring-primary/30"
+                   />
+                   <span class="text-sm font-medium text-text">Show results to students</span>
+                 </label>
+               </div>
+             </div>
             <Button type="submit" disabled={assigning}>
               {assigning ? m.exam_assigning() : m.exam_assign_btn()}
             </Button>
@@ -245,28 +269,73 @@
     {/if}
 
     {#if exam?.classroomExams?.length === 0}
-      <p class="text-sm text-text-muted">{m.exam_not_assigned()}</p>
-    {:else}
-      <div class="space-y-3">
-        {#each exam?.classroomExams ?? [] as ce}
-          <div class="bg-surface rounded-xl border border-slate-100 p-4 flex items-center justify-between">
-            <div>
-              <p class="font-medium text-text">{ce.classroom.name}</p>
-              {#if ce.scheduledAt}
-                <p class="text-xs text-text-muted mt-0.5">
-                  Scheduled: {new Date(ce.scheduledAt).toLocaleDateString()}
-                </p>
-              {/if}
-            </div>
-            <span
-              class="text-xs font-medium px-2 py-0.5 rounded-full {statusBadgeClass[ce.status] ?? 'bg-slate-100 text-slate-600'}"
-            >
-              {ce.status}
-            </span>
-          </div>
-        {/each}
-      </div>
-    {/if}
+       <p class="text-sm text-text-muted">{m.exam_not_assigned()}</p>
+     {:else}
+       <div class="space-y-4">
+         {#each exam?.classroomExams ?? [] as ce}
+           <div class="bg-surface rounded-xl border border-slate-100 p-4">
+             <div class="flex items-center justify-between mb-3">
+               <div>
+                 <p class="font-medium text-text">{ce.classroom.name}</p>
+                 {#if ce.scheduledAt}
+                   <p class="text-xs text-text-muted mt-0.5">
+                     Scheduled: {new Date(ce.scheduledAt).toLocaleDateString()}
+                   </p>
+                 {/if}
+               </div>
+               <span
+                 class="text-xs font-medium px-2 py-0.5 rounded-full {statusBadgeClass[ce.status] ?? 'bg-slate-100 text-slate-600'}"
+               >
+                 {ce.status}
+               </span>
+             </div>
+
+             {#if ce.accessCode}
+               <div class="bg-slate-50 rounded-lg p-3 border border-slate-200 mt-3">
+                 <p class="text-xs text-text-muted font-medium mb-2">Access Code</p>
+                 <div class="flex items-center gap-2 mb-3">
+                   <code class="text-2xl font-mono font-bold text-primary tracking-wider">{ce.accessCode}</code>
+                   <button
+                     type="button"
+                     onclick={() => {
+                       navigator.clipboard.writeText(ce.accessCode);
+                     }}
+                     class="px-2 py-1 text-xs font-medium bg-primary text-white rounded hover:bg-primary/90 transition-colors"
+                   >
+                     Copy
+                   </button>
+                 </div>
+
+                 <p class="text-xs text-text-muted font-medium mb-2">Exam URL</p>
+                 <div class="flex items-center gap-2">
+                   <code class="text-sm font-mono text-slate-600 break-all">/exam/{ce.accessCode}</code>
+                   <button
+                     type="button"
+                     onclick={() => {
+                       navigator.clipboard.writeText(`/exam/${ce.accessCode}`);
+                     }}
+                     class="px-2 py-1 text-xs font-medium bg-primary text-white rounded hover:bg-primary/90 transition-colors"
+                   >
+                     Copy
+                   </button>
+                 </div>
+               </div>
+
+               {#if ce.durationMinutes}
+                 <p class="text-xs text-text-muted mt-3">
+                   <span class="font-medium">Duration:</span> {ce.durationMinutes} minutes
+                 </p>
+               {/if}
+               {#if ce.showResults}
+                 <p class="text-xs text-text-muted mt-1">
+                   <span class="font-medium">Results:</span> Visible to students
+                 </p>
+               {/if}
+             {/if}
+           </div>
+         {/each}
+       </div>
+     {/if}
   {/if}
 
   <!-- Tab: Submissions -->

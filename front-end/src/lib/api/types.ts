@@ -350,6 +350,9 @@ export interface ClassroomExam {
   status: ClassroomExamStatus;
   scheduledAt: string | null;
   dueAt: string | null;
+  accessCode: string | null;
+  durationMinutes: number | null;
+  showResults: boolean;
   examSubmissions: ExamSubmission[];
   createdAt: string;
   updatedAt: string;

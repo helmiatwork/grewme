@@ -118,6 +118,9 @@ export const EXAM_QUERY = `
         status
         scheduledAt
         dueAt
+        accessCode
+        durationMinutes
+        showResults
         examSubmissions {
           id
           student { id name }
@@ -405,6 +408,9 @@ export const ASSIGN_EXAM_MUTATION = `
         status
         scheduledAt
         dueAt
+        accessCode
+        durationMinutes
+        showResults
       }
       errors
     }
