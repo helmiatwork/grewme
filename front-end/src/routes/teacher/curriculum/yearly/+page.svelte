@@ -12,47 +12,91 @@
   let selectedGrade = $state(data.selectedGrade ?? 1);
   let saving = $state(false);
   let saveSuccess = $state(false);
+  let expandedSubjects = $state<Set<string>>(new Set());
 
-  // Set of selected subject IDs for the current grade
-  let selectedSubjectIds = $state<Set<string>>(new Set());
+  // Set of selected topic IDs for the current grade
+  let selectedTopicIds = $state<Set<string>>(new Set());
 
-  // Sync from server data — extract subject IDs from curriculum items
+  // Sync from server data — extract topic IDs from curriculum items
   $effect(() => {
     const gcItems = data.gradeCurriculum?.gradeCurriculumItems ?? [];
     const ids = new Set<string>();
     for (const item of gcItems) {
-      if (item.subject) ids.add(item.subject.id);
-      if (item.topic?.subject) ids.add(item.topic.subject.id);
+      if (item.subject) {
+        // Subject-level item = all topics in that subject are selected
+        for (const topic of item.subject.topics ?? []) {
+          ids.add(topic.id);
+        }
+      }
+      if (item.topic) {
+        ids.add(item.topic.id);
+      }
     }
-    selectedSubjectIds = ids;
+    selectedTopicIds = ids;
     selectedYearId = data.selectedYearId ?? '';
     selectedGrade = data.selectedGrade ?? 1;
-    // Keep URL clean
     if (browser && window.location.search) {
       history.replaceState(history.state, '', '/teacher/curriculum/yearly');
     }
   });
 
-  function toggleSubject(subjectId: string) {
-    const next = new Set(selectedSubjectIds);
-    if (next.has(subjectId)) {
-      next.delete(subjectId);
+  function toggleExpand(subjectId: string) {
+    const next = new Set(expandedSubjects);
+    if (next.has(subjectId)) next.delete(subjectId);
+    else next.add(subjectId);
+    expandedSubjects = next;
+  }
+
+  function toggleSubject(subject: any) {
+    const topicIds = (subject.topics ?? []).map((t: any) => t.id);
+    const allSelected = topicIds.every((id: string) => selectedTopicIds.has(id));
+    const next = new Set(selectedTopicIds);
+    if (allSelected) {
+      topicIds.forEach((id: string) => next.delete(id));
     } else {
-      next.add(subjectId);
+      topicIds.forEach((id: string) => next.add(id));
     }
-    selectedSubjectIds = next;
+    selectedTopicIds = next;
+  }
+
+  function toggleTopic(topicId: string) {
+    const next = new Set(selectedTopicIds);
+    if (next.has(topicId)) next.delete(topicId);
+    else next.add(topicId);
+    selectedTopicIds = next;
+  }
+
+  function subjectState(subject: any): 'all' | 'some' | 'none' {
+    const topicIds = (subject.topics ?? []).map((t: any) => t.id);
+    if (topicIds.length === 0) return 'none';
+    const count = topicIds.filter((id: string) => selectedTopicIds.has(id)).length;
+    if (count === topicIds.length) return 'all';
+    if (count > 0) return 'some';
+    return 'none';
+  }
+
+  function selectedTopicCountFor(subject: any): number {
+    return (subject.topics ?? []).filter((t: any) => selectedTopicIds.has(t.id)).length;
   }
 
   function buildItemsJson(): string {
-    return JSON.stringify(
-      data.subjects
-        .filter((s: any) => selectedSubjectIds.has(s.id))
-        .map((s: any, i: number) => ({
-          subjectId: s.id,
-          topicId: null,
-          position: i + 1
-        }))
-    );
+    let position = 0;
+    const items: Array<{ subjectId: string | null; topicId: string | null; position: number }> = [];
+    for (const subject of data.subjects) {
+      const topics = subject.topics ?? [];
+      const selectedInSubject = topics.filter((t: any) => selectedTopicIds.has(t.id));
+      if (selectedInSubject.length === 0) continue;
+      if (selectedInSubject.length === topics.length) {
+        // All topics selected — save as subject-level item
+        items.push({ subjectId: subject.id, topicId: null, position: ++position });
+      } else {
+        // Partial — save individual topic items
+        for (const topic of selectedInSubject) {
+          items.push({ subjectId: null, topicId: topic.id, position: ++position });
+        }
+      }
+    }
+    return JSON.stringify(items);
   }
 
   async function onSelectionChange() {
@@ -63,12 +107,13 @@
     history.replaceState(history.state, '', '/teacher/curriculum/yearly');
   }
 
-  // Use teacher's grades if available, otherwise school range
   let grades = $derived(
     data.teacherGrades?.length
       ? data.teacherGrades.map((g: number) => ({ value: g, label: gradeDisplayName(g) }))
       : data.school ? gradeOptions(data.school.minGrade, data.school.maxGrade) : []
   );
+
+  let totalSelectedTopics = $derived(selectedTopicIds.size);
 
   $effect(() => {
     if (form?.success) {
@@ -84,7 +129,6 @@
 </svelte:head>
 
 <div>
-  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
       <h1 class="text-2xl font-bold text-text">{m.yearly_title()}</h1>
@@ -134,32 +178,77 @@
       </div>
     </div>
 
-    <!-- Subject Checklist -->
+    <!-- Subject & Topic Checklist -->
     <div class="mb-6">
       <h2 class="text-lg font-semibold text-text mb-3">{gradeDisplayName(selectedGrade)} Curriculum</h2>
-      <div class="bg-surface rounded-xl border border-slate-100 divide-y divide-slate-100">
+      <div class="bg-surface rounded-xl border border-slate-100">
         {#if data.subjects.length === 0}
           <p class="text-sm text-text-muted text-center py-8">{m.yearly_no_master_subjects()}</p>
         {:else}
           {#each data.subjects as subject}
-            {@const isSelected = selectedSubjectIds.has(subject.id)}
+            {@const state = subjectState(subject)}
+            {@const isExpanded = expandedSubjects.has(subject.id)}
             {@const topicCount = subject.topics?.length ?? 0}
-            <label class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onchange={() => toggleSubject(subject.id)}
-                class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/50"
-              />
-              <div class="flex-1 min-w-0">
-                <span class="text-sm font-medium text-text">{subject.name}</span>
+            {@const selectedCount = selectedTopicCountFor(subject)}
+
+            <!-- Subject row -->
+            <div class="border-b border-slate-100 last:border-b-0">
+              <div class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                <!-- Expand toggle -->
+                <button
+                  class="text-text-muted hover:text-text transition-transform flex-shrink-0 {isExpanded ? 'rotate-90' : ''}"
+                  onclick={() => toggleExpand(subject.id)}
+                  aria-label="Toggle topics"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
+
+                <!-- Subject checkbox -->
+                <input
+                  type="checkbox"
+                  checked={state === 'all'}
+                  indeterminate={state === 'some'}
+                  onchange={() => toggleSubject(subject)}
+                  class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/50"
+                />
+
+                <!-- Subject name (clickable to expand) -->
+                <button class="flex-1 min-w-0 text-left" onclick={() => toggleExpand(subject.id)}>
+                  <span class="text-sm font-medium text-text">{subject.name}</span>
+                </button>
+
+                <!-- Topic count badge -->
+                <span class="text-xs text-text-muted flex-shrink-0">
+                  {#if selectedCount > 0 && selectedCount < topicCount}
+                    {selectedCount}/{topicCount} topics
+                  {:else}
+                    {topicCount} topic{topicCount !== 1 ? 's' : ''}
+                  {/if}
+                </span>
               </div>
-              <span class="text-xs text-text-muted">{topicCount} topic{topicCount !== 1 ? 's' : ''}</span>
-            </label>
+
+              <!-- Topic list (expanded) -->
+              {#if isExpanded}
+                <div class="pb-2">
+                  {#each subject.topics ?? [] as topic}
+                    {@const isTopicSelected = selectedTopicIds.has(topic.id)}
+                    <label class="flex items-center gap-3 pl-14 pr-4 py-1.5 cursor-pointer hover:bg-slate-50 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={isTopicSelected}
+                        onchange={() => toggleTopic(topic.id)}
+                        class="w-3.5 h-3.5 rounded border-slate-300 text-primary focus:ring-primary/50"
+                      />
+                      <span class="text-sm text-text">{topic.name}</span>
+                    </label>
+                  {/each}
+                </div>
+              {/if}
+            </div>
           {/each}
         {/if}
       </div>
-      <p class="text-xs text-text-muted mt-2">{selectedSubjectIds.size} of {data.subjects.length} subjects selected</p>
+      <p class="text-xs text-text-muted mt-2">{totalSelectedTopics} topic{totalSelectedTopics !== 1 ? 's' : ''} selected</p>
     </div>
 
     <!-- Save -->
@@ -167,7 +256,7 @@
       <input type="hidden" name="academicYearId" value={selectedYearId} />
       <input type="hidden" name="grade" value={selectedGrade} />
       <input type="hidden" name="items" value={buildItemsJson()} />
-      <Button type="submit" disabled={saving || selectedSubjectIds.size === 0} class="w-full">
+      <Button type="submit" disabled={saving || totalSelectedTopics === 0} class="w-full">
         {saving ? m.yearly_saving() : `Save ${gradeDisplayName(selectedGrade)} Curriculum`}
       </Button>
     </form>
