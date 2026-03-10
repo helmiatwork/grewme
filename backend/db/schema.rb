@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_10_103543) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_10_115453) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -155,15 +155,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_103543) do
   end
 
   create_table "classroom_exams", force: :cascade do |t|
+    t.string "access_code", limit: 6
     t.bigint "assigned_by_id", null: false
     t.string "assigned_by_type", null: false
     t.bigint "classroom_id", null: false
     t.datetime "created_at", null: false
     t.datetime "due_at"
+    t.integer "duration_minutes"
     t.bigint "exam_id", null: false
     t.datetime "scheduled_at"
+    t.boolean "show_results", default: false, null: false
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["access_code"], name: "index_classroom_exams_on_access_code", unique: true
     t.index ["assigned_by_type", "assigned_by_id"], name: "index_classroom_exams_on_assigned_by"
     t.index ["classroom_id", "exam_id"], name: "index_classroom_exams_on_classroom_id_and_exam_id", unique: true
     t.index ["classroom_id", "status"], name: "index_classroom_exams_on_classroom_id_and_status"
@@ -287,11 +291,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_103543) do
   end
 
   create_table "exam_submissions", force: :cascade do |t|
+    t.boolean "auto_submitted", default: false, null: false
     t.bigint "classroom_exam_id", null: false
     t.datetime "created_at", null: false
     t.datetime "graded_at"
     t.boolean "passed"
     t.decimal "score", precision: 5, scale: 2
+    t.string "session_token"
     t.datetime "started_at"
     t.integer "status", default: 0, null: false
     t.bigint "student_id", null: false
@@ -299,6 +305,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_103543) do
     t.text "teacher_notes"
     t.datetime "updated_at", null: false
     t.index ["classroom_exam_id"], name: "index_exam_submissions_on_classroom_exam_id"
+    t.index ["session_token"], name: "index_exam_submissions_on_session_token", unique: true
     t.index ["student_id", "classroom_exam_id"], name: "index_exam_submissions_on_student_id_and_classroom_exam_id", unique: true
     t.index ["student_id"], name: "index_exam_submissions_on_student_id"
   end
