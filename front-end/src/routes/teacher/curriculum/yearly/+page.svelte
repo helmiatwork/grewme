@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto, invalidateAll } from '$app/navigation';
+  import { browser } from '$app/environment';
   import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import { Card, Button, Alert } from '$lib/components/ui';
@@ -42,6 +43,10 @@
     })) ?? [];
     selectedYearId = data.selectedYearId ?? '';
     selectedGrade = data.selectedGrade ?? 1;
+    // Keep URL clean — strip query params after data loads
+    if (browser && window.location.search) {
+      history.replaceState(history.state, '', '/teacher/curriculum/yearly');
+    }
   });
 
   function toggleSubject(subjectId: string) {
@@ -68,11 +73,12 @@
     curriculumItems = e.detail.items.map((it) => ({ ...it }));
   }
 
-  function onSelectionChange() {
+  async function onSelectionChange() {
     const params = new URLSearchParams();
     if (selectedYearId) params.set('yearId', selectedYearId);
     if (selectedGrade) params.set('grade', String(selectedGrade));
-    goto(`/teacher/curriculum/yearly?${params.toString()}`);
+    await goto(`/teacher/curriculum/yearly?${params.toString()}`, { replaceState: true, noScroll: true });
+    history.replaceState(history.state, '', '/teacher/curriculum/yearly');
   }
 
   function buildItemsJson(): string {
