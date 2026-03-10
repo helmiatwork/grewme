@@ -1,0 +1,9 @@
+emma_q1:
+  exam_question: mc_q1
+  student: student_emma
+  classroom_exam: alice_mc_exam
+  values:
+    a: 10
+    b: 7
+  generated_text: "What is 10 + 7?"
+  correct_answer: "17"

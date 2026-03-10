@@ -4,6 +4,7 @@ class ClassroomExam < ApplicationRecord
   belongs_to :assigned_by, polymorphic: true
 
   has_many :exam_submissions, dependent: :destroy
+  has_many :student_questions, dependent: :destroy
 
   enum :status, { draft: 0, active: 1, closed: 2 }
 
