@@ -151,6 +151,9 @@ GEM
     debug (1.11.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    dentaku (3.5.7)
+      bigdecimal
+      concurrent-ruby
     devise (5.0.2)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -593,6 +596,7 @@ DEPENDENCIES
   countries (~> 8.1)
   database_cleaner-active_record (~> 2.2)
   debug
+  dentaku (~> 3.5)
   devise (~> 5.0)
   devise-jwt (~> 0.12)
   dotenv-rails (~> 3.1)
@@ -678,6 +682,7 @@ CHECKSUMS
   database_cleaner-core (2.0.1) sha256=8646574c32162e59ed7b5258a97a208d3c44551b854e510994f24683865d846c
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   debug (1.11.1) sha256=2e0b0ac6119f2207a6f8ac7d4a73ca8eb4e440f64da0a3136c30343146e952b6
+  dentaku (3.5.7) sha256=8d15a4a801ac8e1491dd2842bb76e38dd2794e9c8aa0f6e06f59d7ec62727db0
   devise (5.0.2) sha256=254330c9290e612ad9681e8a18c96aa21fb95bc391af936b84480965444bb0b6
   devise-jwt (0.13.0) sha256=19720e64815cd4ba8cdaf338a482f0237e7f1542cc6439212be7db211e731d64
   docile (1.4.1) sha256=96159be799bfa73cdb721b840e9802126e4e03dfc26863db73647204c727f21e

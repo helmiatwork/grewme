@@ -56,6 +56,7 @@ gem "fcm", "~> 2.0"
 # Utilities
 gem "countries", "~> 8.1"
 gem "ruby_llm", "~> 1.2"
+gem "dentaku", "~> 3.5"
 
 # Admin
 gem "avo", "~> 3.16"
