@@ -372,30 +372,56 @@ subjects_data.each do |subject_name, data|
 end
 
 # ─── Grade Curriculum (Kurikulum Tahunan) ────────────────────────────────────
-# Grade 1 curriculum (Class 1A)
+# Each grade has age-appropriate subjects/topics — simpler for lower grades
+
+# Grade 1 (ELM 1): Basics — counting, reading, writing, nature, art
 gc1 = GradeCurriculum.create!(academic_year: academic_year, grade: 1)
 [
-  { subject: all_subjects["Mathematics"], position: 1 },
-  { subject: all_subjects["English"], position: 2 },
-  { topic: all_topics["Living Things"], position: 3 },
-  { subject: all_subjects["Art"], position: 4 }
+  { topic: all_topics["Numbers & Counting"], position: 1 },
+  { topic: all_topics["Addition & Subtraction"], position: 2 },
+  { topic: all_topics["Reading Comprehension"], position: 3 },
+  { topic: all_topics["Writing"], position: 4 },
+  { topic: all_topics["Vocabulary"], position: 5 },
+  { topic: all_topics["Living Things"], position: 6 },
+  { topic: all_topics["My Community"], position: 7 },
+  { subject: all_subjects["Art"], position: 8 }
 ].each do |item|
   GradeCurriculumItem.create!(grade_curriculum: gc1, **item)
 end
 
-# Grade 3 curriculum (Class 3A, 3B)
+# Grade 2 (ELM 2): Builds on Grade 1 — adds fractions intro, grammar, materials, geography
+gc2 = GradeCurriculum.create!(academic_year: academic_year, grade: 2)
+[
+  { topic: all_topics["Numbers & Counting"], position: 1 },
+  { topic: all_topics["Addition & Subtraction"], position: 2 },
+  { topic: all_topics["Fractions"], position: 3 },
+  { topic: all_topics["Reading Comprehension"], position: 4 },
+  { topic: all_topics["Writing"], position: 5 },
+  { topic: all_topics["Grammar"], position: 6 },
+  { topic: all_topics["Vocabulary"], position: 7 },
+  { topic: all_topics["Living Things"], position: 8 },
+  { topic: all_topics["Matter & Materials"], position: 9 },
+  { topic: all_topics["My Community"], position: 10 },
+  { topic: all_topics["Geography"], position: 11 },
+  { subject: all_subjects["Art"], position: 12 }
+].each do |item|
+  GradeCurriculumItem.create!(grade_curriculum: gc2, **item)
+end
+
+# Grade 3 (ELM 3): Full math, full English, most Science & Social Studies
 gc3 = GradeCurriculum.create!(academic_year: academic_year, grade: 3)
 [
   { subject: all_subjects["Mathematics"], position: 1 },
   { subject: all_subjects["English"], position: 2 },
   { subject: all_subjects["Science"], position: 3 },
-  { subject: all_subjects["Social Studies"], position: 4 },
-  { topic: all_topics["Drawing & Painting"], position: 5 }
+  { topic: all_topics["My Community"], position: 4 },
+  { topic: all_topics["Geography"], position: 5 },
+  { topic: all_topics["Drawing & Painting"], position: 6 }
 ].each do |item|
   GradeCurriculumItem.create!(grade_curriculum: gc3, **item)
 end
 
-# Grade 4 curriculum (Class 4A)
+# Grade 4 (ELM 4): All subjects fully covered
 gc4 = GradeCurriculum.create!(academic_year: academic_year, grade: 4)
 [
   { subject: all_subjects["Mathematics"], position: 1 },
