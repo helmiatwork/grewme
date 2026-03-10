@@ -28,7 +28,7 @@
           query: `query {
             unreadNotificationCount
             notifications(first: 20) {
-              nodes { id title body notifiableType notifiableId read createdAt }
+              nodes { id title body kind params notifiableType notifiableId read createdAt }
             }
           }`
         })
@@ -38,6 +38,10 @@
         id: n.id,
         title: n.title,
         body: n.body,
+        kind: n.kind ?? null,
+        params: n.params ?? null,
+        notifiable_type: n.notifiableType ?? null,
+        notifiable_id: n.notifiableId ?? null,
         feed_post_id: n.notifiableType === 'FeedPost' ? n.notifiableId : null,
         created_at: n.createdAt,
       }));

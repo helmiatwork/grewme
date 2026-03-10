@@ -47,7 +47,9 @@ module Mutations
             recipient: manager,
             notifiable: leave_request,
             title: "New Teacher Leave Request",
-            body: "#{current_user.name} requested #{request_type}#{" half-day (#{half_day_session})" if half_day_session} leave (#{start_date}#{" - #{end_date}" unless start_date == end_date})"
+            body: "#{current_user.name} requested #{request_type}#{" half-day (#{half_day_session})" if half_day_session} leave (#{start_date}#{" - #{end_date}" unless start_date == end_date})",
+            kind: "teacher_leave_request_created",
+            params: { teacher_name: current_user.name, request_type: request_type, half_day_session: half_day_session, start_date: start_date.to_s, end_date: end_date.to_s }
           )
         end
 

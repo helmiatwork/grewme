@@ -68,7 +68,9 @@ module Mutations
             recipient: parent,
             notifiable: post,
             title: "New post about #{tagged_children.to_sentence}",
-            body: "#{teacher_name} posted in #{classroom_name}: #{post.body.truncate(100)}"
+            body: "#{teacher_name} posted in #{classroom_name}: #{post.body.truncate(100)}",
+            kind: "feed_post_tagged",
+            params: { teacher_name: teacher_name, classroom_name: classroom_name, tagged_children: tagged_children, body_preview: post.body.truncate(100) }
           )
           NotificationService.deliver(parent, notification)
         end
@@ -83,7 +85,9 @@ module Mutations
             recipient: parent,
             notifiable: post,
             title: "New post in #{classroom_name}",
-            body: "#{teacher_name}: #{post.body.truncate(100)}"
+            body: "#{teacher_name}: #{post.body.truncate(100)}",
+            kind: "feed_post_created",
+            params: { teacher_name: teacher_name, classroom_name: classroom_name, body_preview: post.body.truncate(100) }
           )
           NotificationService.deliver(parent, notification)
         end

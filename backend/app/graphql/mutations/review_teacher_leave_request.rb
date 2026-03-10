@@ -44,7 +44,9 @@ module Mutations
           recipient: leave_request.teacher,
           notifiable: leave_request,
           title: "Leave Request #{decision.capitalize}",
-          body: "Your #{leave_request.request_type} leave request (#{leave_request.start_date} - #{leave_request.end_date}) has been #{decision}."
+          body: "Your #{leave_request.request_type} leave request (#{leave_request.start_date} - #{leave_request.end_date}) has been #{decision}.",
+          kind: "teacher_leave_request_reviewed",
+          params: { request_type: leave_request.request_type, start_date: leave_request.start_date.to_s, end_date: leave_request.end_date.to_s, decision: decision }
         )
 
         AuditLogger.log(

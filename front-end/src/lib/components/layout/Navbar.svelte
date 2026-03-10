@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Badge } from '$lib/components/ui';
   import type { SessionUser } from '$lib/api/types';
-  import { getNotifications } from '$lib/stores/notifications.svelte';
+  import { getNotifications, translateNotification } from '$lib/stores/notifications.svelte';
   import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -81,6 +81,7 @@
                 </div>
               {:else}
                 {#each notifs.items as notif (notif.id)}
+                  {@const translated = translateNotification(notif)}
                   <button
                     class="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
                     onclick={() => {
@@ -89,8 +90,8 @@
                       window.location.href = dest;
                     }}
                   >
-                    <p class="text-sm font-medium text-text">{notif.title}</p>
-                    <p class="text-xs text-text-muted mt-0.5 line-clamp-2">{notif.body}</p>
+                    <p class="text-sm font-medium text-text">{translated.title}</p>
+                    <p class="text-xs text-text-muted mt-0.5 line-clamp-2">{translated.body}</p>
                     <p class="text-[10px] text-text-muted mt-1">{new Date(notif.created_at).toLocaleString()}</p>
                   </button>
                 {/each}

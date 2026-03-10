@@ -5,6 +5,8 @@ module Types
     field :id, ID, null: false
     field :title, String, null: false
     field :body, String, null: false
+    field :kind, String, null: true
+    field :params, GraphQL::Types::JSON, null: true
     field :notifiable_type, String, null: false
     field :notifiable_id, ID, null: false
     field :read, Boolean, null: false

@@ -48,12 +48,16 @@ module Mutations
       event_date = event.event_date.strftime("%B %d, %Y")
 
       # Notify all teachers in the classroom (except the creator)
+      event_params = { creator_name: creator_name, event_title: event_title, event_date: event_date, classroom_name: classroom_name }
+
       classroom.teachers.where.not(id: current_user.id).find_each do |teacher|
         notification = Notification.create!(
           recipient: teacher,
           notifiable: event,
           title: "New event: #{event_title}",
-          body: "#{creator_name} added \"#{event_title}\" on #{event_date} in #{classroom_name}"
+          body: "#{creator_name} added \"#{event_title}\" on #{event_date} in #{classroom_name}",
+          kind: "classroom_event_created",
+          params: event_params
         )
         NotificationService.deliver(teacher, notification)
       end
@@ -68,7 +72,9 @@ module Mutations
           recipient: parent,
           notifiable: event,
           title: "New event: #{event_title}",
-          body: "#{event_title} on #{event_date} in #{classroom_name}"
+          body: "#{event_title} on #{event_date} in #{classroom_name}",
+          kind: "classroom_event_created",
+          params: event_params
         )
         NotificationService.deliver(parent, notification)
       end

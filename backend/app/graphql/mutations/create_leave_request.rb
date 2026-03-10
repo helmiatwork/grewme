@@ -41,7 +41,9 @@ module Mutations
               recipient: teacher,
               notifiable: leave_request,
               title: "New Leave Request",
-              body: "#{current_user.name} submitted a #{request_type} leave for #{leave_request.student.name} (#{start_date} - #{end_date})"
+              body: "#{current_user.name} submitted a #{request_type} leave for #{leave_request.student.name} (#{start_date} - #{end_date})",
+              kind: "leave_request_created",
+              params: { parent_name: current_user.name, request_type: request_type, student_name: leave_request.student.name, start_date: start_date.to_s, end_date: end_date.to_s }
             )
           end
         end

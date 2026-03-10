@@ -887,43 +887,58 @@ puts "Seeded: #{ObjectiveMastery.count} objective masteries"
 notifications_data = [
   # Leave request notifications (unread)
   { title: "New Leave Request", body: "Kevin Parent submitted a sick leave request for Wyatt (Class 3B) from #{1.day.ago.to_date} to #{1.day.from_now.to_date}.",
-   notifiable: LeaveRequest.find_by(student: all_students["Wyatt"]), created_at: 1.day.ago, read_at: nil },
+   notifiable: LeaveRequest.find_by(student: all_students["Wyatt"]), created_at: 1.day.ago, read_at: nil,
+   kind: "leave_request_created", params: { parent_name: "Kevin Parent", request_type: "sick", student_name: "Wyatt", start_date: 1.day.ago.to_date.to_s, end_date: 1.day.from_now.to_date.to_s } },
   { title: "New Leave Request", body: "Mike Parent submitted an excused leave request for Felix (Class 4A) from #{3.days.from_now.to_date} to #{4.days.from_now.to_date}.",
-   notifiable: LeaveRequest.find_by(student: all_students["Felix"]), created_at: 6.hours.ago, read_at: nil },
+   notifiable: LeaveRequest.find_by(student: all_students["Felix"]), created_at: 6.hours.ago, read_at: nil,
+   kind: "leave_request_created", params: { parent_name: "Mike Parent", request_type: "excused", student_name: "Felix", start_date: 3.days.from_now.to_date.to_s, end_date: 4.days.from_now.to_date.to_s } },
 
   # Exam submission notifications (unread)
   { title: "Exam Submitted", body: "A student in Class 3B submitted the Living Things Test. #{ExamSubmission.where(classroom_exam: score_classroom_exam, status: :submitted).count} submissions awaiting grading.",
-   notifiable: score_classroom_exam, created_at: 3.hours.ago, read_at: nil },
+   notifiable: score_classroom_exam, created_at: 3.hours.ago, read_at: nil,
+   kind: "exam_submitted", params: { classroom_name: "Class 3B", exam_title: "Living Things Test", pending_count: ExamSubmission.where(classroom_exam: score_classroom_exam, status: :submitted).count } },
 
   # Message notifications (unread)
   { title: "New Message", body: "Mike Parent: Felix won't be in class today, he has a dentist appointment.",
-   notifiable: Conversation.find_by(teacher: alice, parent: mike), created_at: 1.day.ago, read_at: nil },
+   notifiable: Conversation.find_by(teacher: alice, parent: mike), created_at: 1.day.ago, read_at: nil,
+   kind: "new_message", params: { sender_name: "Mike Parent", message_preview: "Felix won't be in class today, he has a dentist appointment." } },
 
   # Teacher leave request notification (unread)
   { title: "Leave Request Update", body: "Your personal leave request for #{2.weeks.from_now.to_date} is still pending review.",
-   notifiable: TeacherLeaveRequest.find_by(teacher: alice, status: :pending), created_at: 2.days.ago, read_at: nil },
+   notifiable: TeacherLeaveRequest.find_by(teacher: alice, status: :pending), created_at: 2.days.ago, read_at: nil,
+   kind: "teacher_leave_request_reviewed", params: { request_type: "personal", start_date: 2.weeks.from_now.to_date.to_s, end_date: 2.weeks.from_now.to_date.to_s, decision: "pending" } },
 
   # Read notifications (older)
   { title: "Leave Request Approved", body: "Your sick leave request (#{3.weeks.ago.to_date} – #{(3.weeks.ago + 1.day).to_date}) was approved by Pat Principal.",
-   notifiable: TeacherLeaveRequest.find_by(teacher: alice, request_type: :sick, status: :approved), created_at: 3.weeks.ago + 4.hours, read_at: 3.weeks.ago + 5.hours },
+   notifiable: TeacherLeaveRequest.find_by(teacher: alice, request_type: :sick, status: :approved), created_at: 3.weeks.ago + 4.hours, read_at: 3.weeks.ago + 5.hours,
+   kind: "teacher_leave_request_reviewed", params: { request_type: "sick", start_date: 3.weeks.ago.to_date.to_s, end_date: (3.weeks.ago + 1.day).to_date.to_s, decision: "approved" } },
   { title: "Leave Request Approved", body: "Your annual leave request (#{2.months.ago.to_date} – #{(2.months.ago + 1.day).to_date}) was approved by Pat Principal.",
-   notifiable: TeacherLeaveRequest.find_by(teacher: alice, request_type: :annual, status: :approved), created_at: 2.months.ago + 4.hours, read_at: 2.months.ago + 5.hours },
+   notifiable: TeacherLeaveRequest.find_by(teacher: alice, request_type: :annual, status: :approved), created_at: 2.months.ago + 4.hours, read_at: 2.months.ago + 5.hours,
+   kind: "teacher_leave_request_reviewed", params: { request_type: "annual", start_date: 2.months.ago.to_date.to_s, end_date: (2.months.ago + 1.day).to_date.to_s, decision: "approved" } },
   { title: "Exam Grading Complete", body: "All submissions for 'Paragraph Writing Assessment' in Class 3A have been graded.",
-   notifiable: rubric_classroom_exam, created_at: 3.days.ago, read_at: 3.days.ago + 1.hour },
+   notifiable: rubric_classroom_exam, created_at: 3.days.ago, read_at: 3.days.ago + 1.hour,
+   kind: "exam_grading_complete", params: { exam_title: "Paragraph Writing Assessment", classroom_name: "Class 3A" } },
   { title: "Exam Grading Complete", body: "All submissions for 'Self-Portrait Drawing' in Class 4A have been graded.",
-   notifiable: pf_classroom_exam, created_at: 9.days.ago, read_at: 9.days.ago + 2.hours },
+   notifiable: pf_classroom_exam, created_at: 9.days.ago, read_at: 9.days.ago + 2.hours,
+   kind: "exam_grading_complete", params: { exam_title: "Self-Portrait Drawing", classroom_name: "Class 4A" } },
   { title: "New Message", body: "Carol Parent: That's wonderful to hear! She loves reading at home too.",
-   notifiable: Conversation.find_by(teacher: alice, parent: carol), created_at: 4.days.ago, read_at: 4.days.ago + 30.minutes },
+   notifiable: Conversation.find_by(teacher: alice, parent: carol), created_at: 4.days.ago, read_at: 4.days.ago + 30.minutes,
+   kind: "new_message", params: { sender_name: "Carol Parent", message_preview: "That's wonderful to hear! She loves reading at home too." } },
   { title: "New Message", body: "Dan Parent: Yes please, we'll work on it together at home. Thank you for letting me know.",
-   notifiable: Conversation.find_by(teacher: alice, parent: dan), created_at: 2.days.ago, read_at: 2.days.ago + 1.hour },
+   notifiable: Conversation.find_by(teacher: alice, parent: dan), created_at: 2.days.ago, read_at: 2.days.ago + 1.hour,
+   kind: "new_message", params: { sender_name: "Dan Parent", message_preview: "Yes please, we'll work on it together at home. Thank you for letting me know." } },
   { title: "New Message", body: "Nina Parent: He did much better on the practice sheets! Thank you for the help.",
-   notifiable: Conversation.find_by(teacher: alice, parent: nina), created_at: 3.days.ago, read_at: 3.days.ago + 2.hours },
-  { title: "New Comment", body: "Carol Parent commented on your post: 'Emma loved the space story! She kept talking about it at dinner 😊'",
-   notifiable: posts[0], created_at: 5.days.ago, read_at: 5.days.ago + 1.hour },
+   notifiable: Conversation.find_by(teacher: alice, parent: nina), created_at: 3.days.ago, read_at: 3.days.ago + 2.hours,
+   kind: "new_message", params: { sender_name: "Nina Parent", message_preview: "He did much better on the practice sheets! Thank you for the help." } },
+  { title: "New Comment", body: "Carol Parent commented on your post: 'Emma loved the space story! She kept talking about it at dinner'",
+   notifiable: posts[0], created_at: 5.days.ago, read_at: 5.days.ago + 1.hour,
+   kind: "new_comment", params: { commenter_name: "Carol Parent", comment_preview: "Emma loved the space story! She kept talking about it at dinner" } },
   { title: "New Comment", body: "Mike Parent commented on your post: 'Felix is struggling a bit with long division. Any tips for practice at home?'",
-   notifiable: posts[18], created_at: 4.days.ago, read_at: 4.days.ago + 30.minutes },
+   notifiable: posts[18], created_at: 4.days.ago, read_at: 4.days.ago + 30.minutes,
+   kind: "new_comment", params: { commenter_name: "Mike Parent", comment_preview: "Felix is struggling a bit with long division. Any tips for practice at home?" } },
   { title: "Health Checkup Reminder", body: "Monthly health checkups are due for Class 1A, 3A, 3B, and 4A students.",
-   notifiable: school, created_at: 1.week.ago, read_at: 1.week.ago + 3.hours }
+   notifiable: school, created_at: 1.week.ago, read_at: 1.week.ago + 3.hours,
+   kind: "health_checkup_reminder", params: { classroom_names: "Class 1A, 3A, 3B, and 4A" } }
 ]
 
 notifications_data.each do |n_data|

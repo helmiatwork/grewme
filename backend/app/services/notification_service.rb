@@ -33,6 +33,8 @@ class NotificationService
       id: notification.id,
       title: notification.title,
       body: notification.body,
+      kind: notification.kind,
+      params: notification.params,
       notifiable_type: notification.notifiable_type,
       notifiable_id: notification.notifiable_id,
       created_at: notification.created_at.iso8601
