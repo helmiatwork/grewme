@@ -972,6 +972,9 @@ if ActiveRecord::Base.connection.view_exists?(:student_radar_summaries)
   puts "Refreshed radar summaries"
 end
 
+# ─── Load question templates ──────────────────────────────────────────────────
+load Rails.root.join("db/seeds/question_templates.rb")
+
 puts "\n✅ Seeding complete!"
 puts "   #{School.count} schools, #{Teacher.count} teachers, #{Parent.count} parents, #{Student.count} students"
 puts "   #{Classroom.count} classrooms, #{Invitation.count} invitations, #{Consent.count} consents"
