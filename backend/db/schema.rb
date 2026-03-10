@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_10_100636) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_10_103543) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -259,21 +259,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_100636) do
     t.bigint "exam_submission_id", null: false
     t.integer "points_awarded", default: 0
     t.string "selected_answer"
+    t.bigint "student_question_id"
     t.datetime "updated_at", null: false
     t.index ["exam_question_id"], name: "index_exam_answers_on_exam_question_id"
     t.index ["exam_submission_id", "exam_question_id"], name: "index_exam_answers_on_exam_submission_id_and_exam_question_id", unique: true
     t.index ["exam_submission_id"], name: "index_exam_answers_on_exam_submission_id"
+    t.index ["student_question_id"], name: "index_exam_answers_on_student_question_id"
   end
 
   create_table "exam_questions", force: :cascade do |t|
-    t.string "correct_answer", null: false
+    t.string "correct_answer"
     t.datetime "created_at", null: false
     t.bigint "exam_id", null: false
+    t.jsonb "fixed_values", default: {}
+    t.string "formula"
     t.jsonb "options", default: []
+    t.boolean "parameterized", default: false, null: false
     t.integer "points", default: 1, null: false
     t.integer "position", default: 0, null: false
-    t.text "question_text", null: false
+    t.text "question_text"
+    t.string "template_text"
     t.datetime "updated_at", null: false
+    t.integer "value_mode", default: 0
+    t.jsonb "variables", default: []
     t.index ["exam_id", "position"], name: "index_exam_questions_on_exam_id_and_position"
     t.index ["exam_id"], name: "index_exam_questions_on_exam_id"
   end
@@ -589,6 +597,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_100636) do
     t.index ["user_type", "user_id"], name: "index_push_devices_on_user_type_and_user_id"
   end
 
+  create_table "question_templates", force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.string "formula", null: false
+    t.integer "grade_max", default: 12, null: false
+    t.integer "grade_min", default: 1, null: false
+    t.string "name", null: false
+    t.string "template_text", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "variables", default: [], null: false
+    t.index ["category"], name: "index_question_templates_on_category"
+    t.index ["grade_min", "grade_max"], name: "index_question_templates_on_grade_min_and_grade_max"
+  end
+
   create_table "refresh_tokens", force: :cascade do |t|
     t.bigint "authenticatable_id", null: false
     t.string "authenticatable_type", null: false
@@ -819,6 +841,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_100636) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "student_questions", force: :cascade do |t|
+    t.bigint "classroom_exam_id", null: false
+    t.string "correct_answer", null: false
+    t.datetime "created_at", null: false
+    t.bigint "exam_question_id", null: false
+    t.string "generated_text", null: false
+    t.bigint "student_id", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "values", default: {}, null: false
+    t.index ["classroom_exam_id"], name: "index_student_questions_on_classroom_exam_id"
+    t.index ["exam_question_id", "student_id", "classroom_exam_id"], name: "idx_student_questions_unique", unique: true
+    t.index ["exam_question_id"], name: "index_student_questions_on_exam_question_id"
+    t.index ["student_id"], name: "index_student_questions_on_student_id"
+  end
+
   create_table "students", force: :cascade do |t|
     t.string "address_line1"
     t.string "address_line2"
@@ -951,6 +988,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_100636) do
   add_foreign_key "daily_scores", "teachers"
   add_foreign_key "exam_answers", "exam_questions"
   add_foreign_key "exam_answers", "exam_submissions"
+  add_foreign_key "exam_answers", "student_questions"
   add_foreign_key "exam_questions", "exams"
   add_foreign_key "exam_submissions", "classroom_exams"
   add_foreign_key "exam_submissions", "students"
@@ -989,6 +1027,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_100636) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "student_questions", "classroom_exams"
+  add_foreign_key "student_questions", "exam_questions"
+  add_foreign_key "student_questions", "students"
   add_foreign_key "subjects", "schools"
   add_foreign_key "teacher_leave_balances", "academic_years"
   add_foreign_key "teacher_leave_balances", "teachers"
