@@ -10,11 +10,13 @@ module Types
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def messages
-      object.group_messages.chronological
+      # Sort preloaded group_messages in Ruby to avoid re-querying
+      object.group_messages.sort_by(&:created_at)
     end
 
     def last_message
-      object.last_message
+      # Use preloaded group_messages to avoid N+1 query
+      object.group_messages.max_by(&:created_at)
     end
   end
 end

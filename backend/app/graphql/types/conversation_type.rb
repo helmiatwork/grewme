@@ -12,15 +12,20 @@ module Types
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def unread_count
-      object.unread_count_for(context[:current_user])
+      # Use preloaded messages to avoid N+1 COUNT query
+      user = context[:current_user]
+      object.messages.select { |m| m.sender_type != user.class.name || m.sender_id != user.id }
+        .count { |m| m.read_at.nil? }
     end
 
     def messages
-      object.messages.chronological
+      # Sort preloaded messages in Ruby to avoid re-querying
+      object.messages.sort_by(&:created_at)
     end
 
     def last_message
-      object.last_message
+      # Use preloaded messages to avoid N+1 query
+      object.messages.max_by(&:created_at)
     end
   end
 end

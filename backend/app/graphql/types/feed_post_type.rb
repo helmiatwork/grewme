@@ -37,7 +37,9 @@ module Types
 
     def liked_by_me
       return false unless context[:current_user]
-      object.likes.exists?(liker: context[:current_user])
+      user = context[:current_user]
+      # Use preloaded likes to avoid N+1 EXISTS query
+      object.likes.any? { |l| l.liker_type == user.class.name && l.liker_id == user.id }
     end
 
     def comments

@@ -14,7 +14,8 @@ module Types
     end
 
     def students
-      object.students
+      # Use preloaded classroom_students to avoid N+1, filter active in Ruby
+      object.classroom_students.select(&:active?).map(&:student)
     end
   end
 end

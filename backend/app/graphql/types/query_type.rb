@@ -36,7 +36,7 @@ module Types
     def classrooms
       authenticate!
       ClassroomPolicy::Scope.new(current_user, Classroom).resolve
-        .includes(:classroom_teachers, :classroom_students)
+        .includes(:classroom_teachers, classroom_students: { student: :parents })
     end
 
     field :classroom, Types::ClassroomType, null: false, description: "Get a single classroom" do
@@ -228,7 +228,8 @@ module Types
         ids = []
       end
 
-      scope = FeedPost.where(classroom_id: ids).order(created_at: :desc).includes(:teacher, :classroom, :tagged_students)
+      scope = FeedPost.where(classroom_id: ids).order(created_at: :desc)
+        .includes(:teacher, :classroom, :tagged_students, :likes, media_attachments: :blob)
 
       if student_ids.present?
         scope = scope.joins(:feed_post_students).where(feed_post_students: { student_id: student_ids }).distinct
@@ -268,7 +269,7 @@ module Types
 
     def conversation(id:)
       authenticate!
-      conv = Conversation.find(id)
+      conv = Conversation.includes(:student, :parent, :teacher, messages: :sender).find(id)
       raise Pundit::NotAuthorizedError unless ConversationPolicy.new(current_user, conv).show?
       conv
     end
@@ -301,7 +302,7 @@ module Types
 
     def group_conversation(id:)
       authenticate!
-      gc = GroupConversation.find(id)
+      gc = GroupConversation.includes(:classroom, group_messages: :sender).find(id)
 
       authorized = if current_user.teacher?
         gc.classroom.classroom_teachers.exists?(teacher_id: current_user.id)
@@ -422,9 +423,10 @@ module Types
       authenticate!
       school = School.find(school_id)
       raise Pundit::NotAuthorizedError unless SubjectPolicy.new(current_user, Subject.new).index?
-      Rails.cache.fetch("subjects/#{school_id}", expires_in: 1.hour) do
-        school.subjects.to_a
-      end
+      school.subjects
+        .includes(topics: { exams: :classroom_exams })
+        .order("topics.position ASC")
+        .to_a
     end
 
     field :subject, Types::SubjectType, description: "Get a subject with topics and objectives" do
