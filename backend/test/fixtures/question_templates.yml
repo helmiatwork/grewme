@@ -1,0 +1,29 @@
+addition:
+  name: "Addition"
+  category: "arithmetic"
+  grade_min: 1
+  grade_max: 6
+  template_text: "What is {a} + {b}?"
+  variables:
+    - name: "a"
+      min: 1
+      max: 100
+    - name: "b"
+      min: 1
+      max: 100
+  formula: "a + b"
+
+rectangle_area:
+  name: "Rectangle Area"
+  category: "geometry"
+  grade_min: 3
+  grade_max: 9
+  template_text: "Calculate the area of a rectangle with width {width} and height {height}."
+  variables:
+    - name: "width"
+      min: 1
+      max: 50
+    - name: "height"
+      min: 1
+      max: 50
+  formula: "width * height"
