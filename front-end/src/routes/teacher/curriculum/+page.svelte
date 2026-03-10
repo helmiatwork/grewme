@@ -22,23 +22,14 @@
   let filteredSubjects = $derived.by(() => {
     if (!selectedGrade || !data.gradeCurriculum) return data.subjects;
     const gcItems = data.gradeCurriculum.gradeCurriculumItems ?? [];
-    const subjectIds = new Set(gcItems.filter((i: any) => i.subject).map((i: any) => i.subject.id));
-    const topicIds = new Set(gcItems.filter((i: any) => i.topic).map((i: any) => i.topic.id));
-    return data.subjects.filter((s: any) => 
-      subjectIds.has(s.id) || 
-      s.topics?.some((t: any) => topicIds.has(t.id))
-    );
+    // Collect subject IDs from both subject-level and topic-level items (for backward compat)
+    const subjectIds = new Set<string>();
+    for (const item of gcItems) {
+      if (item.subject) subjectIds.add(item.subject.id);
+      if (item.topic?.subject) subjectIds.add(item.topic.subject.id);
+    }
+    return data.subjects.filter((s: any) => subjectIds.has(s.id));
   });
-
-  function gradeTopicCount(subject: any): { filtered: number; total: number } | null {
-    if (!selectedGrade || !data.gradeCurriculum) return null;
-    const gcItems = data.gradeCurriculum.gradeCurriculumItems ?? [];
-    const isWholeSubject = gcItems.some((i: any) => i.subject?.id === subject.id);
-    if (isWholeSubject) return null; // all topics included
-    const topicIds = new Set(gcItems.filter((i: any) => i.topic).map((i: any) => i.topic.id));
-    const filtered = subject.topics?.filter((t: any) => topicIds.has(t.id)).length ?? 0;
-    return { filtered, total: subject.topics?.length ?? 0 };
-  }
 
   function onGradeChange() {
     const params = new URLSearchParams();
@@ -146,25 +137,20 @@
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {#each filteredSubjects as subject}
-        {@const topicCount = subject.topics?.length ?? 0}
-        {@const loCount = countLOs(subject.topics ?? [])}
-        {@const examCount = countExams(subject.topics ?? [])}
-        {@const gradeTopics = gradeTopicCount(subject)}
-        <a href="/teacher/curriculum/{subject.id}{selectedGrade ? `?grade=${selectedGrade}` : ''}">
-          <Card hover>
-            <h3 class="text-lg font-semibold text-text">{subject.name}</h3>
-            {#if subject.description}
-              <p class="text-sm text-text-muted mt-1 line-clamp-2">{subject.description}</p>
-            {/if}
-            <div class="flex flex-wrap gap-2 mt-3">
-              <span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
-                {#if gradeTopics}
-                  {gradeTopics.filtered} of {gradeTopics.total} topics
-                {:else}
-                  {topicCount} topic{topicCount !== 1 ? 's' : ''}
-                {/if}
-              </span>
+       {#each filteredSubjects as subject}
+         {@const topicCount = subject.topics?.length ?? 0}
+         {@const loCount = countLOs(subject.topics ?? [])}
+         {@const examCount = countExams(subject.topics ?? [])}
+         <a href="/teacher/curriculum/{subject.id}{selectedGrade ? `?grade=${selectedGrade}` : ''}">
+           <Card hover>
+             <h3 class="text-lg font-semibold text-text">{subject.name}</h3>
+             {#if subject.description}
+               <p class="text-sm text-text-muted mt-1 line-clamp-2">{subject.description}</p>
+             {/if}
+             <div class="flex flex-wrap gap-2 mt-3">
+               <span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+                 {topicCount} topic{topicCount !== 1 ? 's' : ''}
+               </span>
               <span class="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
                 {loCount} objective{loCount !== 1 ? 's' : ''}
               </span>
