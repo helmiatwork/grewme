@@ -37,13 +37,13 @@ AdminUser.create!(email: "admin@grewme.app", password: "password123", password_c
 SchoolManager.create!(name: "Pat Principal", email: "pat@greenwood.edu", password: "password123", password_confirmation: "password123", school: school)
 
 # 7 Classrooms — Alice gets 4, others get 1 each
-class1a = Classroom.create!(name: "Class 1A", school: school)
-class1b = Classroom.create!(name: "Class 1B", school: school)
-class2a = Classroom.create!(name: "Class 2A", school: school)
-class2b = Classroom.create!(name: "Class 2B", school: school)
-class3a = Classroom.create!(name: "Class 3A", school: school)
-class3b = Classroom.create!(name: "Class 3B", school: school)
-class4a = Classroom.create!(name: "Class 4A", school: school)
+class1a = Classroom.create!(name: "Class 1A", school: school, grade: 1)
+class1b = Classroom.create!(name: "Class 1B", school: school, grade: 1)
+class2a = Classroom.create!(name: "Class 2A", school: school, grade: 2)
+class2b = Classroom.create!(name: "Class 2B", school: school, grade: 2)
+class3a = Classroom.create!(name: "Class 3A", school: school, grade: 3)
+class3b = Classroom.create!(name: "Class 3B", school: school, grade: 3)
+class4a = Classroom.create!(name: "Class 4A", school: school, grade: 4)
 
 # Assign teachers to classrooms
 # Alice: primary in 1A, 3A, 3B, 4A (4 classes)
