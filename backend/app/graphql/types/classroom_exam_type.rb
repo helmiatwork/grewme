@@ -11,5 +11,8 @@ module Types
     field :exam_submissions, [ Types::ExamSubmissionType ], null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :access_code, String
+    field :duration_minutes, Integer
+    field :show_results, Boolean, null: false
   end
 end

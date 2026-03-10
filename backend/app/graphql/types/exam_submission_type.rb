@@ -16,5 +16,8 @@ module Types
     field :rubric_scores, [ Types::RubricScoreType ], null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :auto_submitted, Boolean, null: false
+    field :session_token, String
+    field :time_remaining, Integer, description: "Seconds remaining, null if untimed"
   end
 end
