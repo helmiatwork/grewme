@@ -187,28 +187,45 @@
       </div>
     {/if}
 
-    <!-- Submit Form (Collapsible) -->
+    <!-- Submit Button -->
     <div class="mb-8">
       <button
-        onclick={() => (showForm = !showForm)}
-        class="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-between"
+        onclick={() => (showForm = true)}
+        class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
       >
-        <span>
-          {m.teacher_leave_submit_title?.() ?? 'Submit New Leave Request'}
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 transition-transform {showForm ? 'rotate-180' : ''}"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <span>{m.teacher_leave_submit_title?.() ?? 'Submit New Leave Request'}</span>
       </button>
+    </div>
 
-      {#if showForm}
-        <div class="mt-4 bg-surface rounded-xl shadow-sm border border-slate-100 p-6">
+    <!-- Modal -->
+    {#if showForm}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onkeydown={(e) => { if (e.key === 'Escape') showForm = false; }}
+      >
+        <!-- Backdrop -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="absolute inset-0 bg-black/50" onclick={() => (showForm = false)}></div>
+
+        <!-- Dialog -->
+        <div class="relative w-full max-w-lg bg-surface rounded-xl shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+          <!-- Header -->
+          <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100">
+            <h2 class="text-lg font-semibold text-text">
+              {m.teacher_leave_submit_title?.() ?? 'Submit New Leave Request'}
+            </h2>
+            <button
+              onclick={() => (showForm = false)}
+              class="text-text-muted hover:text-text transition-colors"
+              aria-label="Close"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <!-- Form -->
           <form
             method="POST"
             action="?/create"
@@ -223,7 +240,7 @@
                 }
               };
             }}
-            class="space-y-4"
+            class="p-6 space-y-4"
           >
             <!-- Leave Type -->
             <div>
@@ -329,7 +346,7 @@
                 bind:value={reason}
                 placeholder={m.teacher_leave_reason_placeholder?.() ?? 'Provide a reason for your leave request...'}
                 required
-                rows="4"
+                rows="3"
                 class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background text-text resize-none"
               ></textarea>
             </div>
@@ -363,8 +380,8 @@
             </div>
           </form>
         </div>
-      {/if}
-    </div>
+      </div>
+    {/if}
 
     <!-- Filter Tabs -->
     <div class="mb-6 flex gap-2 flex-wrap">
