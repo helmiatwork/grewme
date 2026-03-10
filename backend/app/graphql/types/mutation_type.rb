@@ -90,6 +90,11 @@ module Types
     field :submit_exam_answers, mutation: Mutations::SubmitExamAnswers
     field :grade_exam_submission, mutation: Mutations::GradeExamSubmission
 
+    # Kahoot Exam Access (unauthenticated)
+    field :start_exam, mutation: Mutations::StartExam
+    field :save_exam_progress, mutation: Mutations::SaveExamProgress
+    field :submit_exam_session, mutation: Mutations::SubmitExamSession
+
     # Health Checkups
     field :create_health_checkup, mutation: Mutations::CreateHealthCheckup
 
