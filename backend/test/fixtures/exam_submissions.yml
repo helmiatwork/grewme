@@ -4,5 +4,7 @@ emma_fractions_quiz:
   status: 2
   score: 85.00
   passed: true
+  started_at: <%= Time.zone.parse("2026-03-10 09:00:00") %>
   submitted_at: <%= Time.zone.parse("2026-03-10 09:45:00") %>
   graded_at: <%= Time.zone.parse("2026-03-10 10:00:00") %>
+  session_token: emma-test-session-token-abc

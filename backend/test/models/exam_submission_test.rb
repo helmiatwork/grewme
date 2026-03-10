@@ -76,4 +76,46 @@ class ExamSubmissionTest < ActiveSupport::TestCase
     sub.passed = nil
     assert_not sub.passed?
   end
+
+  test "generates session_token before create" do
+    submission = ExamSubmission.create!(
+      student: students(:student_finn),
+      classroom_exam: classroom_exams(:alice_mc_exam),
+      status: :in_progress,
+      started_at: Time.current
+    )
+    assert_not_nil submission.session_token
+  end
+
+  test "session_token is unique" do
+    existing = exam_submissions(:emma_fractions_quiz)
+    new_sub = ExamSubmission.new(
+      student: students(:student_finn),
+      classroom_exam: classroom_exams(:alice_mc_exam),
+      session_token: existing.session_token
+    )
+    assert_not new_sub.valid?
+  end
+
+  test "time_remaining returns seconds left" do
+    sub = exam_submissions(:emma_fractions_quiz)
+    sub.started_at = 10.minutes.ago
+    sub.classroom_exam.duration_minutes = 30
+    remaining = sub.time_remaining
+    assert_in_delta 1200, remaining, 2
+  end
+
+  test "time_remaining returns nil when no duration set" do
+    sub = exam_submissions(:emma_fractions_quiz)
+    sub.started_at = 10.minutes.ago
+    sub.classroom_exam.duration_minutes = nil
+    assert_nil sub.time_remaining
+  end
+
+  test "time_expired? returns true when time is up" do
+    sub = exam_submissions(:emma_fractions_quiz)
+    sub.started_at = 35.minutes.ago
+    sub.classroom_exam.duration_minutes = 30
+    assert sub.time_expired?
+  end
 end
