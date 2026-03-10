@@ -8,6 +8,18 @@
   let submitting = $state(false);
   let examType = $state('SCORE_BASED');
 
+  // Local mirror of the QuestionTemplate shape (avoids PageData generation lag)
+  interface QTemplate {
+    id: string;
+    name: string;
+    category: string;
+    gradeMin: number;
+    gradeMax: number;
+    templateText: string;
+    variables: Array<{ name: string; min: number; max: number }>;
+    formula: string;
+  }
+
   // Questions for SCORE_BASED / MULTIPLE_CHOICE
   interface Question {
     questionText: string;
@@ -16,6 +28,12 @@
     correctAnswer: string;
     points: number;
     position: number;
+    parameterized: boolean;
+    templateText: string;
+    variables: Array<{ name: string; min: number; max: number }>;
+    formula: string;
+    valueMode: string;
+    fixedValues: Record<string, number>;
   }
 
   let questions = $state<Question[]>([]);
@@ -29,7 +47,13 @@
         options: examType === 'MULTIPLE_CHOICE' ? ['', ''] : [],
         correctAnswer: '',
         points: 1,
-        position: questions.length + 1
+        position: questions.length + 1,
+        parameterized: false,
+        templateText: '',
+        variables: [],
+        formula: '',
+        valueMode: 'shuffled',
+        fixedValues: {}
       }
     ];
   }
@@ -58,7 +82,105 @@
     );
   }
 
-  // Rubric criteria for RUBRIC
+  // ── Parameterized helpers ──────────────────────────────────────────────────
+
+  // Use type cast because PageData may not have regenerated yet after server changes
+  const templates: QTemplate[] = $derived(
+    ((data as Record<string, unknown>).questionTemplates as QTemplate[] | undefined) ?? []
+  );
+
+  /** Templates grouped by category for the select optgroup */
+  const templatesByCategory = $derived(
+    templates.reduce<Record<string, QTemplate[]>>((acc, t) => {
+      if (!acc[t.category]) acc[t.category] = [];
+      acc[t.category].push(t);
+      return acc;
+    }, {})
+  );
+
+  function toggleParameterized(qi: number, on: boolean) {
+    questions = questions.map((q, idx) =>
+      idx === qi ? { ...q, parameterized: on } : q
+    );
+  }
+
+  function selectTemplate(qi: number, templateId: string) {
+    if (templateId === 'custom') return;
+    const tmpl = templates.find((t) => t.id === templateId);
+    if (!tmpl) return;
+    questions = questions.map((q, idx) =>
+      idx === qi
+        ? {
+            ...q,
+            templateText: tmpl.templateText,
+            variables: tmpl.variables.map((v) => ({ ...v })),
+            formula: tmpl.formula
+          }
+        : q
+    );
+  }
+
+  function addVariable(qi: number) {
+    questions = questions.map((q, idx) =>
+      idx === qi
+        ? { ...q, variables: [...q.variables, { name: '', min: 1, max: 10 }] }
+        : q
+    );
+  }
+
+  function removeVariable(qi: number, vi: number) {
+    questions = questions.map((q, idx) =>
+      idx === qi
+        ? { ...q, variables: q.variables.filter((_, i) => i !== vi) }
+        : q
+    );
+  }
+
+  function updateVariable(
+    qi: number,
+    vi: number,
+    field: 'name' | 'min' | 'max',
+    val: string
+  ) {
+    questions = questions.map((q, idx) => {
+      if (idx !== qi) return q;
+      const vars = q.variables.map((v, i) => {
+        if (i !== vi) return v;
+        if (field === 'name') return { ...v, name: val };
+        return { ...v, [field]: parseFloat(val) || 0 };
+      });
+      return { ...q, variables: vars };
+    });
+  }
+
+  function updateFixedValue(qi: number, varName: string, val: string) {
+    questions = questions.map((q, idx) =>
+      idx === qi
+        ? { ...q, fixedValues: { ...q.fixedValues, [varName]: parseFloat(val) || 0 } }
+        : q
+    );
+  }
+
+  /** Render template text replacing {varName} with sample values */
+  function renderPreview(question: Question): string {
+    if (!question.templateText) return 'No template text set yet.';
+    let text = question.templateText;
+    for (const v of question.variables) {
+      if (v.name) {
+        const sampleVal =
+          question.valueMode === 'fixed'
+            ? (question.fixedValues[v.name] ?? v.min)
+            : v.min;
+        text = text.replaceAll(`{${v.name}}`, String(sampleVal));
+      }
+    }
+    return text;
+  }
+
+  const templateTextPlaceholder = 'e.g. What is {a} + {b}?';
+
+  // ── Rubric criteria ────────────────────────────────────────────────────────
+
   interface Criterion {
     name: string;
     description: string;
@@ -212,6 +334,7 @@
         {/if}
         {#each questions as question, qi}
           <div class="border border-slate-100 rounded-lg p-4 mb-4 space-y-3">
+            <!-- Question header -->
             <div class="flex items-start justify-between gap-2">
               <span class="text-sm font-medium text-text">Question {qi + 1}</span>
               <button
@@ -220,59 +343,239 @@
                 class="text-xs text-red-500 hover:text-red-700"
               >{m.exam_remove()}</button>
             </div>
-            <div>
-              <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_question_text_label()}</label>
-              <textarea
-                rows="2"
-                value={question.questionText}
-                oninput={(e) => { questions[qi].questionText = (e.target as HTMLTextAreaElement).value; }}
-                placeholder={m.exam_question_text_placeholder()}
-                class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
-              ></textarea>
-            </div>
-            {#if examType === 'MULTIPLE_CHOICE'}
+
+            <!-- Parameterized toggle -->
+            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={question.parameterized}
+                onchange={(e) => toggleParameterized(qi, (e.target as HTMLInputElement).checked)}
+                class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/30"
+              />
+              <span class="text-xs font-medium text-text-muted">Parameterized question</span>
+              <span class="text-xs text-text-muted/60 italic">(generates unique values per student)</span>
+            </label>
+
+            {#if !question.parameterized}
+              <!-- ── Normal question UI ─────────────────────────────────── -->
               <div>
-                <label class="block text-xs font-medium text-text-muted mb-2">{m.exam_options_label()}</label>
-                {#each question.options as opt, oi}
-                  <div class="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={opt}
-                      oninput={(e) => updateOption(qi, oi, (e.target as HTMLInputElement).value)}
-                      placeholder="Option {String.fromCharCode(65 + oi)}"
-                      class="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    />
-                    {#if question.options.length > 2}
-                      <button
-                        type="button"
-                        onclick={() => removeOption(qi, oi)}
-                        class="text-xs text-red-500 hover:text-red-700 px-2"
-                      >✕</button>
-                    {/if}
-                  </div>
-                {/each}
-                <button
-                  type="button"
-                  onclick={() => addOption(qi)}
-                  class="text-xs text-primary hover:underline"
-                >{m.exam_add_option()}</button>
+                <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_question_text_label()}</label>
+                <textarea
+                  rows="2"
+                  value={question.questionText}
+                  oninput={(e) => { questions[qi].questionText = (e.target as HTMLTextAreaElement).value; }}
+                  placeholder={m.exam_question_text_placeholder()}
+                  class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                ></textarea>
               </div>
+              {#if examType === 'MULTIPLE_CHOICE'}
+                <div>
+                  <label class="block text-xs font-medium text-text-muted mb-2">{m.exam_options_label()}</label>
+                  {#each question.options as opt, oi}
+                    <div class="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={opt}
+                        oninput={(e) => updateOption(qi, oi, (e.target as HTMLInputElement).value)}
+                        placeholder="Option {String.fromCharCode(65 + oi)}"
+                        class="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                      {#if question.options.length > 2}
+                        <button
+                          type="button"
+                          onclick={() => removeOption(qi, oi)}
+                          class="text-xs text-red-500 hover:text-red-700 px-2"
+                        >✕</button>
+                      {/if}
+                    </div>
+                  {/each}
+                  <button
+                    type="button"
+                    onclick={() => addOption(qi)}
+                    class="text-xs text-primary hover:underline"
+                  >{m.exam_add_option()}</button>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_correct_answer()}</label>
+                  <select
+                    value={question.correctAnswer}
+                    onchange={(e) => { questions[qi].correctAnswer = (e.target as HTMLSelectElement).value; }}
+                    class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">{m.exam_select_correct()}</option>
+                    {#each question.options as opt, oi}
+                      {#if opt}
+                        <option value={opt}>{String.fromCharCode(65 + oi)}. {opt}</option>
+                      {/if}
+                    {/each}
+                  </select>
+                </div>
+              {/if}
+
+            {:else}
+              <!-- ── Parameterized question UI ──────────────────────────── -->
+
+              <!-- Template picker -->
               <div>
-                <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_correct_answer()}</label>
+                <label class="block text-xs font-medium text-text-muted mb-1">Template</label>
                 <select
-                  value={question.correctAnswer}
-                  onchange={(e) => { questions[qi].correctAnswer = (e.target as HTMLSelectElement).value; }}
+                  onchange={(e) => selectTemplate(qi, (e.target as HTMLSelectElement).value)}
                   class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="">{m.exam_select_correct()}</option>
-                  {#each question.options as opt, oi}
-                    {#if opt}
-                      <option value={opt}>{String.fromCharCode(65 + oi)}. {opt}</option>
-                    {/if}
+                  <option value="custom">— Custom template —</option>
+                  {#each Object.entries(templatesByCategory) as [category, catTemplates]}
+                    <optgroup label={category}>
+                      {#each catTemplates as tmpl}
+                        <option value={tmpl.id}>{tmpl.name}</option>
+                      {/each}
+                    </optgroup>
                   {/each}
                 </select>
               </div>
+
+              <!-- Template text -->
+              <div>
+                <label class="block text-xs font-medium text-text-muted mb-1">
+                  Template text
+                  <span class="font-normal text-text-muted/60 ml-1">— use {'{varName}'} syntax for variables</span>
+                </label>
+                <textarea
+                  rows="2"
+                  value={question.templateText}
+                  oninput={(e) => { questions[qi].templateText = (e.target as HTMLTextAreaElement).value; }}
+                  placeholder={templateTextPlaceholder}
+                  class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none font-mono"
+                ></textarea>
+              </div>
+
+              <!-- Variable range editors -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-xs font-medium text-text-muted">Variables</label>
+                  <button
+                    type="button"
+                    onclick={() => addVariable(qi)}
+                    class="text-xs text-primary hover:underline"
+                  >+ Add variable</button>
+                </div>
+                {#if question.variables.length === 0}
+                  <p class="text-xs text-text-muted/60 italic">No variables yet. Add one or select a template above.</p>
+                {/if}
+                {#each question.variables as v, vi}
+                  <div class="flex items-center gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={v.name}
+                      oninput={(e) => updateVariable(qi, vi, 'name', (e.target as HTMLInputElement).value)}
+                      placeholder="name"
+                      class="w-20 text-sm border border-slate-200 rounded-lg px-2 py-1.5 font-mono focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    <span class="text-xs text-text-muted">min</span>
+                    <input
+                      type="number"
+                      value={v.min}
+                      oninput={(e) => updateVariable(qi, vi, 'min', (e.target as HTMLInputElement).value)}
+                      class="w-20 text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    <span class="text-xs text-text-muted">max</span>
+                    <input
+                      type="number"
+                      value={v.max}
+                      oninput={(e) => updateVariable(qi, vi, 'max', (e.target as HTMLInputElement).value)}
+                      class="w-20 text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    <button
+                      type="button"
+                      onclick={() => removeVariable(qi, vi)}
+                      class="text-xs text-red-400 hover:text-red-600 px-1"
+                    >✕</button>
+                  </div>
+                {/each}
+              </div>
+
+              <!-- Formula -->
+              <div>
+                <label class="block text-xs font-medium text-text-muted mb-1">
+                  Formula
+                  <span class="font-normal text-text-muted/60 ml-1">— expression to compute the correct answer</span>
+                </label>
+                <input
+                  type="text"
+                  value={question.formula}
+                  oninput={(e) => { questions[qi].formula = (e.target as HTMLInputElement).value; }}
+                  placeholder="e.g. a + b"
+                  class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <!-- Value mode -->
+              <div>
+                <label class="block text-xs font-medium text-text-muted mb-1">Value mode</label>
+                <div class="flex gap-4">
+                  <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs text-text">
+                    <input
+                      type="radio"
+                      name={"valueMode_" + qi}
+                      value="shuffled"
+                      checked={question.valueMode === 'shuffled'}
+                      onchange={() => { questions[qi].valueMode = 'shuffled'; }}
+                      class="text-primary focus:ring-primary/30"
+                    />
+                    Unique per student
+                  </label>
+                  <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs text-text">
+                    <input
+                      type="radio"
+                      name={"valueMode_" + qi}
+                      value="fixed"
+                      checked={question.valueMode === 'fixed'}
+                      onchange={() => { questions[qi].valueMode = 'fixed'; }}
+                      class="text-primary focus:ring-primary/30"
+                    />
+                    Same for all students
+                  </label>
+                </div>
+              </div>
+
+              <!-- Fixed values (only when mode = fixed) -->
+              {#if question.valueMode === 'fixed' && question.variables.length > 0}
+                <div class="bg-slate-50 rounded-lg p-3 space-y-2">
+                  <p class="text-xs font-medium text-text-muted">Fixed values</p>
+                  {#each question.variables as v}
+                    {#if v.name}
+                      <div class="flex items-center gap-3">
+                        <span class="text-xs font-mono text-text w-20">{v.name}</span>
+                        <input
+                          type="number"
+                          value={question.fixedValues[v.name] ?? v.min}
+                          oninput={(e) => updateFixedValue(qi, v.name, (e.target as HTMLInputElement).value)}
+                          min={v.min}
+                          max={v.max}
+                          class="w-24 text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                        />
+                        <span class="text-xs text-text-muted/60">{v.min}–{v.max}</span>
+                      </div>
+                    {/if}
+                  {/each}
+                </div>
+              {/if}
+
+              <!-- Live preview -->
+              {#if question.templateText}
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-3">
+                  <p class="text-xs font-medium text-blue-600 mb-1">Preview</p>
+                  <p class="text-sm text-blue-900">{renderPreview(question)}</p>
+                  {#if question.formula}
+                    <p class="text-xs text-blue-500 mt-1.5">
+                      Answer formula: <code class="font-mono">{question.formula}</code>
+                    </p>
+                  {/if}
+                </div>
+              {/if}
+
             {/if}
+
+            <!-- Points (always shown) -->
             <div>
               <label class="block text-xs font-medium text-text-muted mb-1">{m.exam_points_label()}</label>
               <input

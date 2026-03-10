@@ -285,6 +285,39 @@ export interface ExamQuestion {
   correctAnswer: string | null;
   points: number;
   position: number;
+  parameterized: boolean;
+  templateText: string | null;
+  variables: VariableDefinition[] | null;
+  formula: string | null;
+  valueMode: string | null;
+  fixedValues: Record<string, number> | null;
+  studentQuestions: StudentQuestion[];
+}
+
+export interface VariableDefinition {
+  name: string;
+  min: number;
+  max: number;
+}
+
+export interface StudentQuestion {
+  id: string;
+  examQuestionId: string;
+  studentId: string;
+  values: Record<string, number>;
+  generatedText: string;
+  correctAnswer: string;
+}
+
+export interface QuestionTemplate {
+  id: string;
+  name: string;
+  category: string;
+  gradeMin: number;
+  gradeMax: number;
+  templateText: string;
+  variables: VariableDefinition[];
+  formula: string;
 }
 
 export interface RubricCriteria {

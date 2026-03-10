@@ -236,6 +236,36 @@ export const STUDENT_MASTERIES_QUERY = `
   }
 `;
 
+// === Question Templates ===
+
+export const QUESTION_TEMPLATES_QUERY = `
+  query QuestionTemplates($category: String, $grade: Int) {
+    questionTemplates(category: $category, grade: $grade) {
+      id
+      name
+      category
+      gradeMin
+      gradeMax
+      templateText
+      variables
+      formula
+    }
+  }
+`;
+
+export const STUDENT_QUESTIONS_QUERY = `
+  query StudentQuestions($classroomExamId: ID!, $studentId: ID) {
+    studentQuestions(classroomExamId: $classroomExamId, studentId: $studentId) {
+      id
+      examQuestionId
+      studentId
+      values
+      generatedText
+      correctAnswer
+    }
+  }
+`;
+
 // === Curriculum Mutations ===
 
 export const CREATE_SUBJECT_MUTATION = `

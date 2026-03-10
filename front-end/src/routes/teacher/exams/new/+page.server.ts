@@ -3,8 +3,8 @@ import { redirect, fail } from '@sveltejs/kit';
 import { graphql, GraphQLError } from '$lib/api/client';
 import { clearAuthCookies } from '$lib/api/auth';
 import { CLASSROOMS_QUERY } from '$lib/api/queries/classrooms';
-import { CREATE_EXAM_MUTATION } from '$lib/api/queries/curriculum';
-import type { Classroom } from '$lib/api/types';
+import { CREATE_EXAM_MUTATION, QUESTION_TEMPLATES_QUERY } from '$lib/api/queries/curriculum';
+import type { Classroom, QuestionTemplate } from '$lib/api/types';
 
 const SUBJECTS_WITH_TOPICS_QUERY = `
   query SubjectsWithTopics($schoolId: ID!) {
@@ -39,19 +39,19 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
     const schoolId = classrooms[0]?.school?.id;
 
     if (!schoolId) {
-      return { subjects: [], classrooms, schoolId: null };
+      return { subjects: [], classrooms, schoolId: null, questionTemplates: [] };
     }
 
-    const subjectsData = await graphql<{ subjects: SubjectWithTopics[] }>(
-      SUBJECTS_WITH_TOPICS_QUERY,
-      { schoolId },
-      token
-    );
+    const [subjectsData, templatesData] = await Promise.all([
+      graphql<{ subjects: SubjectWithTopics[] }>(SUBJECTS_WITH_TOPICS_QUERY, { schoolId }, token),
+      graphql<{ questionTemplates: QuestionTemplate[] }>(QUESTION_TEMPLATES_QUERY, {}, token)
+    ]);
 
     return {
       subjects: subjectsData.subjects,
       classrooms,
-      schoolId
+      schoolId,
+      questionTemplates: templatesData.questionTemplates
     };
   } catch (err) {
     if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
@@ -78,6 +78,8 @@ export const actions: Actions = {
     if (!topicId) return fail(400, { error: 'Topic is required' });
 
     // Parse questions (MULTIPLE_CHOICE / SCORE_BASED)
+    // Parameterized fields (parameterized, templateText, variables, formula, valueMode, fixedValues)
+    // are included in each question object and handled by the GraphQL input type.
     const questionsRaw = formData.get('questions') as string | null;
     let questions: Array<{
       questionText: string;
@@ -86,6 +88,12 @@ export const actions: Actions = {
       correctAnswer?: string;
       points: number;
       position: number;
+      parameterized?: boolean;
+      templateText?: string;
+      variables?: Array<{ name: string; min: number; max: number }>;
+      formula?: string;
+      valueMode?: string;
+      fixedValues?: Record<string, number>;
     }> | undefined;
 
     if (questionsRaw) {
