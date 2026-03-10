@@ -738,6 +738,30 @@ module Types
       end
     end
 
+    # ── School Onboarding ─────────────────────────────────────────────────────────
+
+    field :school_onboarding_status, GraphQL::Types::JSON, null: false,
+      description: "Onboarding status for the school (school_manager only)"
+
+    def school_onboarding_status
+      authenticate!
+      unless current_user.school_manager?
+        raise GraphQL::ExecutionError, "Only school managers can view onboarding status"
+      end
+
+      school = current_user.school
+      {
+        profileComplete: school.phone.present? || school.email.present?,
+        academicYearComplete: school.academic_years.any?,
+        subjectsComplete: school.subjects.any?,
+        classroomsComplete: school.classrooms.any?,
+        teachersInvited: school.invitations.any?,
+        leaveSettingsConfigured: school.max_annual_leave_days != 12 || school.max_sick_leave_days != 14,
+        onboardingCompletedAt: school.onboarding_completed_at,
+        onboardingStep: school.onboarding_step
+      }
+    end
+
     # ── Leave Requests ──────────────────────────────────────────────────────────
 
     field :leave_requests, [ Types::LeaveRequestType ], null: false,
