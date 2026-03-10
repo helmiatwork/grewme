@@ -906,6 +906,31 @@ module Types
       scope
     end
 
+    # --- Kahoot Exam Access (unauthenticated) ---
+
+    field :exam_by_access_code, Types::ClassroomExamType, null: true do
+      description "Find an active exam by its access code (no auth required)"
+      argument :code, String, required: true
+    end
+
+    def exam_by_access_code(code:)
+      ClassroomExam
+        .where(status: :active)
+        .includes(exam: { exam_questions: :student_questions }, classroom: { classroom_students: :student })
+        .find_by(access_code: code.upcase.strip)
+    end
+
+    field :exam_session, Types::ExamSubmissionType, null: true do
+      description "Get an in-progress exam session by token (no auth required, for rejoin)"
+      argument :session_token, String, required: true
+    end
+
+    def exam_session(session_token:)
+      ExamSubmission.in_progress
+        .includes(:exam_answers, classroom_exam: { exam: :exam_questions })
+        .find_by(session_token: session_token)
+    end
+
     private
 
     def deep_ostruct(data)
