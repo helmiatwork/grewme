@@ -6,6 +6,7 @@ alice_fractions_quiz:
   status: 0
   scheduled_at: <%= Time.zone.parse("2026-03-10 09:00:00") %>
   due_at: <%= Time.zone.parse("2026-03-10 10:00:00") %>
+  access_code: FRKQ2M
 
 alice_mc_exam:
   exam: fractions_mc_exam
@@ -13,3 +14,4 @@ alice_mc_exam:
   assigned_by_type: Teacher
   assigned_by_id: <%= ActiveRecord::FixtureSet.identify(:teacher_alice) %>
   status: 0
+  access_code: MCX7BN

@@ -62,4 +62,39 @@ class ClassroomExamTest < ActiveSupport::TestCase
 
     assert_not_includes ClassroomExam.active_exams, ce
   end
+
+  test "auto-generates access_code before create" do
+    exam = ClassroomExam.create!(
+      exam: exams(:fractions_mc_exam),
+      classroom: classrooms(:bob_class),
+      assigned_by: teachers(:teacher_bob)
+    )
+    assert_not_nil exam.access_code
+    assert_equal 6, exam.access_code.length
+  end
+
+  test "access_code is unique" do
+    existing = classroom_exams(:alice_mc_exam)
+    new_exam = ClassroomExam.new(
+      exam: exams(:poetry_rubric_exam),
+      classroom: classrooms(:bob_class),
+      assigned_by: teachers(:teacher_bob),
+      access_code: existing.access_code
+    )
+    assert_not new_exam.valid?
+  end
+
+  test "duration_minutes must be positive if set" do
+    exam = classroom_exams(:alice_mc_exam)
+    exam.duration_minutes = 0
+    assert_not exam.valid?
+    exam.duration_minutes = 30
+    assert exam.valid?
+  end
+
+  test "duration_minutes is optional" do
+    exam = classroom_exams(:alice_mc_exam)
+    exam.duration_minutes = nil
+    assert exam.valid?
+  end
 end
