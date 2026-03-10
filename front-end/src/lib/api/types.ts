@@ -428,3 +428,36 @@ export interface SessionUser {
   name: string;
   email: string;
 }
+
+// === Kahoot-style exam access ===
+export interface ExamAccessInfo {
+  id: string;
+  accessCode: string;
+  durationMinutes: number | null;
+  showResults: boolean;
+  exam: {
+    id: string;
+    title: string;
+    examType: string;
+    examQuestions: {
+      id: string;
+      questionText: string;
+      answerOptions: string[] | null;
+      points: number;
+    }[];
+  };
+  classroom: {
+    id: string;
+    name: string;
+    students: { id: string; firstName: string; lastName: string }[];
+  };
+}
+
+export interface ExamSessionInfo {
+  id: string;
+  status: string;
+  startedAt: string | null;
+  timeRemaining: number | null;
+  sessionToken: string;
+  examAnswers: { examQuestion: { id: string }; selectedAnswer: string | null }[];
+}
