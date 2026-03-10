@@ -449,6 +449,40 @@ module Types
       topic
     end
 
+    # === Question Templates ===
+
+    field :question_templates, [ Types::QuestionTemplateType ], null: false,
+      description: "List available question templates" do
+      argument :category, String, required: false
+      argument :grade, Integer, required: false
+    end
+
+    def question_templates(category: nil, grade: nil)
+      authenticate!
+      scope = QuestionTemplate.all
+      scope = scope.by_category(category) if category
+      scope = scope.for_grade(grade) if grade
+      scope.order(:category, :name)
+    end
+
+    field :student_questions, [ Types::StudentQuestionType ], null: false,
+      description: "Get student-specific questions for a classroom exam" do
+      argument :classroom_exam_id, ID, required: true
+      argument :student_id, ID, required: false
+    end
+
+    def student_questions(classroom_exam_id:, student_id: nil)
+      authenticate!
+      scope = StudentQuestion.where(classroom_exam_id: classroom_exam_id)
+      if student_id
+        scope = scope.where(student_id: student_id)
+      elsif current_user.respond_to?(:id)
+        # For students taking the exam, default to their own questions
+        scope = scope.where(student_id: current_user.id)
+      end
+      scope.includes(:exam_question)
+    end
+
     # === Exams ===
 
     field :exam, Types::ExamObjectType, description: "Get an exam with questions/criteria" do

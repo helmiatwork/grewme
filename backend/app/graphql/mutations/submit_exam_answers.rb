@@ -28,11 +28,26 @@ module Mutations
 
           input.answers.each do |answer_input|
             question = exam.exam_questions.find(answer_input.exam_question_id)
-            correct = question.correct_answer == answer_input.selected_answer
+
+            # For parameterized questions, check against student-specific answer
+            student_question = nil
+            if question.parameterized?
+              student_question = StudentQuestion.find_by(
+                exam_question: question,
+                student_id: context[:current_user].id,
+                classroom_exam: classroom_exam
+              )
+              correct_answer = student_question&.correct_answer
+            else
+              correct_answer = question.correct_answer
+            end
+
+            correct = correct_answer == answer_input.selected_answer
             points = correct ? question.points : 0
 
             submission.exam_answers.create!(
               exam_question: question,
+              student_question: student_question,
               selected_answer: answer_input.selected_answer,
               correct: correct,
               points_awarded: points

@@ -16,6 +16,8 @@ module Mutations
       classroom_exam.status = :active
 
       if classroom_exam.save
+        # Generate student-specific questions for parameterized questions
+        QuestionGenerator.generate_for_classroom_exam!(classroom_exam)
         { classroom_exam: classroom_exam, errors: [] }
       else
         { classroom_exam: nil, errors: classroom_exam.errors.map { |e| { message: e.full_message, path: [ e.attribute.to_s.camelize(:lower) ] } } }
