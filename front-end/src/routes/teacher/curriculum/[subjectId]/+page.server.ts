@@ -8,17 +8,62 @@ import {
   DELETE_SUBJECT_MUTATION,
   CREATE_TOPIC_MUTATION
 } from '$lib/api/queries/curriculum';
-import type { Subject, Topic } from '$lib/api/types';
+import { ACADEMIC_YEARS_QUERY, GRADE_CURRICULUM_QUERY } from '$lib/api/queries/yearly-curriculum';
+import type { Subject, Topic, AcademicYear, GradeCurriculum } from '$lib/api/types';
 
-export const load: PageServerLoad = async ({ locals, cookies, params }) => {
+export const load: PageServerLoad = async ({ locals, cookies, params, url }) => {
   try {
-    const data = await graphql<{ subject: Subject }>(
+    const gradeParam = url.searchParams.get('grade');
+    const selectedGrade = gradeParam ? Number(gradeParam) : null;
+
+    const subjectData = await graphql<{ subject: Subject }>(
       SUBJECT_QUERY,
       { id: params.subjectId },
       locals.accessToken!
     );
 
-    return { subject: data.subject };
+    let gradeCurriculum: GradeCurriculum | null = null;
+
+    if (selectedGrade) {
+      // Inline query to get classrooms with school ID
+      const CLASSROOMS_WITH_SCHOOL_QUERY = `
+        query {
+          classrooms {
+            id
+            grade
+            school { id }
+          }
+        }
+      `;
+
+      // Need school ID to fetch academic years
+      const classroomsData = await graphql<{ classrooms: Array<{ id: string; grade?: number; school: { id: string } }> }>(
+        CLASSROOMS_WITH_SCHOOL_QUERY,
+        {},
+        locals.accessToken!
+      );
+      const schoolId = classroomsData.classrooms[0]?.school?.id;
+
+      if (schoolId) {
+        const yearsData = await graphql<{ academicYears: AcademicYear[] }>(
+          ACADEMIC_YEARS_QUERY,
+          { schoolId },
+          locals.accessToken!
+        );
+        const currentYear = yearsData.academicYears.find(y => y.current) ?? yearsData.academicYears[0];
+
+        if (currentYear) {
+          const gcData = await graphql<{ gradeCurriculum: GradeCurriculum | null }>(
+            GRADE_CURRICULUM_QUERY,
+            { academicYearId: currentYear.id, grade: selectedGrade },
+            locals.accessToken!
+          );
+          gradeCurriculum = gcData.gradeCurriculum;
+        }
+      }
+    }
+
+    return { subject: subjectData.subject, selectedGrade, gradeCurriculum };
   } catch (err) {
     if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
       clearAuthCookies(cookies);

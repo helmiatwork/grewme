@@ -352,7 +352,7 @@
   });
 </script>
 
-<div class="flex h-[calc(100vh-64px)] bg-background overflow-hidden">
+<div class="flex h-full -m-6 bg-background overflow-hidden">
   <!-- ── Left Sidebar ───────────────────────────────────────────────────── -->
   <aside class="w-80 flex-shrink-0 flex flex-col bg-white border-r border-gray-200">
     <!-- Header -->

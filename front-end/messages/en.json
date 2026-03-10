@@ -425,6 +425,10 @@
   "curriculum_exams_section": "Exams",
   "curriculum_no_topic_exams": "No exams linked to this topic yet.",
   "curriculum_saving": "Saving...",
+  "curriculum_filter_by_grade": "Filter by Grade",
+  "curriculum_all_subjects": "All Subjects",
+  "curriculum_no_grade_subjects": "No subjects for this grade",
+  "curriculum_no_grade_subjects_hint": "Use the Yearly Curriculum page to assign subjects to this grade.",
 
   "yearly_title": "Yearly Curriculum",
   "yearly_subtitle": "Build the curriculum for your grade levels.",

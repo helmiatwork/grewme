@@ -425,6 +425,10 @@
   "curriculum_exams_section": "Ujian",
   "curriculum_no_topic_exams": "Belum ada ujian yang terhubung dengan topik ini.",
   "curriculum_saving": "Menyimpan...",
+  "curriculum_filter_by_grade": "Filter berdasarkan Kelas",
+  "curriculum_all_subjects": "Semua Mata Pelajaran",
+  "curriculum_no_grade_subjects": "Belum ada mata pelajaran untuk kelas ini",
+  "curriculum_no_grade_subjects_hint": "Gunakan halaman Kurikulum Tahunan untuk menambahkan mata pelajaran ke kelas ini.",
 
   "yearly_title": "Kurikulum Tahunan",
   "yearly_subtitle": "Susun kurikulum untuk tingkat kelas Anda.",

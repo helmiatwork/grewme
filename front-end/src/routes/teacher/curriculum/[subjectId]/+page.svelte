@@ -3,6 +3,7 @@
   import { invalidateAll } from '$app/navigation';
   import { Card, Button, Input, Alert } from '$lib/components/ui';
   import * as m from '$lib/paraglide/messages.js';
+  import { gradeDisplayName } from '$lib/utils/grade';
 
   let { data, form } = $props();
 
@@ -10,6 +11,20 @@
   let showTopicForm = $state(false);
   let submitting = $state(false);
   let topicSubmitting = $state(false);
+
+  let filteredTopics = $derived.by(() => {
+    const topics = data.subject.topics ?? [];
+    if (!data.selectedGrade || !data.gradeCurriculum) return topics;
+
+    const gcItems = data.gradeCurriculum.gradeCurriculumItems ?? [];
+    // If the whole subject is in the grade curriculum, show all topics
+    const isWholeSubject = gcItems.some((i: any) => i.subject?.id === data.subject.id);
+    if (isWholeSubject) return topics;
+
+    // Otherwise filter to only topics in the grade curriculum
+    const topicIds = new Set(gcItems.filter((i: any) => i.topic).map((i: any) => i.topic.id));
+    return topics.filter((t: any) => topicIds.has(t.id));
+  });
 
   $effect(() => {
     if (form?.updateSuccess) {
@@ -37,7 +52,11 @@
 <div>
   <!-- Breadcrumb -->
   <nav class="text-sm text-text-muted mb-4">
-    <a href="/teacher/curriculum" class="hover:text-text">Curriculum</a>
+    <a href="/teacher/curriculum{data.selectedGrade ? `?grade=${data.selectedGrade}` : ''}" class="hover:text-text">Curriculum</a>
+    {#if data.selectedGrade}
+      <span class="mx-2">/</span>
+      <a href="/teacher/curriculum?grade={data.selectedGrade}" class="hover:text-text">{gradeDisplayName(data.selectedGrade)}</a>
+    {/if}
     <span class="mx-2">/</span>
     <span class="text-text">{data.subject.name}</span>
   </nav>
@@ -79,7 +98,14 @@
   {:else}
     <div class="flex items-start justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-text">{data.subject.name}</h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-text">{data.subject.name}</h1>
+          {#if data.selectedGrade}
+            <span class="inline-block text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              {gradeDisplayName(data.selectedGrade)}
+            </span>
+          {/if}
+        </div>
         {#if data.subject.description}
           <p class="text-text-muted mt-1">{data.subject.description}</p>
         {/if}
@@ -101,7 +127,14 @@
 
   <!-- Topics Section -->
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-xl font-semibold text-text">{m.curriculum_topics()}</h2>
+    <div>
+      <h2 class="text-xl font-semibold text-text">{m.curriculum_topics()}</h2>
+      {#if data.selectedGrade && filteredTopics.length !== (data.subject.topics?.length ?? 0)}
+        <p class="text-xs text-text-muted mt-1">
+          Showing {filteredTopics.length} of {data.subject.topics?.length ?? 0} topics for {gradeDisplayName(data.selectedGrade)}
+        </p>
+      {/if}
+    </div>
     <Button onclick={() => (showTopicForm = !showTopicForm)}>
       {showTopicForm ? m.common_cancel() : m.curriculum_add_topic()}
     </Button>
@@ -145,14 +178,14 @@
     </div>
   {/if}
 
-  {#if data.subject.topics?.length === 0}
+  {#if filteredTopics.length === 0}
     <div class="text-center py-10 text-text-muted">
       <p>{m.curriculum_no_topics()}</p>
     </div>
   {:else}
     <div class="space-y-3">
-      {#each data.subject.topics ?? [] as topic}
-        <a href="/teacher/curriculum/{data.subject.id}/{topic.id}">
+      {#each filteredTopics as topic}
+        <a href="/teacher/curriculum/{data.subject.id}/{topic.id}{data.selectedGrade ? `?grade=${data.selectedGrade}` : ''}">
           <Card hover>
             <div class="flex items-start justify-between">
               <div class="flex-1">

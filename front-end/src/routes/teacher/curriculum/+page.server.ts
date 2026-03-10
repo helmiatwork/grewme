@@ -2,37 +2,74 @@ import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
 import { graphql, GraphQLError } from '$lib/api/client';
 import { clearAuthCookies } from '$lib/api/auth';
-import { CLASSROOMS_QUERY } from '$lib/api/queries/classrooms';
 import {
   SUBJECTS_QUERY,
   CREATE_SUBJECT_MUTATION
 } from '$lib/api/queries/curriculum';
-import type { Classroom, Subject } from '$lib/api/types';
+import { ACADEMIC_YEARS_QUERY, GRADE_CURRICULUM_QUERY } from '$lib/api/queries/yearly-curriculum';
+import type { Classroom, Subject, AcademicYear, GradeCurriculum } from '$lib/api/types';
 
-export const load: PageServerLoad = async ({ locals, cookies }) => {
+const CLASSROOMS_WITH_GRADE_QUERY = `
+  query {
+    classrooms {
+      id
+      name
+      grade
+      school { id name minGrade maxGrade }
+    }
+  }
+`;
+
+export const load: PageServerLoad = async ({ locals, cookies, url }) => {
   try {
-    const classroomsData = await graphql<{ classrooms: Classroom[] }>(
-      CLASSROOMS_QUERY,
-      {},
-      locals.accessToken!
-    );
+    const classroomsData = await graphql<{
+      classrooms: (Classroom & { grade: number | null; school: { id: string; name: string; minGrade: number; maxGrade: number } })[];
+    }>(CLASSROOMS_WITH_GRADE_QUERY, {}, locals.accessToken!);
 
     const classrooms = classroomsData.classrooms;
-    const schoolId = classrooms[0]?.school?.id;
+    const school = classrooms[0]?.school;
 
-    if (!schoolId) {
-      return { subjects: [], schoolId: null };
+    if (!school) {
+      return {
+        subjects: [],
+        schoolId: null,
+        teacherGrades: [],
+        school: null,
+        currentAcademicYear: null,
+        selectedGrade: null,
+        gradeCurriculum: null
+      };
     }
 
-    const data = await graphql<{ subjects: Subject[] }>(
-      SUBJECTS_QUERY,
-      { schoolId },
-      locals.accessToken!
-    );
+    // Get unique grades this teacher teaches
+    const teacherGrades = [...new Set(classrooms.map(c => c.grade).filter((g): g is number => g !== null))].sort((a, b) => a - b);
+
+    const [subjectsData, yearsData] = await Promise.all([
+      graphql<{ subjects: Subject[] }>(SUBJECTS_QUERY, { schoolId: school.id }, locals.accessToken!),
+      graphql<{ academicYears: AcademicYear[] }>(ACADEMIC_YEARS_QUERY, { schoolId: school.id }, locals.accessToken!)
+    ]);
+
+    const currentAcademicYear = yearsData.academicYears.find(y => y.current) || yearsData.academicYears[0] || null;
+    const selectedGrade = url.searchParams.get('grade') ? Number(url.searchParams.get('grade')) : null;
+
+    let gradeCurriculum: GradeCurriculum | null = null;
+    if (selectedGrade && currentAcademicYear) {
+      const gcData = await graphql<{ gradeCurriculum: GradeCurriculum | null }>(
+        GRADE_CURRICULUM_QUERY,
+        { academicYearId: currentAcademicYear.id, grade: selectedGrade },
+        locals.accessToken!
+      );
+      gradeCurriculum = gcData.gradeCurriculum;
+    }
 
     return {
-      subjects: data.subjects,
-      schoolId
+      subjects: subjectsData.subjects,
+      schoolId: school.id,
+      teacherGrades,
+      school,
+      currentAcademicYear,
+      selectedGrade,
+      gradeCurriculum
     };
   } catch (err) {
     if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
