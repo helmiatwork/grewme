@@ -12,6 +12,14 @@
   }
 
   let { items }: Props = $props();
+
+  const activeHref = $derived(
+    items.reduce((best: string | null, it) =>
+      (page.url.pathname === it.href || page.url.pathname.startsWith(it.href + '/'))
+        ? (!best || it.href.length > best.length ? it.href : best)
+        : best
+    , null)
+  );
 </script>
 
 <aside class="w-64 bg-surface border-r border-slate-100 min-h-screen p-4 flex flex-col">
@@ -21,7 +29,7 @@
 
   <nav class="flex-1 space-y-1">
     {#each items as item}
-      {@const active = page.url.pathname.startsWith(item.href)}
+      {@const active = activeHref === item.href}
       <a
         href={item.href}
         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors

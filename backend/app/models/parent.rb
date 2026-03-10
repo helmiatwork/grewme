@@ -45,6 +45,6 @@ class Parent < ApplicationRecord
   end
 
   def jwt_payload
-    { "sub" => id, "type" => "Parent" }
+    { "sub" => id, "type" => "Parent", "name" => name, "email" => email }
   end
 end

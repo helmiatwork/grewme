@@ -17,6 +17,8 @@
   let startDate = $state('');
   let endDate = $state('');
   let reason = $state('');
+  let isHalfDay = $state(false);
+  let halfDaySession = $state('');
 
   // ── Derived filtered list ──────────────────────────────────────────────────
   const filteredRequests = $derived.by(() => {
@@ -77,6 +79,8 @@
       startDate = '';
       endDate = '';
       reason = '';
+      isHalfDay = false;
+      halfDaySession = '';
       showForm = false;
       clearMessages();
     } else if (form?.error) {
@@ -238,6 +242,47 @@
               </select>
             </div>
 
+            <!-- Half Day Toggle -->
+            <div>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  bind:checked={isHalfDay}
+                  onchange={() => {
+                    if (!isHalfDay) halfDaySession = '';
+                    if (isHalfDay && startDate) endDate = startDate;
+                  }}
+                  class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/30"
+                />
+                <span class="text-sm font-medium text-text">Half Day Leave</span>
+              </label>
+            </div>
+
+            <!-- Half Day Session (AM/PM) -->
+            {#if isHalfDay}
+              <div class="flex gap-3">
+                <button
+                  type="button"
+                  onclick={() => (halfDaySession = 'MORNING')}
+                  class="flex-1 px-4 py-2 rounded-lg font-medium transition-colors {halfDaySession === 'MORNING'
+                    ? 'bg-primary text-white'
+                    : 'bg-slate-100 text-text hover:bg-slate-200'}"
+                >
+                  Morning (AM)
+                </button>
+                <button
+                  type="button"
+                  onclick={() => (halfDaySession = 'AFTERNOON')}
+                  class="flex-1 px-4 py-2 rounded-lg font-medium transition-colors {halfDaySession === 'AFTERNOON'
+                    ? 'bg-primary text-white'
+                    : 'bg-slate-100 text-text hover:bg-slate-200'}"
+                >
+                  Afternoon (PM)
+                </button>
+              </div>
+              <input type="hidden" name="halfDaySession" value={halfDaySession} />
+            {/if}
+
             <!-- Start Date -->
             <div>
               <label for="startDate" class="block text-sm font-medium text-text mb-2">
@@ -248,25 +293,30 @@
                 id="startDate"
                 name="startDate"
                 bind:value={startDate}
+                onchange={() => {
+                  if (isHalfDay) endDate = startDate;
+                }}
                 required
                 class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background text-text"
               />
             </div>
 
             <!-- End Date -->
-            <div>
-              <label for="endDate" class="block text-sm font-medium text-text mb-2">
-                {m.teacher_leave_end_date?.() ?? 'End Date'}
-              </label>
-              <input
-                type="date"
-                id="endDate"
-                name="endDate"
-                bind:value={endDate}
-                required
-                class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background text-text"
-              />
-            </div>
+            {#if !isHalfDay}
+              <div>
+                <label for="endDate" class="block text-sm font-medium text-text mb-2">
+                  {m.teacher_leave_end_date?.() ?? 'End Date'}
+                </label>
+                <input
+                  type="date"
+                  id="endDate"
+                  name="endDate"
+                  bind:value={endDate}
+                  required
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background text-text"
+                />
+              </div>
+            {/if}
 
             <!-- Reason -->
             <div>
@@ -303,6 +353,8 @@
                   startDate = '';
                   endDate = '';
                   reason = '';
+                  isHalfDay = false;
+                  halfDaySession = '';
                 }}
                 class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-text font-medium rounded-lg transition-colors"
               >
@@ -372,102 +424,100 @@
         </p>
       </div>
     {:else}
-      <div class="space-y-4">
-        {#each filteredRequests as leaveRequest (leaveRequest.id)}
-          <div class="bg-surface rounded-xl shadow-sm border border-slate-100 p-6">
-            <!-- Header: Type & Status Badges -->
-            <div class="flex items-start justify-between mb-4">
-              <div>
-                <p class="text-lg font-semibold text-text">
-                  {getLeaveTypeLabel(leaveRequest.requestType)}
-                </p>
-                <p class="text-sm text-text-muted">
-                  {m.leave_date_range?.() ?? 'Date Range'}: {formatDate(leaveRequest.startDate)} –
-                  {formatDate(leaveRequest.endDate)}
-                </p>
-              </div>
-              <div class="flex gap-2">
-                <!-- Leave Type Badge -->
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-medium {getLeaveTypeBadgeClass(
-                    leaveRequest.requestType
-                  )}"
-                >
-                  {getLeaveTypeLabel(leaveRequest.requestType)}
-                </span>
-                <!-- Status Badge -->
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-medium {getStatusBadgeClass(
-                    leaveRequest.status
-                  )}"
-                >
-                  {getStatusLabel(leaveRequest.status)}
-                </span>
-              </div>
-            </div>
-
-            <!-- Days Count -->
-            <div class="mb-4 p-3 bg-slate-50 rounded-lg">
-              <p class="text-sm font-medium text-text">
-                {m.leave_days?.({ count: leaveRequest.daysCount ?? 0 }) ??
-                  `${leaveRequest.daysCount ?? 0} days`}
-              </p>
-            </div>
-
-            <!-- Reason -->
-            <div class="mb-4">
-              <p class="text-sm text-text-muted mb-1">{m.leave_reason_label?.() ?? 'Reason'}</p>
-              <p class="text-sm text-text">{leaveRequest.reason ?? '—'}</p>
-            </div>
-
-            <!-- Review Info (if reviewed) -->
-            {#if leaveRequest.status?.toLowerCase() !== 'pending'}
-              <div class="mb-4 p-3 bg-slate-50 rounded-lg">
-                <p class="text-xs text-text-muted mb-1">
-                  {m.leave_reviewed_by?.() ?? 'Reviewed by'}
-                </p>
-                <p class="text-sm font-medium text-text">
-                  {leaveRequest.reviewedBy?.name ?? 'Unknown'} •
-                  {formatDate(leaveRequest.reviewedAt)}
-                </p>
-                {#if leaveRequest.rejectionReason}
-                  <p class="text-xs text-text-muted mt-2 mb-1">
-                    {m.leave_rejection_reason?.() ?? 'Rejection Reason'}
-                  </p>
-                  <p class="text-sm text-red-700">{leaveRequest.rejectionReason}</p>
-                {/if}
-              </div>
-            {/if}
-
-            <!-- Delete Button (if pending) -->
-            {#if leaveRequest.status?.toLowerCase() === 'pending'}
-              <form
-                method="POST"
-                action="?/delete"
-                use:enhance={() => {
-                  return async ({ result, update }) => {
-                    if (result.type === 'success') {
-                      await update();
-                    }
-                  };
-                }}
-              >
-                <input type="hidden" name="teacherLeaveRequestId" value={leaveRequest.id} />
-                <button
-                  type="submit"
-                  onclick={(e) => {
-                    if (!confirm(m.teacher_leave_delete_confirm?.() ?? 'Are you sure you want to delete this request?')) {
-                      e.preventDefault();
-                    }
-                  }}
-                  class="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-lg transition-colors"
-                >
-                  {m.common_delete?.() ?? 'Delete'}
-                </button>
-              </form>
-            {/if}
-          </div>
-        {/each}
+      <div class="bg-surface rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 font-medium text-text-muted">Type</th>
+                <th class="px-4 py-3 font-medium text-text-muted">Date</th>
+                <th class="px-4 py-3 font-medium text-text-muted">Days</th>
+                <th class="px-4 py-3 font-medium text-text-muted">Reason</th>
+                <th class="px-4 py-3 font-medium text-text-muted">Status</th>
+                <th class="px-4 py-3 font-medium text-text-muted">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {#each filteredRequests as leaveRequest (leaveRequest.id)}
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                  <td class="px-4 py-3">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {getLeaveTypeBadgeClass(leaveRequest.requestType)}">
+                      {getLeaveTypeLabel(leaveRequest.requestType)}
+                    </span>
+                    {#if leaveRequest.halfDaySession}
+                      <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700">
+                        {leaveRequest.halfDaySession === 'morning' ? 'AM' : 'PM'}
+                      </span>
+                    {/if}
+                  </td>
+                  <td class="px-4 py-3 text-text whitespace-nowrap">
+                    {#if leaveRequest.halfDaySession || leaveRequest.startDate === leaveRequest.endDate}
+                      {formatDate(leaveRequest.startDate)}
+                    {:else}
+                      {formatDate(leaveRequest.startDate)} – {formatDate(leaveRequest.endDate)}
+                    {/if}
+                  </td>
+                  <td class="px-4 py-3 text-text">
+                    <span>{leaveRequest.daysCount ?? 0}</span>
+                    {#if leaveRequest.halfDaySession}
+                      <span class="block text-[10px] text-indigo-600 font-medium">
+                        Half Day ({leaveRequest.halfDaySession === 'morning' ? 'AM' : 'PM'})
+                      </span>
+                    {:else}
+                      <span class="block text-[10px] text-text-muted">Full Day</span>
+                    {/if}
+                  </td>
+                  <td class="px-4 py-3 text-text max-w-[200px] truncate" title={leaveRequest.reason ?? ''}>
+                    {leaveRequest.reason ?? '—'}
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {getStatusBadgeClass(leaveRequest.status)}">
+                      {getStatusLabel(leaveRequest.status)}
+                    </span>
+                    {#if leaveRequest.status?.toLowerCase() !== 'pending'}
+                      <p class="text-[10px] text-text-muted mt-1">
+                        {leaveRequest.reviewedBy?.name ?? ''} • {formatDate(leaveRequest.reviewedAt)}
+                      </p>
+                      {#if leaveRequest.rejectionReason}
+                        <p class="text-[10px] text-red-600 mt-0.5">{leaveRequest.rejectionReason}</p>
+                      {/if}
+                    {/if}
+                  </td>
+                  <td class="px-4 py-3">
+                    {#if leaveRequest.status?.toLowerCase() === 'pending'}
+                      <form
+                        method="POST"
+                        action="?/delete"
+                        use:enhance={() => {
+                          return async ({ result, update }) => {
+                            if (result.type === 'success') {
+                              await update();
+                            }
+                          };
+                        }}
+                      >
+                        <input type="hidden" name="teacherLeaveRequestId" value={leaveRequest.id} />
+                        <button
+                          type="submit"
+                          onclick={(e) => {
+                            if (!confirm(m.teacher_leave_delete_confirm?.() ?? 'Are you sure you want to delete this request?')) {
+                              e.preventDefault();
+                            }
+                          }}
+                          class="px-3 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-lg transition-colors"
+                        >
+                          {m.common_delete?.() ?? 'Delete'}
+                        </button>
+                      </form>
+                    {:else}
+                      <span class="text-text-muted text-xs">—</span>
+                    {/if}
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </div>
     {/if}
   </div>

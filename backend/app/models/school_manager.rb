@@ -40,7 +40,7 @@ class SchoolManager < ApplicationRecord
   end
 
   def jwt_payload
-    { "sub" => id, "type" => "SchoolManager" }
+    { "sub" => id, "type" => "SchoolManager", "name" => name, "email" => email }
   end
 
   # Convenience: all classrooms in the school

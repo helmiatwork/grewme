@@ -16,8 +16,7 @@
     { label: m.nav_exams(), href: '/teacher/exams', icon: '📝' },
     { label: m.nav_attendance(), href: '/teacher/attendance', icon: '✅' },
     { label: m.leave_requests_title(), href: '/teacher/leave-requests', icon: '📋' },
-    { label: m.nav_my_leave?.() ?? 'My Leave', href: '/teacher/my-leave', icon: '🏖️' },
-    { label: m.nav_profile(), href: '/teacher/profile', icon: '👤' }
+    { label: m.nav_my_leave?.() ?? 'My Leave', href: '/teacher/my-leave', icon: '🏖️' }
   ]);
 
   onMount(async () => {

@@ -28,16 +28,21 @@
     subjectName?: string;
   }
 
-  let curriculumItems = $state<DndItem[]>(
-    data.gradeCurriculum?.gradeCurriculumItems?.map((item: GCItem) => ({
+  let curriculumItems = $state<DndItem[]>([]);
+
+  // Sync curriculum items when data changes (grade/year selection)
+  $effect(() => {
+    curriculumItems = data.gradeCurriculum?.gradeCurriculumItems?.map((item: GCItem) => ({
       id: item.id,
       subjectId: item.subject?.id,
       topicId: item.topic?.id,
       displayName: item.displayName,
       type: (item.subject ? 'subject' : 'topic') as 'subject' | 'topic',
       subjectName: item.topic?.subject?.name
-    })) ?? []
-  );
+    })) ?? [];
+    selectedYearId = data.selectedYearId ?? '';
+    selectedGrade = data.selectedGrade ?? 1;
+  });
 
   function toggleSubject(subjectId: string) {
     const next = new Set(expandedSubjects);

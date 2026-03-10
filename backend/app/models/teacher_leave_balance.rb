@@ -6,7 +6,7 @@ class TeacherLeaveBalance < ApplicationRecord
 
   validates :teacher_id, uniqueness: { scope: :academic_year_id }
   validates :max_annual_leave, :max_sick_leave, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :used_annual, :used_sick, :used_personal, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :used_annual, :used_sick, :used_personal, numericality: { greater_than_or_equal_to: 0 }
 
   def self.find_or_create_for(teacher, academic_year)
     find_or_create_by!(teacher: teacher, academic_year: academic_year) do |balance|

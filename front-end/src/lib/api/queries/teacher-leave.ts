@@ -12,6 +12,7 @@ export const MY_TEACHER_LEAVE_REQUESTS_QUERY = `
       rejectionReason
       reviewedAt
       daysCount
+      halfDaySession
       teacher { id name }
       reviewedBy { id name }
       substitute { id name }
@@ -47,6 +48,7 @@ export const SCHOOL_TEACHER_LEAVE_REQUESTS_QUERY = `
       rejectionReason
       reviewedAt
       daysCount
+      halfDaySession
       teacher { id name }
       reviewedBy { id name }
       substitute { id name }
@@ -64,10 +66,10 @@ export const SCHOOL_LEAVE_SETTINGS_QUERY = `
 // ── Teacher Leave Mutations ──────────────────────────────────────────────────
 
 export const CREATE_TEACHER_LEAVE_REQUEST_MUTATION = `
-  mutation CreateTeacherLeaveRequest($requestType: TeacherLeaveRequestTypeEnum!, $startDate: ISO8601Date!, $endDate: ISO8601Date!, $reason: String!) {
-    createTeacherLeaveRequest(requestType: $requestType, startDate: $startDate, endDate: $endDate, reason: $reason) {
+  mutation CreateTeacherLeaveRequest($requestType: TeacherLeaveRequestTypeEnum!, $startDate: ISO8601Date!, $endDate: ISO8601Date!, $reason: String!, $halfDaySession: HalfDaySessionEnum) {
+    createTeacherLeaveRequest(requestType: $requestType, startDate: $startDate, endDate: $endDate, reason: $reason, halfDaySession: $halfDaySession) {
       teacherLeaveRequest {
-        id requestType startDate endDate reason status daysCount
+        id requestType startDate endDate reason status daysCount halfDaySession
       }
       errors { message path }
     }

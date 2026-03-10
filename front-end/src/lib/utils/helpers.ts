@@ -1,7 +1,8 @@
 /**
  * Format a date string (YYYY-MM-DD or ISO8601) to a readable format.
  */
-export function formatDate(dateStr: string): string {
+export function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '—';
   // If it's just a date (YYYY-MM-DD), add time to avoid timezone issues
   const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('en-US', {

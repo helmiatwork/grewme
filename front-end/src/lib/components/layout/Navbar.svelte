@@ -13,6 +13,13 @@
 
   const notifs = getNotifications();
   let showDropdown = $state(false);
+  let showProfileMenu = $state(false);
+
+  const initials = $derived(
+    user.name
+      ? user.name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2)
+      : user.email.charAt(0).toUpperCase()
+  );
 
   async function logout() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -103,15 +110,70 @@
       <option value="id">🇮🇩 ID</option>
     </select>
 
-    <Badge variant={user.type === 'Teacher' ? 'primary' : user.type === 'SchoolManager' ? 'warning' : 'success'}>
-      {user.type === 'SchoolManager' ? m.role_school_manager() : user.type === 'Teacher' ? m.role_teacher() : m.role_parent()}
-    </Badge>
-    <span class="text-sm text-text">{user.email}</span>
-    <button
-      onclick={logout}
-      class="text-sm text-text-muted hover:text-red-500 transition-colors"
-    >
-      {m.common_sign_out()}
-    </button>
+    <!-- Profile Avatar -->
+    <div class="relative">
+      <button
+        onclick={() => (showProfileMenu = !showProfileMenu)}
+        class="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+      >
+        <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+          {initials}
+        </div>
+        <svg class="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {#if showProfileMenu}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="fixed inset-0 z-40" onclick={() => (showProfileMenu = false)}></div>
+        <div class="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden">
+          <!-- User Info -->
+          <div class="px-4 py-3 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-base font-semibold">
+                {initials}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-text truncate">{user.name || user.email}</p>
+                <p class="text-xs text-text-muted truncate">{user.email}</p>
+                <div class="mt-1">
+                  <Badge variant={user.type === 'Teacher' ? 'primary' : user.type === 'SchoolManager' ? 'warning' : 'success'}>
+                    {user.type === 'SchoolManager' ? m.role_school_manager() : user.type === 'Teacher' ? m.role_teacher() : m.role_parent()}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Menu Items -->
+          <div class="py-1">
+            <a
+              href={user.type === 'Teacher' ? '/teacher/profile' : user.type === 'Parent' ? '/parent/profile' : '/manager/profile'}
+              class="flex items-center gap-3 px-4 py-2.5 text-sm text-text hover:bg-slate-50 transition-colors"
+              onclick={() => (showProfileMenu = false)}
+            >
+              <svg class="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              {m.nav_profile()}
+            </a>
+          </div>
+
+          <!-- Logout -->
+          <div class="border-t border-slate-100 py-1">
+            <button
+              onclick={logout}
+              class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
+              {m.common_sign_out()}
+            </button>
+          </div>
+        </div>
+      {/if}
+    </div>
   </div>
 </header>

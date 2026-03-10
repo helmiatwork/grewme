@@ -10,7 +10,8 @@ module Types
     field :reason, String, null: false
     field :rejection_reason, String
     field :reviewed_at, GraphQL::Types::ISO8601DateTime
-    field :days_count, Integer, null: false
+    field :days_count, Float, null: false
+    field :half_day_session, String
     field :teacher, Types::TeacherType, null: false
     field :school, Types::SchoolType, null: false
     field :reviewed_by, Types::SchoolManagerType

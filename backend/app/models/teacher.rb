@@ -52,6 +52,6 @@ class Teacher < ApplicationRecord
   end
 
   def jwt_payload
-    { "sub" => id, "type" => "Teacher" }
+    { "sub" => id, "type" => "Teacher", "name" => name, "email" => email }
   end
 end

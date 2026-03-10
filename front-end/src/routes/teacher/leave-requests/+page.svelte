@@ -143,177 +143,176 @@
         </p>
       </div>
     {:else}
-      <div class="space-y-4">
-        {#each filteredRequests as leaveRequest (leaveRequest.id)}
-          <div class="bg-surface rounded-xl shadow-sm border border-slate-100 p-6">
-            <!-- Header: Student & Parent Names -->
-            <div class="flex items-start justify-between mb-4">
-              <div>
-                <p class="text-lg font-semibold text-text">
-                  {leaveRequest.student?.name ?? 'Unknown Student'}
-                </p>
-                <p class="text-sm text-text-muted">
-                  {m.leave_parent_label?.() ?? 'Parent'}: {leaveRequest.parent?.name ?? 'Unknown'}
-                </p>
-              </div>
-              <div class="flex gap-2">
-                <!-- Leave Type Badge -->
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-medium {getLeaveTypeBadgeClass(
-                    leaveRequest.requestType
-                  )}"
-                >
-                  {getLeaveTypeLabel(leaveRequest.requestType)}
-                </span>
-                <!-- Status Badge -->
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-medium {getStatusBadgeClass(
-                    leaveRequest.status
-                  )}"
-                >
-                  {getStatusLabel(leaveRequest.status)}
-                </span>
-              </div>
-            </div>
+      <div class="bg-surface rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.nav_students?.() ?? 'Student'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.leave_parent_label?.() ?? 'Parent'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.leave_type_label?.() ?? 'Type'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.leave_date_range?.() ?? 'Date Range'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.leave_days?.({ count: 0 }) ?? 'Days'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.leave_reason_label?.() ?? 'Reason'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.common_status?.() ?? 'Status'}</th>
+                <th class="px-4 py-3 font-medium text-text-muted">{m.common_actions?.() ?? 'Actions'}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {#each filteredRequests as leaveRequest (leaveRequest.id)}
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                  <!-- Student -->
+                  <td class="px-4 py-3 text-text font-medium">
+                    {leaveRequest.student?.name ?? 'Unknown Student'}
+                  </td>
 
-            <!-- Date Range & Days Count -->
-            <div class="mb-4 p-3 bg-slate-50 rounded-lg">
-              <p class="text-sm text-text-muted mb-1">
-                {m.leave_date_range?.() ?? 'Date Range'}
-              </p>
-              <p class="text-sm font-medium text-text">
-                {formatDate(leaveRequest.startDate)} – {formatDate(leaveRequest.endDate)}
-              </p>
-              <p class="text-xs text-text-muted mt-1">
-                {m.leave_days?.({ count: leaveRequest.daysCount ?? 0 }) ??
-                  `${leaveRequest.daysCount ?? 0} days`}
-              </p>
-            </div>
+                  <!-- Parent -->
+                  <td class="px-4 py-3 text-text">
+                    {leaveRequest.parent?.name ?? 'Unknown'}
+                  </td>
 
-            <!-- Reason -->
-            <div class="mb-4">
-              <p class="text-sm text-text-muted mb-1">{m.leave_reason_label?.() ?? 'Reason'}</p>
-              <p class="text-sm text-text">{leaveRequest.reason ?? '—'}</p>
-            </div>
-
-            <!-- Review Info (if reviewed) -->
-            {#if leaveRequest.status?.toLowerCase() !== 'pending'}
-              <div class="mb-4 p-3 bg-slate-50 rounded-lg">
-                <p class="text-xs text-text-muted mb-1">
-                  {m.leave_reviewed_by?.() ?? 'Reviewed by'}
-                </p>
-                <p class="text-sm font-medium text-text">
-                  {leaveRequest.reviewedBy?.name ?? 'Unknown'} •
-                  {formatDate(leaveRequest.reviewedAt)}
-                </p>
-                {#if leaveRequest.rejectionReason}
-                  <p class="text-xs text-text-muted mt-2 mb-1">
-                    {m.leave_rejection_reason?.() ?? 'Rejection Reason'}
-                  </p>
-                  <p class="text-sm text-red-700">{leaveRequest.rejectionReason}</p>
-                {/if}
-              </div>
-            {/if}
-
-            <!-- Action Buttons (if pending) -->
-            {#if leaveRequest.status?.toLowerCase() === 'pending'}
-              <div class="space-y-3">
-                <!-- Rejection Reason Input -->
-                {#if showRejectionReason[leaveRequest.id]}
-                  <div class="p-3 bg-red-50 rounded-lg border border-red-100">
-                    <label for="reason-{leaveRequest.id}" class="block text-xs font-medium text-text mb-2">
-                      {m.leave_rejection_reason?.() ?? 'Rejection Reason'}
-                    </label>
-                    <textarea
-                      id="reason-{leaveRequest.id}"
-                      placeholder={m.leave_rejection_placeholder?.() ?? 'Explain why this request is rejected...'}
-                      class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/30 resize-none"
-                      rows="3"
-                    ></textarea>
-                  </div>
-                {/if}
-
-                <!-- Approve/Reject Buttons -->
-                <div class="flex gap-3">
-                  <form
-                    method="POST"
-                    action="?/review"
-                    use:enhance={() => {
-                      return async ({ result, update }) => {
-                        if (result.type === 'success') {
-                          successMessage = (result.data as any)?.success ?? 'Leave request approved';
-                          clearMessages();
-                          await update();
-                        } else if (result.type === 'failure') {
-                          errorMessage = (result.data as any)?.error ?? 'Failed to approve request';
-                          clearMessages();
-                        }
-                      };
-                    }}
-                    class="flex-1"
-                  >
-                    <input type="hidden" name="leaveRequestId" value={leaveRequest.id} />
-                    <input type="hidden" name="decision" value="APPROVED" />
-                    <button
-                      type="submit"
-                      class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+                  <!-- Type -->
+                  <td class="px-4 py-3">
+                    <span
+                      class="px-2 py-0.5 rounded-full text-xs font-medium {getLeaveTypeBadgeClass(
+                        leaveRequest.requestType
+                      )}"
                     >
-                      {m.leave_approve_button?.() ?? 'Approve'}
-                    </button>
-                  </form>
+                      {getLeaveTypeLabel(leaveRequest.requestType)}
+                    </span>
+                  </td>
 
-                  <button
-                    type="button"
-                    onclick={() => {
-                      showRejectionReason[leaveRequest.id] = !showRejectionReason[leaveRequest.id];
-                    }}
-                    class="flex-1 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-lg transition-colors"
-                  >
-                    {showRejectionReason[leaveRequest.id]
-                      ? m.leave_cancel_reject?.() ?? 'Cancel'
-                      : m.leave_reject_button?.() ?? 'Reject'}
-                  </button>
-                </div>
+                  <!-- Date Range -->
+                  <td class="px-4 py-3 text-text whitespace-nowrap">
+                    {formatDate(leaveRequest.startDate)} – {formatDate(leaveRequest.endDate)}
+                  </td>
 
-                <!-- Reject Form (shown when textarea is visible) -->
-                {#if showRejectionReason[leaveRequest.id]}
-                  <form
-                    method="POST"
-                    action="?/review"
-                    use:enhance={() => {
-                      return async ({ result, update }) => {
-                        if (result.type === 'success') {
-                          successMessage = (result.data as any)?.success ?? 'Leave request rejected';
-                          clearMessages();
-                          await update();
-                        } else if (result.type === 'failure') {
-                          errorMessage = (result.data as any)?.error ?? 'Failed to reject request';
-                          clearMessages();
-                        }
-                      };
-                    }}
-                  >
-                    <input type="hidden" name="leaveRequestId" value={leaveRequest.id} />
-                    <input type="hidden" name="decision" value="REJECTED" />
-                    <textarea
-                      name="rejectionReason"
-                      placeholder={m.leave_rejection_placeholder?.() ?? 'Explain why this request is rejected...'}
-                      class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/30 resize-none"
-                      rows="3"
-                      required
-                    ></textarea>
-                    <button
-                      type="submit"
-                      class="w-full mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
-                    >
-                      {m.leave_confirm_reject?.() ?? 'Confirm Rejection'}
-                    </button>
-                  </form>
+                  <!-- Days -->
+                  <td class="px-4 py-3 text-text text-center">
+                    <span>{leaveRequest.daysCount ?? 0}</span>
+                    <span class="block text-[10px] text-text-muted">Full Day</span>
+                  </td>
+
+                  <!-- Reason -->
+                  <td class="px-4 py-3 text-text max-w-[200px] truncate" title={leaveRequest.reason ?? '—'}>
+                    {leaveRequest.reason ?? '—'}
+                  </td>
+
+                  <!-- Status -->
+                  <td class="px-4 py-3">
+                    <div>
+                      <span
+                        class="px-2 py-0.5 rounded-full text-xs font-medium {getStatusBadgeClass(
+                          leaveRequest.status
+                        )}"
+                      >
+                        {getStatusLabel(leaveRequest.status)}
+                      </span>
+                      {#if leaveRequest.status?.toLowerCase() !== 'pending'}
+                        <p class="text-xs text-text-muted mt-1">
+                          {leaveRequest.reviewedBy?.name ?? 'Unknown'} • {formatDate(leaveRequest.reviewedAt)}
+                        </p>
+                      {/if}
+                    </div>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="px-4 py-3">
+                    {#if leaveRequest.status?.toLowerCase() === 'pending'}
+                      <div class="flex gap-2">
+                        <form
+                          method="POST"
+                          action="?/review"
+                          use:enhance={() => {
+                            return async ({ result, update }) => {
+                              if (result.type === 'success') {
+                                successMessage = (result.data as any)?.success ?? 'Leave request approved';
+                                clearMessages();
+                                await update();
+                              } else if (result.type === 'failure') {
+                                errorMessage = (result.data as any)?.error ?? 'Failed to approve request';
+                                clearMessages();
+                              }
+                            };
+                          }}
+                        >
+                          <input type="hidden" name="leaveRequestId" value={leaveRequest.id} />
+                          <input type="hidden" name="decision" value="APPROVED" />
+                          <button
+                            type="submit"
+                            class="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white font-medium rounded transition-colors"
+                          >
+                            {m.leave_approve_button?.() ?? 'Approve'}
+                          </button>
+                        </form>
+
+                        <button
+                          type="button"
+                          onclick={() => {
+                            showRejectionReason[leaveRequest.id] = !showRejectionReason[leaveRequest.id];
+                          }}
+                          class="px-3 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded transition-colors"
+                        >
+                          {showRejectionReason[leaveRequest.id]
+                            ? m.leave_cancel_reject?.() ?? 'Cancel'
+                            : m.leave_reject_button?.() ?? 'Reject'}
+                        </button>
+                      </div>
+                    {/if}
+                  </td>
+                </tr>
+
+                <!-- Rejection Form Expanded Row -->
+                {#if leaveRequest.status?.toLowerCase() === 'pending' && showRejectionReason[leaveRequest.id]}
+                  <tr class="bg-red-50/50">
+                    <td colspan="8" class="px-4 py-3">
+                      <form
+                        method="POST"
+                        action="?/review"
+                        use:enhance={() => {
+                          return async ({ result, update }) => {
+                            if (result.type === 'success') {
+                              successMessage = (result.data as any)?.success ?? 'Leave request rejected';
+                              clearMessages();
+                              await update();
+                            } else if (result.type === 'failure') {
+                              errorMessage = (result.data as any)?.error ?? 'Failed to reject request';
+                              clearMessages();
+                            }
+                          };
+                        }}
+                      >
+                        <input type="hidden" name="leaveRequestId" value={leaveRequest.id} />
+                        <input type="hidden" name="decision" value="REJECTED" />
+                        <div class="space-y-2">
+                          <label for="reason-{leaveRequest.id}" class="block text-xs font-medium text-text">
+                            {m.leave_rejection_reason?.() ?? 'Rejection Reason'}
+                          </label>
+                          <textarea
+                            id="reason-{leaveRequest.id}"
+                            name="rejectionReason"
+                            placeholder={m.leave_rejection_placeholder?.() ?? 'Explain why this request is rejected...'}
+                            class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/30 resize-none"
+                            rows="3"
+                            required
+                          ></textarea>
+                          <div class="flex gap-2">
+                            <button
+                              type="submit"
+                              class="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-colors"
+                            >
+                              {m.leave_confirm_reject?.() ?? 'Confirm Rejection'}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </td>
+                  </tr>
                 {/if}
-              </div>
-            {/if}
-          </div>
-        {/each}
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </div>
     {/if}
   </div>

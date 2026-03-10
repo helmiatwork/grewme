@@ -6,11 +6,12 @@ module Mutations
     argument :start_date, GraphQL::Types::ISO8601Date, required: true
     argument :end_date, GraphQL::Types::ISO8601Date, required: true
     argument :reason, String, required: true
+    argument :half_day_session, Types::HalfDaySessionEnum, required: false
 
     field :teacher_leave_request, Types::TeacherLeaveRequestType
     field :errors, [ Types::UserErrorType ], null: false
 
-    def resolve(request_type:, start_date:, end_date:, reason:)
+    def resolve(request_type:, start_date:, end_date:, reason:, half_day_session: nil)
       authenticate!
 
       unless current_user.teacher?
@@ -27,7 +28,8 @@ module Mutations
         request_type: request_type,
         start_date: start_date,
         end_date: end_date,
-        reason: reason
+        reason: reason,
+        half_day_session: half_day_session
       )
 
       if leave_request.save
@@ -45,7 +47,7 @@ module Mutations
             recipient: manager,
             notifiable: leave_request,
             title: "New Teacher Leave Request",
-            body: "#{current_user.name} requested #{request_type} leave (#{start_date} - #{end_date})"
+            body: "#{current_user.name} requested #{request_type}#{" half-day (#{half_day_session})" if half_day_session} leave (#{start_date}#{" - #{end_date}" unless start_date == end_date})"
           )
         end
 

@@ -12,6 +12,7 @@ class TeacherLeaveRequest < ApplicationRecord
 
   enum :request_type, { sick: 0, personal: 1, annual: 2 }
   enum :status, { pending: 0, approved: 1, rejected: 2 }
+  enum :half_day_session, { morning: 0, afternoon: 1 }, prefix: :half_day
 
   encrypts :reason
   encrypts :rejection_reason
@@ -23,9 +24,18 @@ class TeacherLeaveRequest < ApplicationRecord
   validate :teacher_belongs_to_school
   validate :substitute_is_different_teacher
   validate :check_leave_balance, on: :create
+  validate :half_day_requires_same_dates
+
+  def half_day?
+    half_day_session.present?
+  end
 
   def days_count
-    (end_date - start_date).to_i + 1
+    if half_day?
+      0.5
+    else
+      (end_date - start_date).to_i + 1
+    end
   end
 
   def date_range
@@ -48,6 +58,12 @@ class TeacherLeaveRequest < ApplicationRecord
     return if substitute_id.blank?
     errors.add(:substitute, "cannot be the same teacher") if substitute_id == teacher_id
     errors.add(:substitute, "must belong to the same school") if substitute&.school_id != school_id
+  end
+
+  def half_day_requires_same_dates
+    return unless half_day?
+    return if start_date.blank? || end_date.blank?
+    errors.add(:end_date, "must be the same as start date for half-day leave") if start_date != end_date
   end
 
   def check_leave_balance

@@ -392,5 +392,6 @@ export interface GradeCurriculumItem {
 export interface SessionUser {
   id: string;
   type: 'Teacher' | 'Parent' | 'SchoolManager';
+  name: string;
   email: string;
 }

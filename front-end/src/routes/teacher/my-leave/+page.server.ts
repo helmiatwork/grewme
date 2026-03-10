@@ -33,15 +33,26 @@ export const actions: Actions = {
     const startDate = formData.get('startDate') as string;
     const endDate = formData.get('endDate') as string;
     const reason = formData.get('reason') as string;
+    const halfDaySession = formData.get('halfDaySession') as string | null;
 
     if (!requestType || !startDate || !endDate || !reason?.trim()) {
       return fail(400, { error: 'All fields are required' });
     }
 
+    const variables: Record<string, unknown> = {
+      requestType,
+      startDate,
+      endDate,
+      reason: reason.trim()
+    };
+    if (halfDaySession) {
+      variables.halfDaySession = halfDaySession;
+    }
+
     try {
       const result = await graphql<any>(
         CREATE_TEACHER_LEAVE_REQUEST_MUTATION,
-        { requestType, startDate, endDate, reason: reason.trim() },
+        variables,
         token
       );
       if (result.createTeacherLeaveRequest.errors?.length > 0) {

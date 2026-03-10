@@ -64,6 +64,7 @@ export function decodeJwtPayload(token: string): SessionUser | null {
     return {
       id: payload.sub,
       type: payload.type,
+      name: payload.name || '',
       email: payload.email || ''
     };
   } catch {
