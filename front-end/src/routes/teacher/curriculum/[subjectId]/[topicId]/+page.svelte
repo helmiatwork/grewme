@@ -3,6 +3,7 @@
   import { invalidateAll } from '$app/navigation';
   import { Card, Button, Input, Alert } from '$lib/components/ui';
   import * as m from '$lib/paraglide/messages.js';
+  import { gradeDisplayName } from '$lib/utils/grade';
 
   let { data, form } = $props();
 
@@ -59,9 +60,13 @@
 <div>
   <!-- Breadcrumb -->
   <nav class="text-sm text-text-muted mb-4">
-    <a href="/teacher/curriculum" class="hover:text-text">Curriculum</a>
+    <a href="/teacher/curriculum{data.selectedGrade ? `?grade=${data.selectedGrade}` : ''}" class="hover:text-text">Curriculum</a>
+    {#if data.selectedGrade}
+      <span class="mx-2">/</span>
+      <a href="/teacher/curriculum?grade={data.selectedGrade}" class="hover:text-text">{gradeDisplayName(data.selectedGrade)}</a>
+    {/if}
     <span class="mx-2">/</span>
-    <a href="/teacher/curriculum/{data.topic.subject?.id}" class="hover:text-text">
+    <a href="/teacher/curriculum/{data.topic.subject?.id}{data.selectedGrade ? `?grade=${data.selectedGrade}` : ''}" class="hover:text-text">
       {data.topic.subject?.name}
     </a>
     <span class="mx-2">/</span>

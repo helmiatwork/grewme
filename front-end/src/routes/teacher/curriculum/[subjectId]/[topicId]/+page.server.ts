@@ -12,7 +12,7 @@ import {
 } from '$lib/api/queries/curriculum';
 import type { Topic, LearningObjective } from '$lib/api/types';
 
-export const load: PageServerLoad = async ({ locals, cookies, params }) => {
+export const load: PageServerLoad = async ({ locals, cookies, params, url }) => {
   try {
     const data = await graphql<{ topic: Topic }>(
       TOPIC_QUERY,
@@ -20,7 +20,9 @@ export const load: PageServerLoad = async ({ locals, cookies, params }) => {
       locals.accessToken!
     );
 
-    return { topic: data.topic };
+    const selectedGrade = url.searchParams.get('grade') ? Number(url.searchParams.get('grade')) : null;
+
+    return { topic: data.topic, selectedGrade };
   } catch (err) {
     if (err instanceof GraphQLError && err.message.toLowerCase().includes('authentication')) {
       clearAuthCookies(cookies);

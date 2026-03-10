@@ -50,7 +50,9 @@ export const load: PageServerLoad = async ({ locals, cookies, url }) => {
     ]);
 
     const currentAcademicYear = yearsData.academicYears.find(y => y.current) || yearsData.academicYears[0] || null;
-    const selectedGrade = url.searchParams.get('grade') ? Number(url.searchParams.get('grade')) : null;
+    const selectedGrade = url.searchParams.get('grade')
+      ? Number(url.searchParams.get('grade'))
+      : teacherGrades[0] ?? null;
 
     let gradeCurriculum: GradeCurriculum | null = null;
     if (selectedGrade && currentAcademicYear) {

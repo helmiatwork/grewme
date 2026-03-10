@@ -9,7 +9,7 @@
 
   let showNewSubjectForm = $state(false);
   let submitting = $state(false);
-  let selectedGrade = $state(data.selectedGrade ?? 0);
+  let selectedGrade = $state(data.selectedGrade);
 
   function countLOs(topics: Array<{ learningObjectives?: unknown[] }>): number {
     return topics.reduce((sum, t) => sum + (t.learningObjectives?.length ?? 0), 0);
@@ -20,7 +20,7 @@
   }
 
   let filteredSubjects = $derived.by(() => {
-    if (!selectedGrade || !data.gradeCurriculum) return data.subjects;
+    if (!data.gradeCurriculum) return data.subjects;
     const gcItems = data.gradeCurriculum.gradeCurriculumItems ?? [];
     // Collect subject IDs from both subject-level and topic-level items (for backward compat)
     const subjectIds = new Set<string>();
@@ -32,9 +32,7 @@
   });
 
   function onGradeChange() {
-    const params = new URLSearchParams();
-    if (selectedGrade) params.set('grade', String(selectedGrade));
-    goto(`/teacher/curriculum${params.toString() ? '?' + params.toString() : ''}`);
+    goto(`/teacher/curriculum?grade=${selectedGrade}`);
   }
 
   $effect(() => {
@@ -45,7 +43,7 @@
   });
 
   $effect(() => {
-    selectedGrade = data.selectedGrade ?? 0;
+    selectedGrade = data.selectedGrade;
   });
 </script>
 
@@ -77,7 +75,6 @@
         bind:value={selectedGrade}
         onchange={onGradeChange}
       >
-        <option value={0}>{m.curriculum_all_subjects()}</option>
         {#each data.teacherGrades as grade}
           <option value={grade}>{gradeDisplayName(grade)}</option>
         {/each}
@@ -127,13 +124,8 @@
     </div>
   {:else if filteredSubjects.length === 0}
     <div class="text-center py-12 text-text-muted">
-      {#if selectedGrade}
-        <p class="text-lg">{m.curriculum_no_grade_subjects()}</p>
-        <p class="text-sm mt-1">{m.curriculum_no_grade_subjects_hint()}</p>
-      {:else}
-        <p class="text-lg">{m.curriculum_no_subjects()}</p>
-        <p class="text-sm mt-1">{m.curriculum_no_subjects_hint()}</p>
-      {/if}
+      <p class="text-lg">{m.curriculum_no_grade_subjects()}</p>
+      <p class="text-sm mt-1">{m.curriculum_no_grade_subjects_hint()}</p>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -141,7 +133,7 @@
          {@const topicCount = subject.topics?.length ?? 0}
          {@const loCount = countLOs(subject.topics ?? [])}
          {@const examCount = countExams(subject.topics ?? [])}
-         <a href="/teacher/curriculum/{subject.id}{selectedGrade ? `?grade=${selectedGrade}` : ''}">
+         <a href="/teacher/curriculum/{subject.id}?grade={selectedGrade}">
            <Card hover>
              <h3 class="text-lg font-semibold text-text">{subject.name}</h3>
              {#if subject.description}
