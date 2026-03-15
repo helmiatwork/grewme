@@ -931,6 +931,87 @@ module Types
         .find_by(session_token: session_token)
     end
 
+    # === Behavior ===
+
+    field :behavior_categories, [ Types::BehaviorCategoryType ], null: false,
+      description: "List behavior categories for a school" do
+      argument :school_id, ID, required: true
+    end
+
+    def behavior_categories(school_id:)
+      authenticate!
+      BehaviorCategoryPolicy::Scope.new(current_user, BehaviorCategory)
+        .resolve.where(school_id: school_id).active.ordered
+    end
+
+    field :classroom_behavior_today, [ Types::ClassroomBehaviorStudentType ], null: false,
+      description: "All students with today's behavior totals for a classroom" do
+      argument :classroom_id, ID, required: true
+    end
+
+    def classroom_behavior_today(classroom_id:)
+      authenticate!
+      classroom = Classroom.find(classroom_id)
+      raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).show?
+
+      students = classroom.students.includes(:classroom_students)
+      today_points = BehaviorPoint.active.where(classroom_id: classroom_id).for_date(Date.current)
+
+      students.map do |student|
+        student_points = today_points.select { |p| p.student_id == student.id }
+        {
+          student: student,
+          total_points: student_points.sum(&:point_value),
+          positive_count: student_points.count { |p| p.point_value > 0 },
+          negative_count: student_points.count { |p| p.point_value < 0 },
+          recent_points: student_points.sort_by(&:awarded_at).last(5)
+        }
+      end
+    end
+
+    field :student_behavior_history, [ Types::BehaviorPointType ], null: false,
+      description: "Behavior point history for a student" do
+      argument :student_id, ID, required: true
+      argument :start_date, GraphQL::Types::ISO8601Date, required: false
+      argument :end_date, GraphQL::Types::ISO8601Date, required: false
+    end
+
+    def student_behavior_history(student_id:, start_date: nil, end_date: nil)
+      authenticate!
+      scope = BehaviorPointPolicy::Scope.new(current_user, BehaviorPoint).resolve
+        .where(student_id: student_id).active.includes(:behavior_category, :teacher)
+      scope = scope.where("awarded_at >= ?", start_date.beginning_of_day) if start_date
+      scope = scope.where("awarded_at <= ?", end_date.end_of_day) if end_date
+      scope.order(awarded_at: :desc)
+    end
+
+    field :student_weekly_report, Types::BehaviorSummaryType, null: true,
+      description: "Latest weekly behavior summary for a student" do
+      argument :student_id, ID, required: true
+    end
+
+    def student_weekly_report(student_id:)
+      authenticate!
+      summary = BehaviorSummary.where(student_id: student_id).order(week_start: :desc).first
+      return nil unless summary
+      raise Pundit::NotAuthorizedError unless BehaviorSummaryPolicy.new(current_user, summary).show?
+      summary
+    end
+
+    field :classroom_behavior_summary, [ Types::BehaviorSummaryType ], null: false,
+      description: "Weekly behavior summaries for all students in a classroom" do
+      argument :classroom_id, ID, required: true
+      argument :week_start, GraphQL::Types::ISO8601Date, required: true
+    end
+
+    def classroom_behavior_summary(classroom_id:, week_start:)
+      authenticate!
+      classroom = Classroom.find(classroom_id)
+      raise Pundit::NotAuthorizedError unless ClassroomPolicy.new(current_user, classroom).show?
+      BehaviorSummary.where(classroom_id: classroom_id, week_start: week_start)
+        .includes(:student, :top_behavior_category)
+    end
+
     private
 
     def deep_ostruct(data)
