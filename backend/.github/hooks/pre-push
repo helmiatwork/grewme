@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# GrewMe Backend — Pre-push hook: auto-update stale codemap.md files
+# Install: .github/hooks/install.sh
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)/backend"
+HOOK_DIR="$(dirname "$0")"
+UPDATER="$HOOK_DIR/update-codemap.sh"
+
+# ---------------------------------------------------------------------------
+# 1. Determine changed files between local HEAD and remote tracking branch
+# ---------------------------------------------------------------------------
+remote="$1"
+url="$2"
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+  # Skip delete pushes
+  if [ "$local_oid" = "0000000000000000000000000000000000000000" ]; then
+    continue
+  fi
+
+  # If remote branch doesn't exist yet, compare against merge-base with main
+  if [ "$remote_oid" = "0000000000000000000000000000000000000000" ]; then
+    base=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+    if [ -z "$base" ]; then
+      echo "[codemap] New repo — skipping codemap check."
+      exit 0
+    fi
+    range="$base..HEAD"
+  else
+    range="$remote_oid..$local_oid"
+  fi
+
+  # Get changed files relative to backend/
+  changed_files=$(git diff --name-only "$range" -- backend/ 2>/dev/null | sed 's|^backend/||' || true)
+
+  if [ -z "$changed_files" ]; then
+    echo "[codemap] No backend changes detected — skipping."
+    exit 0
+  fi
+
+  # ---------------------------------------------------------------------------
+  # 2. Find affected directories that have codemap.md
+  # ---------------------------------------------------------------------------
+  affected_dirs=()
+  declare -A seen_dirs
+
+  while IFS= read -r file; do
+    # Skip codemap files themselves, tests, docs, translations
+    case "$file" in
+      */codemap.md|test/*|spec/*|docs/*|*.md) continue ;;
+    esac
+
+    dir=$(dirname "$file")
+
+    # Walk up directory tree to find nearest codemap.md
+    check_dir="$dir"
+    while [ "$check_dir" != "." ] && [ -n "$check_dir" ]; do
+      if [ -f "$REPO_ROOT/$check_dir/codemap.md" ] && [ -z "${seen_dirs[$check_dir]+x}" ]; then
+        seen_dirs[$check_dir]=1
+        affected_dirs+=("$check_dir")
+      fi
+      check_dir=$(dirname "$check_dir")
+    done
+
+    # Check root codemap
+    if [ -f "$REPO_ROOT/codemap.md" ] && [ -z "${seen_dirs[.]+x}" ]; then
+      seen_dirs[.]=1
+      affected_dirs+=(".")
+    fi
+  done <<< "$changed_files"
+
+  if [ ${#affected_dirs[@]} -eq 0 ]; then
+    echo "[codemap] No codemap-tracked directories affected."
+    exit 0
+  fi
+
+  # ---------------------------------------------------------------------------
+  # 3. Check staleness — compare codemap mtime vs newest file in directory
+  # ---------------------------------------------------------------------------
+  stale_dirs=()
+
+  for dir in "${affected_dirs[@]}"; do
+    codemap_path="$REPO_ROOT/$dir/codemap.md"
+    if [ ! -f "$codemap_path" ]; then continue; fi
+
+    codemap_mtime=$(stat -f %m "$codemap_path" 2>/dev/null || stat -c %Y "$codemap_path" 2>/dev/null)
+
+    # Find newest non-codemap file in directory
+    newest_file_mtime=$(find "$REPO_ROOT/$dir" -maxdepth 1 -type f \
+      ! -name "codemap.md" ! -name "*.md" ! -name "*.test.*" ! -name "*.spec.*" \
+      -exec stat -f %m {} \; 2>/dev/null | sort -rn | head -1 || echo "0")
+
+    if [ -n "$newest_file_mtime" ] && [ "$newest_file_mtime" -gt "$codemap_mtime" ] 2>/dev/null; then
+      stale_dirs+=("$dir")
+    fi
+  done
+
+  if [ ${#stale_dirs[@]} -eq 0 ]; then
+    echo "[codemap] All codemaps are up to date."
+    exit 0
+  fi
+
+  # ---------------------------------------------------------------------------
+  # 4. Update stale codemaps
+  # ---------------------------------------------------------------------------
+  echo ""
+  echo "[codemap] Stale codemaps detected (${#stale_dirs[@]} directories):"
+  for dir in "${stale_dirs[@]}"; do
+    echo "  - $dir/codemap.md"
+  done
+  echo ""
+
+  if [ -x "$UPDATER" ]; then
+    bash "$UPDATER" "$REPO_ROOT" "${stale_dirs[@]}"
+  else
+    echo "[codemap] WARNING: update-codemap.sh not found or not executable."
+    echo "[codemap] Run manually: .github/hooks/update-codemap.sh <repo_root> <dirs...>"
+    echo "[codemap] Proceeding with push anyway."
+  fi
+done
+
+exit 0

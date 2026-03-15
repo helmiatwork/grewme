@@ -1,0 +1,104 @@
+<h2>Behavior Point Awarding — UI Approach</h2>
+<p class="subtitle">How should teachers award points during class? Pick the approach that feels right.</p>
+
+<div class="cards">
+  <!-- Option A: Grid Mode -->
+  <div class="card" data-choice="grid" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e; border-radius:8px; padding:16px; color:#e0e0e0; font-family:system-ui;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-weight:600; color:#fff;">Class 1A — Behavior</span>
+          <span style="background:#7c3aed; padding:2px 8px; border-radius:12px; font-size:12px;">Today</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
+          <div style="background:#2a2a4a; border-radius:8px; padding:8px; text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#4ade80;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:16px;">👦</div>
+            <div style="font-size:11px; color:#ccc;">Andi</div>
+            <div style="font-size:14px; font-weight:700; color:#4ade80;">+12</div>
+          </div>
+          <div style="background:#2a2a4a; border-radius:8px; padding:8px; text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#60a5fa;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:16px;">👧</div>
+            <div style="font-size:11px; color:#ccc;">Budi</div>
+            <div style="font-size:14px; font-weight:700; color:#4ade80;">+8</div>
+          </div>
+          <div style="background:#2a2a4a; border-radius:8px; padding:8px; text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#f472b6;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:16px;">👧</div>
+            <div style="font-size:11px; color:#ccc;">Citra</div>
+            <div style="font-size:14px; font-weight:700; color:#facc15;">+3</div>
+          </div>
+          <div style="background:#2a2a4a; border-radius:8px; padding:8px; text-align:center;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#a78bfa;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:16px;">👦</div>
+            <div style="font-size:11px; color:#ccc;">Dimas</div>
+            <div style="font-size:14px; font-weight:700; color:#f87171;">-2</div>
+          </div>
+        </div>
+        <div style="margin-top:10px; font-size:11px; color:#888;">Tap student → select behavior → point awarded</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Student Grid (ClassDojo-style)</h3>
+      <p>All students visible in a grid. Tap a student to open behavior selector popup. One tap to award. Great for quick classroom scanning.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Fast — see everyone at a glance</li><li>Familiar ClassDojo pattern</li><li>Works on projector</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Gets crowded with 30+ students</li><li>Extra tap to select behavior</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Quick Action Bar -->
+  <div class="card" data-choice="quickbar" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e; border-radius:8px; padding:16px; color:#e0e0e0; font-family:system-ui;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-weight:600; color:#fff;">Quick Award</span>
+          <span style="background:#059669; padding:2px 8px; border-radius:12px; font-size:12px;">Helping Others (+3)</span>
+        </div>
+        <div style="background:#2a2a4a; border-radius:8px; padding:8px; margin-bottom:8px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <span style="background:#059669; color:white; padding:4px 10px; border-radius:16px; font-size:12px; cursor:pointer;">Helping Others +3</span>
+            <span style="background:#2563eb; color:white; padding:4px 10px; border-radius:16px; font-size:12px; opacity:0.6;">Teamwork +2</span>
+            <span style="background:#7c3aed; color:white; padding:4px 10px; border-radius:16px; font-size:12px; opacity:0.6;">Leadership +5</span>
+            <span style="background:#dc2626; color:white; padding:4px 10px; border-radius:16px; font-size:12px; opacity:0.6;">Late -1</span>
+          </div>
+        </div>
+        <div style="font-size:11px; color:#888; margin-bottom:6px;">Now tap students to apply:</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <span style="background:#065f46; border:1px solid #059669; padding:4px 10px; border-radius:16px; font-size:12px;">✓ Andi</span>
+          <span style="background:#065f46; border:1px solid #059669; padding:4px 10px; border-radius:16px; font-size:12px;">✓ Budi</span>
+          <span style="background:#2a2a4a; border:1px solid #444; padding:4px 10px; border-radius:16px; font-size:12px;">Citra</span>
+          <span style="background:#2a2a4a; border:1px solid #444; padding:4px 10px; border-radius:16px; font-size:12px;">Dimas</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Behavior-First Quick Bar</h3>
+      <p>Select the behavior FIRST, then tap multiple students to apply it. Great for "3 students helped today" scenarios. Batch-friendly.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Batch award to multiple students</li><li>Fewer total taps</li><li>Behavior always visible</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Less intuitive initially</li><li>Reversed mental model</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Both -->
+  <div class="card" data-choice="both" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e; border-radius:8px; padding:16px; color:#e0e0e0; font-family:system-ui; text-align:center;">
+        <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+          <span style="background:#7c3aed; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600;">Grid View</span>
+          <span style="background:#2a2a4a; padding:6px 14px; border-radius:8px; font-size:12px; border:1px solid #444;">Quick Award</span>
+        </div>
+        <div style="font-size:13px; color:#aaa;">Teacher switches between modes</div>
+        <div style="margin-top:8px; font-size:11px; color:#666;">Grid = single student focus<br>Quick = batch behaviors</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Both Modes (Tab Switch)</h3>
+      <p>Grid view for individual awarding + Quick bar for batch awarding. Teacher picks which mode fits the moment.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Best of both worlds</li><li>Flexible for different situations</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>More complex to build</li><li>More UI to learn</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

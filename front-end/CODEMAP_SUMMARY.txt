@@ -1,0 +1,306 @@
+================================================================================
+GREWME FRONTEND — DEEP CODEMAP GENERATION COMPLETE
+================================================================================
+
+PROJECT: GrewMe — Kids Learning Radar App
+FRAMEWORK: SvelteKit 2.50.2 + Vite 7.3.1
+LANGUAGE: TypeScript 5.9.3 + Svelte 5.51.0
+DEPLOYMENT: Vercel (adapter-vercel)
+
+================================================================================
+CODEMAP FILES GENERATED
+================================================================================
+
+✅ COMPLETE (4 files):
+
+1. CODEMAP.md (Root)
+   - 12 sections covering entire frontend
+   - Project overview, architecture, entry points
+   - Directory structure with responsibilities
+   - Design patterns & data flow examples
+   - Integration points & dependencies
+   - Development workflow & best practices
+   - ~1,200 lines
+
+2. src/lib/api/CODEMAP.md
+   - GraphQL client, auth, types, queries
+   - client.ts: GraphQL fetch wrapper
+   - auth.ts: JWT/cookie management
+   - types.ts: 50+ TypeScript interfaces
+   - queries/: 18+ GraphQL query files organized by feature
+   - Data flow examples
+   - ~400 lines
+
+3. src/lib/components/CODEMAP.md
+   - 20+ reusable UI components
+   - Layout: AppShell, Navbar, Sidebar
+   - UI: Button, Card, Input, Alert, Badge, Toast, Skeleton
+   - Charts: RadarChart, ProgressChart, AxisRadial, RadarArea
+   - Feed: FeedCard, CommentSection, FilePicker, MediaGallery
+   - Component composition examples
+   - ~600 lines
+
+4. src/routes/teacher/CODEMAP.md
+   - Teacher dashboard & all features
+   - 61 pages, 57 server load functions
+   - Dashboard, classrooms, students, curriculum
+   - Exams (create, assign, grade)
+   - Attendance, calendar, feed, messages
+   - Leave requests, profile, settings
+   - Data flow patterns & integration points
+   - ~500 lines
+
+📋 PLANNED (7 files):
+   - src/lib/stores/CODEMAP.md
+   - src/lib/utils/CODEMAP.md
+   - src/lib/paraglide/CODEMAP.md
+   - src/routes/parent/CODEMAP.md
+   - src/routes/school/CODEMAP.md
+   - src/routes/admin/CODEMAP.md
+   - src/routes/api/CODEMAP.md
+
+📑 INDEX FILE:
+   - CODEMAP_INDEX.md: Navigation guide for all codemaps
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+ARCHITECTURE:
+  - Multi-role SPA (Teacher, Parent, SchoolManager)
+  - Server-side data loading (SvelteKit load functions)
+  - GraphQL API communication
+  - Real-time notifications via ActionCable WebSocket
+  - Paraglide i18n for multi-language support
+
+DESIGN PATTERNS:
+  1. Server-side load functions (no client-side data fetching)
+  2. Form actions for mutations (progressive enhancement)
+  3. Reactive stores (Svelte 5 $state, $derived)
+  4. Role-based access control (hooks.server.ts guards)
+  5. GraphQL query organization by feature
+  6. Component composition with Snippets
+  7. Real-time notifications via ActionCable
+  8. Skill radar visualization (LayerCake + D3)
+
+DATA FLOW:
+  - User Action → Form Action/Event → GraphQL Query/Mutation
+  - Rails Backend → Response → Store/State Update → Component Re-render
+  - Real-time: Rails broadcast → ActionCable → Store → Toast/Notification
+
+INTEGRATION POINTS:
+  - GraphQL Endpoint: RAILS_GRAPHQL_URL (http://localhost:3000/graphql)
+  - WebSocket: RAILS_CABLE_URL (ws://localhost:3004/cable)
+  - File Upload: Firebase or backend endpoint
+  - i18n: Paraglide (project.inlang)
+  - Deployment: Vercel
+
+CODE ORGANIZATION:
+  - src/lib/api/: GraphQL client, auth, types, queries
+  - src/lib/stores/: Reactive state (notifications, toasts, push)
+  - src/lib/components/: Reusable UI components (layout, ui, charts, feed)
+  - src/lib/utils/: Constants, helpers, grade calculations
+  - src/lib/paraglide/: i18n setup and messages
+  - src/routes/: SvelteKit routes (teacher, parent, school, admin, api, public)
+  - src/hooks.server.ts: Auth middleware, locale detection, route guards
+
+STATISTICS:
+  - Total Routes: 61 pages
+  - Server Load Functions: 57
+  - Reusable Components: 20+
+  - GraphQL Query Files: 18+
+  - TypeScript Interfaces: 50+
+  - Reactive Stores: 3
+  - Lines of Code (core): ~5,000
+
+KEY FILES:
+  - src/hooks.server.ts (115 lines): Auth middleware, route guards
+  - src/lib/api/types.ts (466 lines): All TypeScript interfaces
+  - src/lib/stores/notifications.svelte.ts (289 lines): Real-time notifications
+  - src/lib/components/layout/Navbar.svelte (180 lines): Top navigation
+  - src/lib/components/charts/ProgressChart.svelte (121 lines): Progress chart
+
+================================================================================
+DIRECTORY MAPPING
+================================================================================
+
+src/
+├── routes/                    (61 pages, 57 server loads)
+│   ├── teacher/              → CODEMAP.md ✅
+│   ├── parent/               → CODEMAP.md 📋
+│   ├── school/               → CODEMAP.md 📋
+│   ├── admin/                → CODEMAP.md 📋
+│   ├── api/                  → CODEMAP.md 📋
+│   ├── login/, register/, consent/, invite/, exam/, posts/, privacy/, terms/
+│   ├── +layout.svelte, +layout.server.ts, +page.svelte
+│
+├── lib/
+│   ├── api/                  → CODEMAP.md ✅
+│   │   ├── client.ts, auth.ts, types.ts, upload.ts
+│   │   └── queries/ (18+ files)
+│   │
+│   ├── stores/               → CODEMAP.md 📋
+│   │   ├── notifications.svelte.ts, toasts.svelte.ts, push.svelte.ts
+│   │
+│   ├── components/           → CODEMAP.md ✅
+│   │   ├── layout/ (AppShell, Navbar, Sidebar)
+│   │   ├── ui/ (Button, Card, Input, Alert, Badge, Toast, Skeleton)
+│   │   ├── charts/ (RadarChart, ProgressChart, _radar/)
+│   │   └── feed/ (FeedCard, CommentSection, FilePicker, MediaGallery)
+│   │
+│   ├── utils/                → CODEMAP.md 📋
+│   │   ├── constants.ts, helpers.ts, grade.ts
+│   │
+│   ├── paraglide/            → CODEMAP.md 📋
+│   │   ├── messages.js, runtime.js, server.js, messages/
+│   │
+│   └── assets/
+│
+├── hooks.server.ts           (115 lines)
+├── app.css
+├── +layout.svelte
+└── +page.svelte
+
+Configuration:
+├── svelte.config.js
+├── vite.config.ts
+├── tsconfig.json
+├── package.json
+└── project.inlang/
+
+================================================================================
+QUICK REFERENCE
+================================================================================
+
+AUTHENTICATION:
+  - JWT-based (access + refresh tokens)
+  - httpOnly cookies for security
+  - Token refresh on expiration
+  - Role-based access control (Teacher, Parent, SchoolManager)
+  - Route guards in hooks.server.ts
+
+GRAPHQL QUERIES:
+  - Organized by feature in src/lib/api/queries/
+  - 18+ query files (auth, classrooms, students, curriculum, exams, etc.)
+  - Relay-style pagination (Connection<T>)
+  - Error handling with GraphQLError class
+
+COMPONENTS:
+  - Reusable, composable, type-safe
+  - Svelte 5 reactivity ($state, $derived)
+  - Tailwind CSS styling
+  - Props-based configuration
+
+CHARTS:
+  - RadarChart: 5-axis skill visualization (LayerCake + D3)
+  - ProgressChart: Weekly progress line chart (D3 scales + d3-shape)
+  - Responsive, color-coded, legend included
+
+NOTIFICATIONS:
+  - Real-time via ActionCable WebSocket
+  - Auto-reconnect with exponential backoff
+  - Paraglide i18n translation
+  - Toast UI integration
+
+i18n:
+  - Paraglide JS for message management
+  - Multi-language support
+  - Type-safe message functions
+  - Language switcher in Navbar
+
+================================================================================
+DEVELOPMENT WORKFLOW
+================================================================================
+
+Setup:
+  cd front-end
+  npm install
+  npm run dev  # Vite dev server on http://localhost:5173
+
+Type Checking:
+  npm run check  # svelte-kit sync + svelte-check
+  npm run check:watch  # Watch mode
+
+Build & Deploy:
+  npm run build  # SvelteKit + Vite build
+  npm run preview  # Preview production build
+  # Vercel auto-deploys on git push
+
+Environment Variables:
+  RAILS_GRAPHQL_URL=http://localhost:3000/graphql
+  RAILS_CABLE_URL=ws://localhost:3004/cable
+
+================================================================================
+BEST PRACTICES
+================================================================================
+
+✅ DO:
+  - Use server-side load functions for data fetching
+  - Centralize GraphQL queries in /lib/api/queries/
+  - Use Paraglide message functions for all UI text
+  - Leverage Svelte 5 reactivity ($state, $derived)
+  - Guard routes in hooks.server.ts
+  - Use TypeScript for type safety
+  - Organize components by feature/responsibility
+  - Handle GraphQL errors separately from network errors
+  - Use form actions for mutations
+  - Validate input server-side
+
+❌ DON'T:
+  - Fetch data in components (use load functions)
+  - Hardcode strings (use Paraglide messages)
+  - Store sensitive data in localStorage (use httpOnly cookies)
+  - Bypass role guards (enforce in hooks.server.ts)
+  - Mix concerns (keep components, stores, queries separate)
+  - Ignore GraphQL errors
+  - Create deeply nested component hierarchies
+  - Pass too many props (consider composition)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Read CODEMAP.md for overall architecture
+2. Navigate to specific layer codemaps:
+   - API: src/lib/api/CODEMAP.md
+   - Components: src/lib/components/CODEMAP.md
+   - Routes: src/routes/teacher/CODEMAP.md
+3. Use CODEMAP_INDEX.md for quick navigation
+4. Generate remaining codemaps (7 planned files)
+5. Keep codemaps updated as codebase evolves
+
+================================================================================
+RELATED DOCUMENTATION
+================================================================================
+
+Backend: /Users/theresiaputri/repo/grewme/backend (Rails 8.1.2)
+Mobile: /Users/theresiaputri/repo/grewme/mobile (Kotlin Multiplatform)
+Project Root: /Users/theresiaputri/repo/grewme
+
+================================================================================
+COMPLETION STATUS
+================================================================================
+
+✅ Complete (4/11):
+   - Root CODEMAP.md
+   - src/lib/api/CODEMAP.md
+   - src/lib/components/CODEMAP.md
+   - src/routes/teacher/CODEMAP.md
+
+📋 Planned (7/11):
+   - src/lib/stores/CODEMAP.md
+   - src/lib/utils/CODEMAP.md
+   - src/lib/paraglide/CODEMAP.md
+   - src/routes/parent/CODEMAP.md
+   - src/routes/school/CODEMAP.md
+   - src/routes/admin/CODEMAP.md
+   - src/routes/api/CODEMAP.md
+
+📑 Index:
+   - CODEMAP_INDEX.md (navigation guide)
+
+================================================================================
+GENERATED: March 15, 2026
+MAINTAINER: GrewMe Team
+STATUS: Deep mapping complete, ready for documentation & onboarding
+================================================================================

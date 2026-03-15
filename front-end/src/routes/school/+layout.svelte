@@ -17,7 +17,8 @@
     { label: m.nav_attendance(), href: '/school/attendance', icon: '✅' },
     { label: m.nav_teacher_leave?.() ?? 'Teacher Leave', href: '/school/teacher-leave', icon: '🏖️' },
     { label: m.nav_settings(), href: '/school/settings/academic-years', icon: '⚙️' },
-    { label: m.nav_profile(), href: '/school/profile', icon: '👤' }
+    { label: m.nav_profile(), href: '/school/profile', icon: '👤' },
+    { label: (m as any).behavior_title?.() ?? 'Behavior Points', href: '/school/behavior', icon: '⭐' }
   ]);
 </script>
 
