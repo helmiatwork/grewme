@@ -182,9 +182,9 @@
       </h1>
       <p class="text-sm text-text-muted mt-0.5">School-wide behavior overview</p>
     </div>
-    <Button variant="outline" size="sm" href="/school/behavior/categories">
+    <a href="/school/behavior/categories" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors">
       ⚙️ {(m as any).behavior_categories?.() ?? 'Manage Categories'}
-    </Button>
+    </a>
   </div>
 
   <!-- Week picker -->
