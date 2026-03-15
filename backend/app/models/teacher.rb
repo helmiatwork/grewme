@@ -23,6 +23,7 @@ class Teacher < ApplicationRecord
   has_many :reviewed_leave_requests, class_name: "LeaveRequest", foreign_key: :reviewed_by_id, dependent: :nullify
   has_many :teacher_leave_requests, dependent: :destroy
   has_many :substitute_assignments, class_name: "TeacherLeaveRequest", foreign_key: :substitute_id, dependent: :nullify
+  has_many :awarded_behavior_points, class_name: "BehaviorPoint", foreign_key: :teacher_id, dependent: :destroy, inverse_of: :teacher
 
   has_one_attached :avatar_image
 
