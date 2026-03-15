@@ -1,0 +1,17 @@
+emma_week1:
+  student: student_emma
+  classroom: alice_class
+  week_start: "2026-03-09"
+  total_points: 12
+  positive_count: 5
+  negative_count: 1
+  top_behavior_category: helping_others
+
+finn_week1:
+  student: student_finn
+  classroom: alice_class
+  week_start: "2026-03-09"
+  total_points: 8
+  positive_count: 3
+  negative_count: 0
+  top_behavior_category: leadership
