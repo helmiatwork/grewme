@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# GrewMe Frontend — Pre-push hook: auto-update stale CODEMAP.md files
+# Install: .github/hooks/install.sh
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)/front-end"
+HOOK_DIR="$(dirname "$0")"
+UPDATER="$HOOK_DIR/update-codemap.sh"
+
+# ---------------------------------------------------------------------------
+# 1. Determine changed files between local HEAD and remote tracking branch
+# ---------------------------------------------------------------------------
+remote="$1"
+url="$2"
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+  # Skip delete pushes
+  if [ "$local_oid" = "0000000000000000000000000000000000000000" ]; then
+    continue
+  fi
+
+  # If remote branch doesn't exist yet, compare against merge-base with main
+  if [ "$remote_oid" = "0000000000000000000000000000000000000000" ]; then
+    base=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+    if [ -z "$base" ]; then
+      echo "[codemap] New repo — skipping codemap check."
+      exit 0
+    fi
+    range="$base..HEAD"
+  else
+    range="$remote_oid..$local_oid"
+  fi
+
+  # Get changed files relative to front-end/
+  changed_files=$(git diff --name-only "$range" -- front-end/ 2>/dev/null | sed 's|^front-end/||' || true)
+
+  if [ -z "$changed_files" ]; then
+    echo "[codemap] No frontend changes detected — skipping."
+    exit 0
+  fi
+
+  # ---------------------------------------------------------------------------
+  # 2. Find affected directories that have CODEMAP.md
+  # ---------------------------------------------------------------------------
+  affected_dirs=()
+  declare -A seen_dirs
+
+  while IFS= read -r file; do
+    # Skip codemap files themselves, tests, docs, node_modules, translations
+    case "$file" in
+      */CODEMAP*|*/codemap*|tests/*|__tests__/*|node_modules/*|.svelte-kit/*|*.md) continue ;;
+    esac
+
+    dir=$(dirname "$file")
+
+    # Walk up directory tree to find nearest CODEMAP.md
+    check_dir="$dir"
+    while [ "$check_dir" != "." ] && [ -n "$check_dir" ]; do
+      if [ -f "$REPO_ROOT/$check_dir/CODEMAP.md" ] && [ -z "${seen_dirs[$check_dir]+x}" ]; then
+        seen_dirs[$check_dir]=1
+        affected_dirs+=("$check_dir")
+      fi
+      check_dir=$(dirname "$check_dir")
+    done
+
+    # Check root CODEMAP.md
+    if [ -f "$REPO_ROOT/CODEMAP.md" ] && [ -z "${seen_dirs[.]+x}" ]; then
+      seen_dirs[.]=1
+      affected_dirs+=(".")
+    fi
+  done <<< "$changed_files"
+
+  if [ ${#affected_dirs[@]} -eq 0 ]; then
+    echo "[codemap] No codemap-tracked directories affected."
+    exit 0
+  fi
+
+  # ---------------------------------------------------------------------------
+  # 3. Check staleness — compare codemap mtime vs newest file in directory
+  # ---------------------------------------------------------------------------
+  stale_dirs=()
+
+  for dir in "${affected_dirs[@]}"; do
+    if [ "$dir" = "." ]; then
+      codemap_path="$REPO_ROOT/CODEMAP.md"
+    else
+      codemap_path="$REPO_ROOT/$dir/CODEMAP.md"
+    fi
+    if [ ! -f "$codemap_path" ]; then continue; fi
+
+    codemap_mtime=$(stat -f %m "$codemap_path" 2>/dev/null || stat -c %Y "$codemap_path" 2>/dev/null)
+
+    local_dir="$REPO_ROOT/$dir"
+    if [ "$dir" = "." ]; then local_dir="$REPO_ROOT"; fi
+
+    # Find newest source file in directory
+    newest_file_mtime=$(find "$local_dir" -maxdepth 1 -type f \
+      ! -name "CODEMAP*" ! -name "codemap*" ! -name "*.md" \
+      ! -name "*.test.*" ! -name "*.spec.*" ! -name ".DS_Store" \
+      -exec stat -f %m {} \; 2>/dev/null | sort -rn | head -1 || echo "0")
+
+    if [ -n "$newest_file_mtime" ] && [ "$newest_file_mtime" -gt "$codemap_mtime" ] 2>/dev/null; then
+      stale_dirs+=("$dir")
+    fi
+  done
+
+  if [ ${#stale_dirs[@]} -eq 0 ]; then
+    echo "[codemap] All codemaps are up to date."
+    exit 0
+  fi
+
+  # ---------------------------------------------------------------------------
+  # 4. Update stale codemaps
+  # ---------------------------------------------------------------------------
+  echo ""
+  echo "[codemap] Stale codemaps detected (${#stale_dirs[@]} directories):"
+  for dir in "${stale_dirs[@]}"; do
+    if [ "$dir" = "." ]; then
+      echo "  - CODEMAP.md"
+    else
+      echo "  - $dir/CODEMAP.md"
+    fi
+  done
+  echo ""
+
+  if [ -x "$UPDATER" ]; then
+    bash "$UPDATER" "$REPO_ROOT" "${stale_dirs[@]}"
+  else
+    echo "[codemap] WARNING: update-codemap.sh not found or not executable."
+    echo "[codemap] Proceeding with push anyway."
+  fi
+done
+
+exit 0

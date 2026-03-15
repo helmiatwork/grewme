@@ -1,0 +1,139 @@
+<h2>Live Classroom Projection Display</h2>
+<p class="subtitle">What students see on the projector during class. Pick the style.</p>
+
+<div class="cards">
+  <!-- Option A: Leaderboard -->
+  <div class="card" data-choice="leaderboard" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e); border-radius:8px; padding:20px; color:#e0e0e0; font-family:system-ui;">
+        <div style="text-align:center; margin-bottom:16px;">
+          <span style="font-size:18px; font-weight:700; color:#fff;">Class 1A — Today's Stars</span>
+        </div>
+        <!-- Top 3 podium -->
+        <div style="display:flex; justify-content:center; align-items:flex-end; gap:12px; margin-bottom:16px;">
+          <div style="text-align:center;">
+            <div style="font-size:11px; color:#c0c0c0;">2nd</div>
+            <div style="width:44px;height:44px;border-radius:50%;background:#60a5fa;margin:4px auto;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #c0c0c0;">👧</div>
+            <div style="font-size:12px; color:#fff;">Budi</div>
+            <div style="font-size:16px; font-weight:700; color:#60a5fa;">+15</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:13px; color:#ffd700;">1st</div>
+            <div style="width:52px;height:52px;border-radius:50%;background:#4ade80;margin:4px auto;display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid #ffd700;">👦</div>
+            <div style="font-size:14px; font-weight:600; color:#fff;">Andi</div>
+            <div style="font-size:20px; font-weight:700; color:#4ade80;">+22</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px; color:#cd7f32;">3rd</div>
+            <div style="width:44px;height:44px;border-radius:50%;background:#f472b6;margin:4px auto;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #cd7f32;">👧</div>
+            <div style="font-size:12px; color:#fff;">Citra</div>
+            <div style="font-size:16px; font-weight:700; color:#f472b6;">+12</div>
+          </div>
+        </div>
+        <div style="font-size:10px; color:#666; text-align:center;">Real-time updates via WebSocket</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Leaderboard / Podium</h3>
+      <p>Top students highlighted with podium ranking. Gamified and competitive. Points animate when awarded.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Highly motivating for kids</li><li>Clear visual hierarchy</li><li>Game-like feel</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Can discourage low-scoring students</li><li>Competitive pressure</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Equal Grid -->
+  <div class="card" data-choice="equal-grid" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e); border-radius:8px; padding:20px; color:#e0e0e0; font-family:system-ui;">
+        <div style="text-align:center; margin-bottom:12px;">
+          <span style="font-size:16px; font-weight:700; color:#fff;">Class 1A</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
+          <div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:10px; text-align:center;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#4ade80;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">👦</div>
+            <div style="font-size:12px; color:#fff;">Andi</div>
+            <div style="font-size:18px; font-weight:700; color:#4ade80;">+22</div>
+            <div style="width:100%;height:4px;background:#333;border-radius:2px;margin-top:4px;"><div style="width:90%;height:100%;background:#4ade80;border-radius:2px;"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:10px; text-align:center;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#60a5fa;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">👧</div>
+            <div style="font-size:12px; color:#fff;">Budi</div>
+            <div style="font-size:18px; font-weight:700; color:#60a5fa;">+15</div>
+            <div style="width:100%;height:4px;background:#333;border-radius:2px;margin-top:4px;"><div style="width:65%;height:100%;background:#60a5fa;border-radius:2px;"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:10px; text-align:center;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#f472b6;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">👧</div>
+            <div style="font-size:12px; color:#fff;">Citra</div>
+            <div style="font-size:18px; font-weight:700; color:#f472b6;">+12</div>
+            <div style="width:100%;height:4px;background:#333;border-radius:2px;margin-top:4px;"><div style="width:50%;height:100%;background:#f472b6;border-radius:2px;"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:12px; padding:10px; text-align:center;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#a78bfa;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">👦</div>
+            <div style="font-size:12px; color:#fff;">Dimas</div>
+            <div style="font-size:18px; font-weight:700; color:#facc15;">+5</div>
+            <div style="width:100%;height:4px;background:#333;border-radius:2px;margin-top:4px;"><div style="width:20%;height:100%;background:#facc15;border-radius:2px;"></div></div>
+          </div>
+        </div>
+        <div style="font-size:10px; color:#666; text-align:center; margin-top:8px;">All students equal size — progress bars show relative scores</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Equal Grid with Progress Bars</h3>
+      <p>All students shown equally in a grid. Progress bars show relative scores without explicit ranking. Less competitive, more inclusive.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Inclusive — no student singled out</li><li>Progress visible without ranking</li><li>Works well with large classes</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Less exciting/game-like</li><li>Less motivation from competition</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Celebration Feed -->
+  <div class="card" data-choice="feed" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e); border-radius:8px; padding:20px; color:#e0e0e0; font-family:system-ui;">
+        <div style="text-align:center; margin-bottom:12px;">
+          <span style="font-size:16px; font-weight:700; color:#fff;">Live Activity</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="background:rgba(74,222,128,0.15); border-left:3px solid #4ade80; padding:8px 10px; border-radius:0 8px 8px 0; display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">👦</span>
+            <div>
+              <span style="font-size:12px; color:#4ade80; font-weight:600;">Andi</span>
+              <span style="font-size:12px; color:#aaa;"> earned </span>
+              <span style="font-size:12px; color:#4ade80; font-weight:600;">Helping Others +3</span>
+            </div>
+            <span style="margin-left:auto; font-size:10px; color:#666;">just now</span>
+          </div>
+          <div style="background:rgba(96,165,250,0.15); border-left:3px solid #60a5fa; padding:8px 10px; border-radius:0 8px 8px 0; display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">👧</span>
+            <div>
+              <span style="font-size:12px; color:#60a5fa; font-weight:600;">Budi</span>
+              <span style="font-size:12px; color:#aaa;"> earned </span>
+              <span style="font-size:12px; color:#60a5fa; font-weight:600;">Teamwork +2</span>
+            </div>
+            <span style="margin-left:auto; font-size:10px; color:#666;">2m ago</span>
+          </div>
+          <div style="background:rgba(248,113,113,0.15); border-left:3px solid #f87171; padding:8px 10px; border-radius:0 8px 8px 0; display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">👦</span>
+            <div>
+              <span style="font-size:12px; color:#f87171; font-weight:600;">Dimas</span>
+              <span style="font-size:12px; color:#aaa;"> received </span>
+              <span style="font-size:12px; color:#f87171; font-weight:600;">Off-task -1</span>
+            </div>
+            <span style="margin-left:auto; font-size:10px; color:#666;">5m ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Live Activity Feed</h3>
+      <p>Real-time scrolling feed of behavior events. Shows who earned what, when. Like a live stream of classroom behavior.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Immediate feedback visible</li><li>Shows positive behaviors in real-time</li><li>Narrative/story feel</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Negative events visible to class</li><li>Can be distracting</li><li>No overview of totals</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

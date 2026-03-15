@@ -1,0 +1,40 @@
+emma_helping:
+  student: student_emma
+  teacher: teacher_alice
+  classroom: alice_class
+  behavior_category: helping_others
+  point_value: 3
+  awarded_at: "2026-03-15 09:00:00"
+
+emma_teamwork:
+  student: student_emma
+  teacher: teacher_alice
+  classroom: alice_class
+  behavior_category: teamwork
+  point_value: 2
+  awarded_at: "2026-03-15 10:30:00"
+
+emma_off_task:
+  student: student_emma
+  teacher: teacher_alice
+  classroom: alice_class
+  behavior_category: off_task
+  point_value: -1
+  awarded_at: "2026-03-15 14:00:00"
+
+finn_leadership:
+  student: student_finn
+  teacher: teacher_alice
+  classroom: alice_class
+  behavior_category: leadership
+  point_value: 5
+  awarded_at: "2026-03-15 11:00:00"
+
+revoked_point:
+  student: student_emma
+  teacher: teacher_alice
+  classroom: alice_class
+  behavior_category: disruptive
+  point_value: -2
+  awarded_at: "2026-03-15 13:00:00"
+  revoked_at: "2026-03-15 13:05:00"

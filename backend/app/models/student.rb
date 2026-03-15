@@ -13,6 +13,8 @@ class Student < ApplicationRecord
   has_many :objective_masteries, dependent: :destroy
   has_many :attendances, dependent: :destroy
   has_many :leave_requests, dependent: :destroy
+  has_many :behavior_points, dependent: :destroy
+  has_many :behavior_summaries, dependent: :destroy
 
   encrypts :name
 

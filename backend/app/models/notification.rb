@@ -14,6 +14,7 @@ class Notification < ApplicationRecord
     new_message
     new_comment
     health_checkup_reminder
+    behavior_report
   ].freeze
 
   belongs_to :recipient, polymorphic: true

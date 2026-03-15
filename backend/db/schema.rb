@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_10_115453) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_15_074029) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,6 +136,57 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_115453) do
     t.index ["resource_type", "resource_id"], name: "index_audit_logs_on_resource_type_and_resource_id"
     t.index ["severity"], name: "index_audit_logs_on_severity"
     t.index ["user_type", "user_id"], name: "index_audit_logs_on_user_type_and_user_id"
+  end
+
+  create_table "behavior_categories", force: :cascade do |t|
+    t.string "color", null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.text "description"
+    t.string "icon", null: false
+    t.boolean "is_positive", default: true, null: false
+    t.string "name", null: false
+    t.integer "point_value", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "name"], name: "idx_behavior_categories_unique_name_per_school", unique: true, where: "(deleted_at IS NULL)"
+    t.index ["school_id"], name: "index_behavior_categories_on_school_id"
+  end
+
+  create_table "behavior_points", force: :cascade do |t|
+    t.datetime "awarded_at", null: false
+    t.bigint "behavior_category_id", null: false
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.text "note"
+    t.integer "point_value", null: false
+    t.datetime "revoked_at"
+    t.bigint "student_id", null: false
+    t.bigint "teacher_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["behavior_category_id"], name: "index_behavior_points_on_behavior_category_id"
+    t.index ["classroom_id", "awarded_at"], name: "index_behavior_points_on_classroom_id_and_awarded_at"
+    t.index ["classroom_id"], name: "index_behavior_points_on_classroom_id"
+    t.index ["student_id", "awarded_at"], name: "index_behavior_points_on_student_id_and_awarded_at"
+    t.index ["student_id"], name: "index_behavior_points_on_student_id"
+    t.index ["teacher_id"], name: "index_behavior_points_on_teacher_id"
+  end
+
+  create_table "behavior_summaries", force: :cascade do |t|
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "negative_count", default: 0, null: false
+    t.integer "positive_count", default: 0, null: false
+    t.bigint "student_id", null: false
+    t.bigint "top_behavior_category_id"
+    t.integer "total_points", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.date "week_start", null: false
+    t.index ["classroom_id"], name: "index_behavior_summaries_on_classroom_id"
+    t.index ["student_id", "classroom_id", "week_start"], name: "idx_behavior_summaries_unique_per_student_week", unique: true
+    t.index ["student_id"], name: "index_behavior_summaries_on_student_id"
+    t.index ["top_behavior_category_id"], name: "index_behavior_summaries_on_top_behavior_category_id"
   end
 
   create_table "classroom_events", force: :cascade do |t|
@@ -978,6 +1029,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_115453) do
   add_foreign_key "attendances", "classrooms"
   add_foreign_key "attendances", "leave_requests"
   add_foreign_key "attendances", "students"
+  add_foreign_key "behavior_categories", "schools"
+  add_foreign_key "behavior_points", "behavior_categories"
+  add_foreign_key "behavior_points", "classrooms"
+  add_foreign_key "behavior_points", "students"
+  add_foreign_key "behavior_points", "teachers"
+  add_foreign_key "behavior_summaries", "behavior_categories", column: "top_behavior_category_id"
+  add_foreign_key "behavior_summaries", "classrooms"
+  add_foreign_key "behavior_summaries", "students"
   add_foreign_key "classroom_events", "classrooms"
   add_foreign_key "classroom_exams", "classrooms"
   add_foreign_key "classroom_exams", "exams"

@@ -1,0 +1,71 @@
+helping_others:
+  school: greenwood
+  name: "Helping Others"
+  point_value: 3
+  is_positive: true
+  icon: "🤝"
+  color: "#059669"
+  position: 0
+
+teamwork:
+  school: greenwood
+  name: "Teamwork"
+  point_value: 2
+  is_positive: true
+  icon: "👥"
+  color: "#2563eb"
+  position: 1
+
+leadership:
+  school: greenwood
+  name: "Leadership"
+  point_value: 5
+  is_positive: true
+  icon: "⭐"
+  color: "#7c3aed"
+  position: 2
+
+working_hard:
+  school: greenwood
+  name: "Working Hard"
+  point_value: 2
+  is_positive: true
+  icon: "💪"
+  color: "#d97706"
+  position: 3
+
+being_respectful:
+  school: greenwood
+  name: "Being Respectful"
+  point_value: 1
+  is_positive: true
+  icon: "🙏"
+  color: "#0891b2"
+  position: 4
+
+off_task:
+  school: greenwood
+  name: "Off-task"
+  point_value: -1
+  is_positive: false
+  icon: "📵"
+  color: "#dc2626"
+  position: 5
+
+disruptive:
+  school: greenwood
+  name: "Disruptive"
+  point_value: -2
+  is_positive: false
+  icon: "🔊"
+  color: "#b91c1c"
+  position: 6
+
+late_behavior:
+  school: greenwood
+  name: "Late"
+  point_value: -1
+  is_positive: false
+  icon: "⏰"
+  color: "#9f1239"
+  position: 7
