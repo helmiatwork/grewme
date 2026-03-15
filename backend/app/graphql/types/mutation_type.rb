@@ -128,5 +128,8 @@ module Types
     field :update_behavior_category, mutation: Mutations::UpdateBehaviorCategory
     field :delete_behavior_category, mutation: Mutations::DeleteBehaviorCategory
     field :reorder_behavior_categories, mutation: Mutations::ReorderBehaviorCategories
+    field :award_behavior_point, mutation: Mutations::AwardBehaviorPoint
+    field :batch_award_behavior_points, mutation: Mutations::BatchAwardBehaviorPoints
+    field :revoke_behavior_point, mutation: Mutations::RevokeBehaviorPoint
   end
 end
