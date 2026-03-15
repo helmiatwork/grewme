@@ -975,6 +975,68 @@ end
 # ─── Load question templates ──────────────────────────────────────────────────
 load Rails.root.join("db/seeds/question_templates.rb")
 
+# === Behavior Points ===
+puts "Seeding behavior categories..."
+
+behavior_categories_data = [
+  { name: "Helping Others", point_value: 3, is_positive: true, icon: "🤝", color: "#059669" },
+  { name: "Teamwork", point_value: 2, is_positive: true, icon: "👥", color: "#2563eb" },
+  { name: "Leadership", point_value: 5, is_positive: true, icon: "⭐", color: "#7c3aed" },
+  { name: "Working Hard", point_value: 2, is_positive: true, icon: "💪", color: "#d97706" },
+  { name: "Being Respectful", point_value: 1, is_positive: true, icon: "🙏", color: "#0891b2" },
+  { name: "Off-task", point_value: -1, is_positive: false, icon: "📵", color: "#dc2626" },
+  { name: "Disruptive", point_value: -2, is_positive: false, icon: "🔊", color: "#b91c1c" },
+  { name: "Late", point_value: -1, is_positive: false, icon: "⏰", color: "#9f1239" }
+]
+
+cats = behavior_categories_data.each_with_index.map do |attrs, idx|
+  BehaviorCategory.find_or_create_by!(school: school, name: attrs[:name]) do |c|
+    c.assign_attributes(attrs.merge(position: idx))
+  end
+end
+
+puts "Seeding behavior points (30 days)..."
+
+positive_cats = cats.select(&:is_positive)
+negative_cats = cats.reject(&:is_positive)
+
+Classroom.all.each do |classroom|
+  teacher = classroom.teachers.first
+  next unless teacher
+
+  classroom.students.each do |student|
+    30.times do |day_offset|
+      date = (Date.current - day_offset)
+
+      rand(2..4).times do
+        cat = positive_cats.sample
+        BehaviorPoint.create!(
+          student: student,
+          teacher: teacher,
+          classroom: classroom,
+          behavior_category: cat,
+          point_value: cat.point_value,
+          awarded_at: date.to_datetime + rand(8..15).hours + rand(0..59).minutes
+        )
+      end
+
+      if rand < 0.3
+        cat = negative_cats.sample
+        BehaviorPoint.create!(
+          student: student,
+          teacher: teacher,
+          classroom: classroom,
+          behavior_category: cat,
+          point_value: cat.point_value,
+          awarded_at: date.to_datetime + rand(8..15).hours + rand(0..59).minutes
+        )
+      end
+    end
+  end
+end
+
+puts "Behavior points seeded!"
+
 puts "\n✅ Seeding complete!"
 puts "   #{School.count} schools, #{Teacher.count} teachers, #{Parent.count} parents, #{Student.count} students"
 puts "   #{Classroom.count} classrooms, #{Invitation.count} invitations, #{Consent.count} consents"
@@ -983,3 +1045,4 @@ puts "   #{Exam.count} exams, #{ExamSubmission.count} submissions, #{Attendance.
 puts "   #{Conversation.count} conversations, #{Message.count} messages"
 puts "   #{LeaveRequest.count} student leave requests, #{TeacherLeaveRequest.count} teacher leave requests"
 puts "   #{HealthCheckup.count} health checkups, #{FeedPost.count} feed posts"
+puts "   #{BehaviorCategory.count} behavior categories, #{BehaviorPoint.count} behavior points"
