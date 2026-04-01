@@ -120,8 +120,9 @@ interface AuthStore {
 - `activeClassroomId` — set on teacher Dashboard load from first result of `classrooms` query. Used by Award Behavior and Class Overview.
 - `activeSchoolId` — set on teacher Dashboard load from `classrooms[0].school.id`. Used by the `behaviorCategories(schoolId)` query on the Award Behavior screen.
 - Token persisted in `expo-secure-store` (iOS Keychain / Android Keystore)
-- On app start: read token from SecureStore → hydrate Zustand store
+- **On app start:** `apps/<app>/app/_layout.tsx` (root layout) runs `SecureStore.getItemAsync('token')` in a `useEffect` on mount. Until hydration completes, render a splash/loading screen. Only after `hydrated: true` does `index.tsx` evaluate the token guard. This ensures the auth check never reads stale state.
 - Apollo Client reads token from store via auth link on every request
+- **401 navigation pattern:** `packages/shared/graphql/client.ts` exports a `clearAuthCallback: { current: (() => void) | null }` ref object. Each app's `(app)/_layout.tsx` sets `clearAuthCallback.current = () => router.replace('/(auth)/login')` on mount. The Apollo error link calls `clearAuthCallback.current?.()` on 401 — this bridges the non-React Apollo layer to Expo Router.
 - **Refresh token:** available in `data.login.refresh_token` but refresh flow is out of scope for v1. Treat 401 as session expiry → redirect to login.
 
 ### Navigation Flow
@@ -154,7 +155,20 @@ App starts
 
 Child detail (`[id]`) is a tab navigator containing Radar, Progress, and History tabs.
 
-**History pagination:** `studentDailyScores` is a graphql-ruby `connection_type`. Pass `first: 20, after: <cursor>` as standard connection arguments; the cursor comes from `pageInfo.endCursor` in the response. `skillCategory` is optional — omit to fetch all subjects. Implementer may choose infinite scroll or a load-more button.
+**History pagination:** `studentDailyScores` is a graphql-ruby `connection_type`. Pass `first: 20, after: <cursor>` as standard connection arguments; the cursor comes from `pageInfo.endCursor` in the response. `skillCategory` is optional — omit to fetch all subjects. Implementer may choose infinite scroll or a load-more button. Response shape per node: `{ id, date, skillCategory, score, notes, student { id, name }, teacher { id, name } }` plus `pageInfo { endCursor, hasNextPage }`.
+
+**Child Radar response:** `studentRadar` returns `RadarDataType { studentId, studentName, skills { reading, math, writing, logic, social } }` — all skill values are Float (nullable).
+
+**Child Progress response:** `studentProgress` returns `ProgressDataType { weeks: [ProgressWeekType] }`. Each `ProgressWeekType` has `period: String` (e.g. "Week of Mar 24") and `skills: RadarSkillType { reading, math, writing, logic, social }` (all Float, nullable). Returns 5 weeks (current + 4 prior). Render as a line chart with one line per skill.
+
+**RadarChart shared component props:**
+```typescript
+interface RadarChartProps {
+  skills: { reading: number; math: number; writing: number; logic: number; social: number }
+  size?: number  // defaults to 200
+}
+```
+Both parent radar screen and teacher class overview must use this exact interface.
 
 ### Teacher App (6 screens)
 
@@ -171,11 +185,11 @@ Child detail (`[id]`) is a tab navigator containing Radar, Progress, and History
 
 **Class Overview:** Calls `classroomOverview(classroomId: activeClassroomId)` — returns all students and their radar data in one request. Do NOT call `studentRadar` per student (N+1). The `classrooms` query on Dashboard also returns `school { id }` — store `schoolId` in Zustand alongside `activeClassroomId` (used by behavior categories query).
 
-**Award Behavior flow:** Teacher navigates from Class Overview → taps a student → navigates to `/(app)/behavior?studentId=X`. The behavior screen receives `studentId` as a query param. On mount, fetch `behaviorCategories(schoolId: activeSchoolId)` to populate the category picker — returns `[BehaviorCategoryType]` with fields `id`, `name`, `description`, `pointValue`, `isPositive`, `icon`, `color`, `position`. Teacher picks a category, optionally adds a note, then calls `awardBehaviorPoint(studentId, classroomId: activeClassroomId, behaviorCategoryId, note?)`.
+**Award Behavior flow:** Teacher navigates from Class Overview → taps a student → navigates to `/(app)/behavior?studentId=X`. The behavior screen receives `studentId` as a query param. On mount, fetch `behaviorCategories(schoolId: activeSchoolId)` to populate the category picker — returns `[BehaviorCategoryType]` with fields `id`, `name`, `description`, `pointValue`, `isPositive`, `icon`, `color`, `position`. Teacher picks a category, optionally adds a note, then calls `awardBehaviorPoint(studentId, classroomId: activeClassroomId, behaviorCategoryId, note?)`. Mutation returns `{ behaviorPoint { id, pointValue, awardedAt }, dailyTotal, errors { message } }`. On error, show `errors[0].message` in a toast. Note: the backend enforces a 30-second cooldown per student/category — handle the error message gracefully.
 
 **Behavior History flow:** Teacher taps a student in Class Overview → navigates to `/(app)/behavior/history?studentId=X`. Uses `studentBehaviorHistory(studentId: ID!, startDate?: ISO8601Date, endDate?: ISO8601Date)`. Returns `[BehaviorPointType]`: fields per record are `id`, `pointValue`, `note`, `awardedAt`, `revokable`, `teacher { name }`, `behaviorCategory { name, isPositive, icon, color }`. Date filters are optional — omit for full history (no pagination; results ordered by `awardedAt` desc).
 
-**Record Checkup flow:** Teacher selects a student from a picker on the health screen. The picker is populated by calling `classroomOverview(classroomId: activeClassroomId)` — use Apollo's cached result if available (no extra network call if Class Overview was visited). Form fields: `studentId` (required, from picker), `measuredAt` (required, date picker), `weightKg` (optional), `heightCm` (optional), `headCircumferenceCm` (optional), `notes` (optional).
+**Record Checkup flow:** Teacher selects a student from a picker on the health screen. The picker is populated by calling `classroomOverview(classroomId: activeClassroomId)` — Apollo will return the cached result if Class Overview was visited; otherwise it fetches. Form fields: `studentId` (required, from picker), `measuredAt` (required, date picker), `weightKg` (optional Float), `heightCm` (optional Float), `headCircumferenceCm` (optional Float), `notes` (optional String). Mutation returns `{ healthCheckup { id, measuredAt, weightKg, heightCm, headCircumferenceCm, bmi, bmiCategory }, errors { message } }`. On success, show confirmation and reset the form.
 
 **Student Progress screen (parent):** `studentProgress(studentId: ID!)` returns `ProgressDataType { weeks: [ProgressWeekType] }` where each `ProgressWeekType` has `period: String` (e.g. "Week of Mar 24") and `skills: RadarSkillType { reading, math, writing, logic, social }` (all Float, nullable). Returns 5 weeks of data (current + 4 prior). Render as a line/trend chart per skill over the 5 weeks.
 
@@ -194,6 +208,7 @@ Child detail (`[id]`) is a tab navigator containing Radar, Progress, and History
 
 - Uses `@graphql-codegen/cli` v3+ with `ts-node` as the runner
 - Configured in `packages/shared/graphql/codegen.ts`
+- **Schema source:** Download the SDL once and commit it as `packages/shared/graphql/schema.graphql`. Codegen reads from this file (`schema: './schema.graphql'`), not a live server URL — this makes codegen work offline and in CI. Regenerate the SDL whenever the backend schema changes: `rails graphql:schema:dump` in the backend.
 - Reads `.graphql` files → generates typed hooks in `generated/graphql.ts`
 - `packages/shared/package.json` script: `"codegen": "graphql-codegen --config graphql/codegen.ts"`
 - Run from workspace root: `yarn codegen`
