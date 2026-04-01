@@ -107,15 +107,18 @@ interface AuthStore {
   token: string | null
   userType: 'parent' | 'teacher' | null
   activeClassroomId: string | null
+  activeSchoolId: string | null
   setAuth: (token: string, userType: 'parent' | 'teacher') => void
   setActiveClassroomId: (id: string) => void
+  setActiveSchoolId: (id: string) => void
   clearAuth: () => void
 }
 ```
 
 - `token` is the JWT **access token** from `data.login.access_token`
 - `userType` is derived from `data.login.user.__typename`. The exhaustive set of values is `'Teacher'`, `'Parent'`, `'SchoolManager'`. Normalize: `'Teacher'` → `'teacher'`, `'Parent'` → `'parent'`. If `__typename` is `'SchoolManager'` (a valid backend response when a school manager logs in via the mobile app), call `clearAuth()` and show: "This account type is not supported in this app."
-- `activeClassroomId` — set on teacher Dashboard/Class Overview load (first classroom from `classrooms` query). Used by the Award Behavior screen to pass `classroomId` to the mutation.
+- `activeClassroomId` — set on teacher Dashboard load from first result of `classrooms` query. Used by Award Behavior and Class Overview.
+- `activeSchoolId` — set on teacher Dashboard load from `classrooms[0].school.id`. Used by the `behaviorCategories(schoolId)` query on the Award Behavior screen.
 - Token persisted in `expo-secure-store` (iOS Keychain / Android Keystore)
 - On app start: read token from SecureStore → hydrate Zustand store
 - Apollo Client reads token from store via auth link on every request
@@ -164,15 +167,17 @@ Child detail (`[id]`) is a tab navigator containing Radar, Progress, and History
 | Behavior History | `/(app)/behavior/history` | `studentBehaviorHistory(studentId)` query |
 | Record Checkup | `/(app)/health` | `createHealthCheckup(studentId: ID!, measuredAt: ISO8601Date!, weightKg?: Float, heightCm?: Float, headCircumferenceCm?: Float, notes?: String)` mutation |
 
-**Teacher Dashboard:** Shows the teacher's first classroom name and today's behavior summary. Uses two sequential `useQuery` calls: first fetch `classrooms` (to get classroom name + set `activeClassroomId` in Zustand), then fetch `classroomBehaviorToday(classroomId)` with `skip: !activeClassroomId`. Display fields from `ClassroomBehaviorStudentType`: `student.name`, `totalPoints`, `positiveCount`, `negativeCount`, `recentPoints`.
+**Teacher Dashboard:** Shows the teacher's first classroom name and today's behavior summary. Uses two sequential `useQuery` calls: first fetch `classrooms { id, name, school { id } }` (set `activeClassroomId` and `activeSchoolId` in Zustand), then fetch `classroomBehaviorToday(classroomId)` with `skip: !activeClassroomId`. Display fields from `ClassroomBehaviorStudentType`: `student { id, name }`, `totalPoints`, `positiveCount`, `negativeCount`, `recentPoints { id, pointValue, awardedAt, behaviorCategory { name, isPositive } }`.
 
-**Class Overview:** Calls `classroomOverview(classroomId: activeClassroomId)` — returns all students and their radar data in one request. Do NOT call `studentRadar` per student (N+1).
+**Class Overview:** Calls `classroomOverview(classroomId: activeClassroomId)` — returns all students and their radar data in one request. Do NOT call `studentRadar` per student (N+1). The `classrooms` query on Dashboard also returns `school { id }` — store `schoolId` in Zustand alongside `activeClassroomId` (used by behavior categories query).
 
-**Award Behavior flow:** Teacher navigates from Class Overview → taps a student → navigates to `/(app)/behavior?studentId=X`. The behavior screen receives `studentId` as a query param. `classroomId` is read from `activeClassroomId` in Zustand (set on Dashboard/Class Overview load).
+**Award Behavior flow:** Teacher navigates from Class Overview → taps a student → navigates to `/(app)/behavior?studentId=X`. The behavior screen receives `studentId` as a query param. On mount, fetch `behaviorCategories(schoolId: activeSchoolId)` to populate the category picker — returns `[BehaviorCategoryType]` with fields `id`, `name`, `description`, `pointValue`, `isPositive`, `icon`, `color`, `position`. Teacher picks a category, optionally adds a note, then calls `awardBehaviorPoint(studentId, classroomId: activeClassroomId, behaviorCategoryId, note?)`.
 
-**Behavior History flow:** Teacher taps a student in Class Overview → navigates to `/(app)/behavior/history?studentId=X`. Uses `studentBehaviorHistory(studentId: ID!, startDate?: ISO8601Date, endDate?: ISO8601Date)`. Date filters are optional — omit for full history.
+**Behavior History flow:** Teacher taps a student in Class Overview → navigates to `/(app)/behavior/history?studentId=X`. Uses `studentBehaviorHistory(studentId: ID!, startDate?: ISO8601Date, endDate?: ISO8601Date)`. Returns `[BehaviorPointType]`: fields per record are `id`, `pointValue`, `note`, `awardedAt`, `revokable`, `teacher { name }`, `behaviorCategory { name, isPositive, icon, color }`. Date filters are optional — omit for full history (no pagination; results ordered by `awardedAt` desc).
 
-**Record Checkup flow:** Teacher selects a student from a picker on the health screen (backed by `classrooms` + student list from `classroomOverview`). Required fields: `studentId`, `measuredAt`. Optional: `weightKg`, `heightCm`, `headCircumferenceCm`, `notes`.
+**Record Checkup flow:** Teacher selects a student from a picker on the health screen. The picker is populated by calling `classroomOverview(classroomId: activeClassroomId)` — use Apollo's cached result if available (no extra network call if Class Overview was visited). Form fields: `studentId` (required, from picker), `measuredAt` (required, date picker), `weightKg` (optional), `heightCm` (optional), `headCircumferenceCm` (optional), `notes` (optional).
+
+**Student Progress screen (parent):** `studentProgress(studentId: ID!)` returns `ProgressDataType { weeks: [ProgressWeekType] }` where each `ProgressWeekType` has `period: String` (e.g. "Week of Mar 24") and `skills: RadarSkillType { reading, math, writing, logic, social }` (all Float, nullable). Returns 5 weeks of data (current + 4 prior). Render as a line/trend chart per skill over the 5 weeks.
 
 ### Shared Components
 
