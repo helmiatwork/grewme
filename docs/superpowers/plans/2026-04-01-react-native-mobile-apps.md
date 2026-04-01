@@ -334,8 +334,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setAuth: (token, userType) => set({ token, userType }),
   setActiveClassroomId: (activeClassroomId) => set({ activeClassroomId }),
   setActiveSchoolId: (activeSchoolId) => set({ activeSchoolId }),
-  clearAuth: () =>
-    set({ token: null, userType: null, activeClassroomId: null, activeSchoolId: null }),
+  clearAuth: () => {
+    // MUST delete from SecureStore — store-only clear leaves stale token on next app launch
+    import('expo-secure-store').then((SecureStore) => {
+      SecureStore.deleteItemAsync('auth_token')
+    })
+    set({ token: null, userType: null, activeClassroomId: null, activeSchoolId: null })
+  },
 }))
 ```
 
@@ -2512,7 +2517,7 @@ export default function StudentsScreen() {
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.card}
-          onPress={() => router.push(`/(app)/behavior?studentId=${item.studentId}`)}
+          onPress={() => router.push({ pathname: '/(app)/behavior', params: { studentId: item.studentId } })}
         >
           <Text style={styles.name}>{item.studentName}</Text>
           <RadarChart skills={item.skills} size={120} />
