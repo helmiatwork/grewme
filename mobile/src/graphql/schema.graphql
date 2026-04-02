@@ -1,0 +1,231 @@
+# GrewMe GraphQL Schema (mobile-relevant subset)
+# Regenerate from backend: bundle exec rails graphql:schema:dump
+# This file is a manually curated subset for offline codegen.
+# Update when backend schema changes.
+
+scalar ISO8601Date
+scalar ISO8601DateTime
+
+enum SkillCategoryEnum {
+  READING
+  MATH
+  WRITING
+  LOGIC
+  SOCIAL
+}
+
+# --- User types ---
+
+type TeacherType {
+  id: ID!
+  name: String!
+  email: String!
+  role: String!
+  classrooms: [ClassroomType!]!
+}
+
+type ParentType {
+  id: ID!
+  name: String!
+  email: String!
+  role: String!
+  children: [StudentType!]!
+}
+
+union UserUnion = TeacherType | ParentType
+
+type StudentType {
+  id: ID!
+  name: String!
+  avatar: String
+}
+
+# --- School & Classroom ---
+
+type SchoolType {
+  id: ID!
+  name: String!
+}
+
+type ClassroomType {
+  id: ID!
+  name: String!
+  school: SchoolType!
+}
+
+# --- Radar & Progress ---
+
+type RadarSkillType {
+  reading: Float
+  math: Float
+  writing: Float
+  logic: Float
+  social: Float
+}
+
+type RadarDataType {
+  studentId: ID!
+  studentName: String!
+  skills: RadarSkillType!
+}
+
+type ProgressWeekType {
+  period: String!
+  skills: RadarSkillType!
+}
+
+type ProgressDataType {
+  weeks: [ProgressWeekType!]!
+}
+
+type ClassroomOverviewType {
+  classroomId: ID!
+  classroomName: String!
+  students: [RadarDataType!]!
+}
+
+# --- Daily Scores (connection) ---
+
+type DailyScoreType {
+  id: ID!
+  date: ISO8601Date!
+  skillCategory: SkillCategoryEnum!
+  score: Int!
+  notes: String
+  studentId: ID!
+}
+
+type DailyScoreTypeEdge {
+  node: DailyScoreType!
+  cursor: String!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type DailyScoreTypeConnection {
+  edges: [DailyScoreTypeEdge!]!
+  pageInfo: PageInfo!
+}
+
+# --- Behavior ---
+
+type BehaviorCategoryType {
+  id: ID!
+  name: String!
+  description: String
+  pointValue: Int!
+  isPositive: Boolean!
+  icon: String!
+  color: String!
+  position: Int!
+}
+
+type BehaviorPointType {
+  id: ID!
+  pointValue: Int!
+  note: String
+  awardedAt: ISO8601DateTime!
+  revokedAt: ISO8601DateTime
+  revokable: Boolean!
+  student: StudentType!
+  teacher: TeacherType!
+  behaviorCategory: BehaviorCategoryType!
+}
+
+type ClassroomBehaviorStudentType {
+  student: StudentType!
+  totalPoints: Int!
+  positiveCount: Int!
+  negativeCount: Int!
+  recentPoints: [BehaviorPointType!]!
+}
+
+# --- Health ---
+
+type HealthCheckupType {
+  id: ID!
+  measuredAt: ISO8601Date!
+  weightKg: Float
+  heightCm: Float
+  headCircumferenceCm: Float
+  bmi: Float
+  bmiCategory: String
+  notes: String
+}
+
+# --- Shared error type ---
+
+type UserErrorType {
+  message: String!
+  path: [String!]
+}
+
+# --- Mutation payloads ---
+
+type LoginPayload {
+  accessToken: String
+  refreshToken: String
+  expiresIn: Int
+  user: UserUnion
+  errors: [UserErrorType!]!
+}
+
+type AwardBehaviorPointPayload {
+  behaviorPoint: BehaviorPointType
+  dailyTotal: Int!
+  errors: [UserErrorType!]!
+}
+
+type CreateHealthCheckupPayload {
+  healthCheckup: HealthCheckupType
+  errors: [UserErrorType!]!
+}
+
+# --- Root types ---
+
+type Query {
+  # Parent
+  myChildren: [StudentType!]!
+  studentRadar(studentId: ID!): RadarDataType!
+  studentProgress(studentId: ID!): ProgressDataType!
+  studentDailyScores(
+    studentId: ID!
+    skillCategory: SkillCategoryEnum
+    first: Int
+    after: String
+  ): DailyScoreTypeConnection!
+
+  # Teacher
+  classrooms: [ClassroomType!]!
+  classroomOverview(classroomId: ID!): ClassroomOverviewType!
+  classroomBehaviorToday(classroomId: ID!): [ClassroomBehaviorStudentType!]!
+  behaviorCategories(schoolId: ID!): [BehaviorCategoryType!]!
+  studentBehaviorHistory(
+    studentId: ID!
+    startDate: ISO8601Date
+    endDate: ISO8601Date
+  ): [BehaviorPointType!]!
+}
+
+type Mutation {
+  login(email: String!, password: String!, role: String!): LoginPayload!
+  awardBehaviorPoint(
+    studentId: ID!
+    classroomId: ID!
+    behaviorCategoryId: ID!
+    note: String
+  ): AwardBehaviorPointPayload!
+  createHealthCheckup(
+    studentId: ID!
+    measuredAt: ISO8601Date!
+    weightKg: Float
+    heightCm: Float
+    headCircumferenceCm: Float
+    notes: String
+  ): CreateHealthCheckupPayload!
+}

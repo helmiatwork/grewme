@@ -1,0 +1,29 @@
+query Classrooms {
+  classrooms {
+    id
+    name
+    school {
+      id
+    }
+  }
+}
+
+# N+1 WARNING: classroomOverview returns all students + radar data in one call.
+# Do NOT call studentRadar per student from Class Overview screen.
+query ClassroomOverview($classroomId: ID!) {
+  classroomOverview(classroomId: $classroomId) {
+    classroomId
+    classroomName
+    students {
+      studentId
+      studentName
+      skills {
+        reading
+        math
+        writing
+        logic
+        social
+      }
+    }
+  }
+}

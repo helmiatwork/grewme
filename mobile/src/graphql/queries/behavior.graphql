@@ -1,0 +1,64 @@
+query ClassroomBehaviorToday($classroomId: ID!) {
+  classroomBehaviorToday(classroomId: $classroomId) {
+    student {
+      id
+      name
+    }
+    totalPoints
+    positiveCount
+    negativeCount
+    recentPoints {
+      id
+      pointValue
+      awardedAt
+      behaviorCategory {
+        name
+        isPositive
+      }
+    }
+  }
+}
+
+query BehaviorCategories($schoolId: ID!) {
+  behaviorCategories(schoolId: $schoolId) {
+    id
+    name
+    description
+    pointValue
+    isPositive
+    icon
+    color
+    position
+  }
+}
+
+# N+1 WARNING: Do NOT request student { ... } on this query.
+# The backend resolver only preloads :behavior_category and :teacher.
+# Requesting student will cause an N+1 DB query per record.
+query StudentBehaviorHistory(
+  $studentId: ID!
+  $startDate: ISO8601Date
+  $endDate: ISO8601Date
+) {
+  studentBehaviorHistory(
+    studentId: $studentId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    id
+    pointValue
+    note
+    awardedAt
+    revokable
+    teacher {
+      id
+      name
+    }
+    behaviorCategory {
+      name
+      isPositive
+      icon
+      color
+    }
+  }
+}

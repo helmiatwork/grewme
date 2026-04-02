@@ -1,0 +1,68 @@
+query MyChildren {
+  myChildren {
+    id
+    name
+    avatar
+  }
+}
+
+query StudentRadar($studentId: ID!) {
+  studentRadar(studentId: $studentId) {
+    studentId
+    studentName
+    skills {
+      reading
+      math
+      writing
+      logic
+      social
+    }
+  }
+}
+
+query StudentProgress($studentId: ID!) {
+  studentProgress(studentId: $studentId) {
+    weeks {
+      period
+      skills {
+        reading
+        math
+        writing
+        logic
+        social
+      }
+    }
+  }
+}
+
+# N+1 WARNING: Do NOT request teacher { ... } or student { ... } on this query.
+# The backend resolver does NOT preload :teacher or :student.
+# The student is already known from the screen context (child detail tab).
+query StudentDailyScores(
+  $studentId: ID!
+  $skillCategory: SkillCategoryEnum
+  $first: Int
+  $after: String
+) {
+  studentDailyScores(
+    studentId: $studentId
+    skillCategory: $skillCategory
+    first: $first
+    after: $after
+  ) {
+    edges {
+      node {
+        id
+        date
+        skillCategory
+        score
+        notes
+      }
+      cursor
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
