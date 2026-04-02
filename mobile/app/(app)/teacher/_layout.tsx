@@ -29,6 +29,16 @@ export default function TeacherLayout() {
         }}
       />
       <Tabs.Screen
+        name="curriculum"
+        options={{
+          title: 'Curriculum',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="book-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="attendance"
         options={{
           title: 'Attendance',
