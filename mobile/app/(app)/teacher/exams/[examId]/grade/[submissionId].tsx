@@ -17,6 +17,11 @@ import {
   useExamSubmissionDetailQuery,
   useGradeExamSubmissionMutation,
 } from '../../../../../../src/graphql/generated/graphql';
+import {
+  formatExamDate,
+  examStatusColor,
+  formatExamType,
+} from '../../../../../../src/utils/examHelpers';
 
 interface RubricScoreLocal {
   criteriaId: string;
@@ -26,31 +31,9 @@ interface RubricScoreLocal {
   feedback: string;
 }
 
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '--';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function statusColor(status: string): string {
-  switch (status) {
-    case 'SUBMITTED':
-      return '#2196F3';
-    case 'GRADED':
-      return '#4CAF50';
-    case 'IN_PROGRESS':
-      return '#FF9800';
-    case 'NOT_STARTED':
-      return '#9E9E9E';
-    default:
-      return '#666';
-  }
+function parseNumeric(value: string): number {
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : 0;
 }
 
 export default function GradeSubmissionScreen() {
@@ -77,22 +60,14 @@ export default function GradeSubmissionScreen() {
   const exam = submission?.classroomExam?.exam;
   const examType = exam?.examType ?? '';
 
-  // Pre-populate from existing grading data (once)
   useEffect(() => {
     if (!submission || hasInitialized.current) return;
     hasInitialized.current = true;
 
-    if (submission.score != null) {
-      setScore(String(submission.score));
-    }
-    if (submission.passed != null) {
-      setPassed(submission.passed);
-    }
-    if (submission.teacherNotes) {
-      setTeacherNotes(submission.teacherNotes);
-    }
+    if (submission.score != null) setScore(String(submission.score));
+    if (submission.passed != null) setPassed(submission.passed);
+    if (submission.teacherNotes) setTeacherNotes(submission.teacherNotes);
 
-    // Pre-populate rubric scores
     if (exam?.rubricCriteria && exam.rubricCriteria.length > 0) {
       const existingScores = submission.rubricScores ?? [];
       setRubricScores(
@@ -119,25 +94,29 @@ export default function GradeSubmissionScreen() {
 
   if (!submission || !exam) {
     return (
-      <View style={styles.emptyContainer} testID="submission-not-found">
-        <Text style={styles.emptyText}>Submission not found</Text>
+      <View style={s.centered} testID="submission-not-found">
+        <Text style={s.emptyText}>Submission not found</Text>
       </View>
     );
   }
 
   const answers = submission.examAnswers ?? [];
-
-  const mcTotalScore = answers.reduce(
-    (sum, a) => sum + (a.pointsAwarded ?? 0),
-    0,
-  );
-
-  const rubricTotalScore = rubricScores.reduce(
+  const mcTotal = answers.reduce((sum, a) => sum + (a.pointsAwarded ?? 0), 0);
+  const rubricTotal = rubricScores.reduce(
     (sum, rs) => sum + (parseInt(rs.score, 10) || 0),
     0,
   );
 
   const handleGrade = async () => {
+    if (examType === 'SCORE_BASED' && !score.trim()) {
+      Alert.alert('Validation', 'Please enter a score');
+      return;
+    }
+    if (examType === 'PASS_FAIL' && passed === null) {
+      Alert.alert('Validation', 'Please select Pass or Fail');
+      return;
+    }
+
     try {
       const input: {
         examSubmissionId: string;
@@ -155,13 +134,13 @@ export default function GradeSubmissionScreen() {
       };
 
       if (examType === 'SCORE_BASED') {
-        input.score = parseFloat(score) || 0;
+        input.score = parseNumeric(score);
       } else if (examType === 'MULTIPLE_CHOICE') {
-        input.score = mcTotalScore;
+        input.score = mcTotal;
       } else if (examType === 'PASS_FAIL') {
         input.passed = passed ?? false;
       } else if (examType === 'RUBRIC') {
-        input.score = rubricTotalScore;
+        input.score = rubricTotal;
         input.rubricScores = rubricScores.map((rs) => ({
           rubricCriteriaId: rs.criteriaId,
           score: parseInt(rs.score, 10) || 0,
@@ -190,104 +169,65 @@ export default function GradeSubmissionScreen() {
     }
   };
 
-  const updateRubricScore = (index: number, value: string) => {
-    setRubricScores((prev) =>
-      prev.map((rs, i) => (i === index ? { ...rs, score: value } : rs)),
-    );
-  };
-
-  const updateRubricFeedback = (index: number, value: string) => {
-    setRubricScores((prev) =>
-      prev.map((rs, i) => (i === index ? { ...rs, feedback: value } : rs)),
-    );
-  };
-
   return (
-    <View style={styles.wrapper} testID="grade-submission-screen">
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-      >
+    <View style={s.wrapper} testID="grade-submission-screen">
+      <ScrollView style={s.scroll} contentContainerStyle={s.scrollContent}>
         {/* Student Header */}
-        <View style={styles.headerSection}>
-          <Text style={styles.studentName}>{submission.student.name}</Text>
-          <View style={styles.headerMeta}>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: statusColor(submission.status) },
-              ]}
-            >
-              <Text style={styles.statusBadgeText}>
-                {submission.status.replaceAll('_', ' ')}
-              </Text>
+        <View style={s.header}>
+          <Text style={s.studentName}>{submission.student.name}</Text>
+          <View style={s.headerMeta}>
+            <View style={[s.badge, { backgroundColor: examStatusColor(submission.status) }]}>
+              <Text style={s.badgeText}>{formatExamType(submission.status)}</Text>
             </View>
             {submission.submittedAt ? (
-              <Text style={styles.dateText}>
-                Submitted: {formatDate(submission.submittedAt)}
+              <Text style={s.metaText}>
+                Submitted: {formatExamDate(submission.submittedAt, true)}
               </Text>
             ) : null}
           </View>
-          <Text style={styles.examInfo}>
-            {exam.title} &middot;{' '}
-            {exam.examType.replaceAll('_', ' ')}
+          <Text style={s.examInfo}>
+            {exam.title} &middot; {formatExamType(exam.examType)}
             {exam.maxScore ? ` &middot; ${exam.maxScore} pts` : ''}
           </Text>
         </View>
 
-        {/* MULTIPLE_CHOICE — Show answers */}
+        {/* MULTIPLE_CHOICE */}
         {examType === 'MULTIPLE_CHOICE' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Answers</Text>
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Answers</Text>
             {answers.map((a) => (
-              <View
-                key={a.id}
-                style={styles.answerCard}
-                testID={`answer-${a.id}`}
-              >
-                <Text style={styles.questionText}>
-                  {a.examQuestion.questionText}
-                </Text>
-                <View style={styles.answerRow}>
+              <View key={a.id} style={s.card} testID={`answer-${a.id}`}>
+                <Text style={s.cardTitle}>{a.examQuestion.questionText}</Text>
+                <View style={s.answerRow}>
                   <Ionicons
-                    name={
-                      a.correct
-                        ? 'checkmark-circle'
-                        : 'close-circle'
-                    }
+                    name={a.correct ? 'checkmark-circle' : 'close-circle'}
                     size={18}
                     color={a.correct ? '#4CAF50' : '#F44336'}
                   />
-                  <Text style={styles.answerText}>
-                    {a.selectedAnswer ?? 'No answer'}
-                  </Text>
+                  <Text style={s.answerText}>{a.selectedAnswer ?? 'No answer'}</Text>
                 </View>
                 {!a.correct && a.examQuestion.correctAnswer ? (
-                  <Text style={styles.correctAnswer}>
-                    Correct: {a.examQuestion.correctAnswer}
-                  </Text>
+                  <Text style={s.correctText}>Correct: {a.examQuestion.correctAnswer}</Text>
                 ) : null}
-                <Text style={styles.pointsText}>
+                <Text style={s.pointsText}>
                   {a.pointsAwarded}/{a.examQuestion.points} pts
                 </Text>
               </View>
             ))}
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total Score</Text>
-              <Text style={styles.totalValue}>
-                {mcTotalScore}/{exam.maxScore ?? '?'}
-              </Text>
+            <View style={s.totalRow}>
+              <Text style={s.totalLabel}>Total Score</Text>
+              <Text style={s.totalValue}>{mcTotal}/{exam.maxScore ?? '?'}</Text>
             </View>
           </View>
         )}
 
-        {/* SCORE_BASED — Score input */}
+        {/* SCORE_BASED */}
         {examType === 'SCORE_BASED' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Score</Text>
-            <View style={styles.scoreInputRow}>
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Score</Text>
+            <View style={s.scoreRow}>
               <TextInput
-                style={[styles.input, styles.scoreInput]}
+                style={[s.input, s.scoreInput]}
                 value={score}
                 onChangeText={setScore}
                 placeholder="0"
@@ -295,111 +235,85 @@ export default function GradeSubmissionScreen() {
                 keyboardType="numeric"
                 testID="input-score"
               />
-              <Text style={styles.scoreMax}>
-                / {exam.maxScore ?? '?'}
-              </Text>
+              <Text style={s.scoreMax}>/ {exam.maxScore ?? '?'}</Text>
             </View>
           </View>
         )}
 
-        {/* RUBRIC — Criteria scores */}
+        {/* RUBRIC */}
         {examType === 'RUBRIC' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Rubric Scoring</Text>
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Rubric Scoring</Text>
             {rubricScores.map((rs, i) => (
-              <View
-                key={rs.criteriaId}
-                style={styles.rubricCard}
-                testID={`rubric-${rs.criteriaId}`}
-              >
-                <View style={styles.rubricHeader}>
-                  <Text style={styles.rubricName}>{rs.criteriaName}</Text>
-                  <Text style={styles.rubricMax}>/ {rs.maxScore}</Text>
+              <View key={rs.criteriaId} style={s.card} testID={`rubric-${rs.criteriaId}`}>
+                <View style={s.rubricHeader}>
+                  <Text style={s.cardTitle}>{rs.criteriaName}</Text>
+                  <Text style={s.metaText}>/ {rs.maxScore}</Text>
                 </View>
                 <TextInput
-                  style={[styles.input, { width: 80 }]}
+                  style={[s.input, { width: 80 }]}
                   value={rs.score}
-                  onChangeText={(v) => updateRubricScore(i, v)}
+                  onChangeText={(v) =>
+                    setRubricScores((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, score: v } : r)),
+                    )
+                  }
                   placeholder="0"
                   placeholderTextColor="#999"
                   keyboardType="numeric"
                   testID={`rubric-score-${i}`}
                 />
                 <TextInput
-                  style={[styles.input, { marginTop: 8 }]}
+                  style={[s.input, { marginTop: 8 }]}
                   value={rs.feedback}
-                  onChangeText={(v) => updateRubricFeedback(i, v)}
+                  onChangeText={(v) =>
+                    setRubricScores((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, feedback: v } : r)),
+                    )
+                  }
                   placeholder="Feedback (optional)"
                   placeholderTextColor="#999"
                   testID={`rubric-feedback-${i}`}
                 />
               </View>
             ))}
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>{rubricTotalScore}</Text>
+            <View style={s.totalRow}>
+              <Text style={s.totalLabel}>Total</Text>
+              <Text style={s.totalValue}>{rubricTotal}</Text>
             </View>
           </View>
         )}
 
-        {/* PASS_FAIL — Toggle */}
+        {/* PASS_FAIL */}
         {examType === 'PASS_FAIL' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Result</Text>
-            <View style={styles.passFailRow}>
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Result</Text>
+            <View style={s.passFailRow}>
               <Pressable
-                style={[
-                  styles.passFailChip,
-                  passed === true && styles.passChipActive,
-                ]}
+                style={[s.passFailChip, passed === true && s.passActive]}
                 onPress={() => setPassed(true)}
                 testID="pass-button"
               >
-                <Ionicons
-                  name="checkmark-circle"
-                  size={20}
-                  color={passed === true ? '#FFFFFF' : '#4CAF50'}
-                />
-                <Text
-                  style={[
-                    styles.passFailText,
-                    passed === true && styles.passFailTextActive,
-                  ]}
-                >
-                  Pass
-                </Text>
+                <Ionicons name="checkmark-circle" size={20} color={passed === true ? '#FFF' : '#4CAF50'} />
+                <Text style={[s.passFailText, passed === true && s.passFailTextActive]}>Pass</Text>
               </Pressable>
               <Pressable
-                style={[
-                  styles.passFailChip,
-                  passed === false && styles.failChipActive,
-                ]}
+                style={[s.passFailChip, passed === false && s.failActive]}
                 onPress={() => setPassed(false)}
                 testID="fail-button"
               >
-                <Ionicons
-                  name="close-circle"
-                  size={20}
-                  color={passed === false ? '#FFFFFF' : '#F44336'}
-                />
-                <Text
-                  style={[
-                    styles.passFailText,
-                    passed === false && styles.passFailTextActive,
-                  ]}
-                >
-                  Fail
-                </Text>
+                <Ionicons name="close-circle" size={20} color={passed === false ? '#FFF' : '#F44336'} />
+                <Text style={[s.passFailText, passed === false && s.passFailTextActive]}>Fail</Text>
               </Pressable>
             </View>
           </View>
         )}
 
         {/* Teacher Notes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Teacher Notes</Text>
+        <View style={s.section}>
+          <Text style={s.sectionTitle}>Teacher Notes</Text>
           <TextInput
-            style={[styles.input, styles.multiline]}
+            style={[s.input, s.multiline]}
             value={teacherNotes}
             onChangeText={setTeacherNotes}
             placeholder="Add notes about this submission..."
@@ -411,13 +325,9 @@ export default function GradeSubmissionScreen() {
         </View>
       </ScrollView>
 
-      {/* Footer */}
-      <View style={styles.footer}>
+      <View style={s.footer}>
         <Pressable
-          style={[
-            styles.gradeButton,
-            grading && styles.gradeButtonDisabled,
-          ]}
+          style={[s.gradeBtn, grading && s.gradeBtnDisabled]}
           onPress={handleGrade}
           disabled={grading}
           testID="submit-grade"
@@ -425,10 +335,8 @@ export default function GradeSubmissionScreen() {
           {grading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.gradeButtonText}>
-              {submission.status === 'GRADED'
-                ? 'Update Grade'
-                : 'Submit Grade'}
+            <Text style={s.gradeBtnText}>
+              {submission.status === 'GRADED' ? 'Update Grade' : 'Submit Grade'}
             </Text>
           )}
         </Pressable>
@@ -437,233 +345,59 @@ export default function GradeSubmissionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
+const s = StyleSheet.create({
+  wrapper: { flex: 1, backgroundColor: '#F5F5F5' },
+  scroll: { flex: 1 },
+  scrollContent: { paddingBottom: 100 },
+  header: { backgroundColor: '#FFF', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  studentName: { fontSize: 20, fontWeight: '700', color: '#333' },
+  headerMeta: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
+  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
+  badgeText: { color: '#FFF', fontSize: 11, fontWeight: '700', textTransform: 'capitalize' },
+  metaText: { fontSize: 12, color: '#888' },
+  examInfo: { fontSize: 13, color: '#666', marginTop: 6 },
+  section: { paddingHorizontal: 16, marginTop: 16 },
+  sectionTitle: { fontSize: 17, fontWeight: '600', color: '#333', marginBottom: 10 },
+  card: {
+    backgroundColor: '#fff', borderRadius: 10, padding: 14, marginBottom: 8,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 2, elevation: 1,
   },
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  headerSection: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  studentName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-  },
-  headerMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 6,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  statusBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'capitalize',
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#888',
-  },
-  examInfo: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 6,
-  },
-  section: {
-    paddingHorizontal: 16,
-    marginTop: 16,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-  },
-  answerCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  questionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-  },
-  answerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  answerText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  correctAnswer: {
-    fontSize: 12,
-    color: '#4CAF50',
-    marginTop: 4,
-  },
-  pointsText: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-    textAlign: 'right',
-  },
+  cardTitle: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 6 },
+  answerRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  answerText: { fontSize: 14, color: '#333' },
+  correctText: { fontSize: 12, color: '#4CAF50', marginTop: 4 },
+  pointsText: { fontSize: 12, color: '#888', marginTop: 4, textAlign: 'right' },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    marginTop: 4,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingTop: 12, borderTopWidth: 1, borderTopColor: '#E0E0E0', marginTop: 4,
   },
-  totalLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-  },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#4CAF50',
-  },
-  scoreInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  scoreInput: {
-    width: 100,
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  scoreMax: {
-    fontSize: 20,
-    color: '#888',
-  },
+  totalLabel: { fontSize: 15, fontWeight: '600', color: '#333' },
+  totalValue: { fontSize: 18, fontWeight: '700', color: '#4CAF50' },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  scoreInput: { width: 100, textAlign: 'center', fontSize: 24, fontWeight: '700' },
+  scoreMax: { fontSize: 20, color: '#888' },
   input: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    color: '#333',
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, padding: 12,
+    fontSize: 14, color: '#333', backgroundColor: '#FFF',
   },
-  multiline: {
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  rubricCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  rubricHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  rubricName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  rubricMax: {
-    fontSize: 13,
-    color: '#888',
-  },
-  passFailRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
+  multiline: { minHeight: 100, textAlignVertical: 'top' },
+  rubricHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  passFailRow: { flexDirection: 'row', gap: 12 },
   passFailChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: '#F0F0F0',
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, backgroundColor: '#F0F0F0',
   },
-  passChipActive: {
-    backgroundColor: '#4CAF50',
-  },
-  failChipActive: {
-    backgroundColor: '#F44336',
-  },
-  passFailText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#666',
-  },
-  passFailTextActive: {
-    color: '#FFFFFF',
-  },
+  passActive: { backgroundColor: '#4CAF50' },
+  failActive: { backgroundColor: '#F44336' },
+  passFailText: { fontSize: 15, fontWeight: '600', color: '#666' },
+  passFailTextActive: { color: '#FFF' },
   footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    backgroundColor: '#FFF', padding: 16, borderTopWidth: 1, borderTopColor: '#E0E0E0',
   },
-  gradeButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  gradeButtonDisabled: {
-    backgroundColor: '#BDBDBD',
-  },
-  gradeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-  },
+  gradeBtn: { backgroundColor: '#4CAF50', paddingVertical: 14, borderRadius: 8, alignItems: 'center' },
+  gradeBtnDisabled: { backgroundColor: '#BDBDBD' },
+  gradeBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  emptyText: { fontSize: 16, color: '#666' },
 });

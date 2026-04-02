@@ -15,6 +15,11 @@ import {
 import { useAuthStore } from '../../../../src/auth/store';
 import LoadingState from '../../../../src/components/LoadingState';
 import ErrorState from '../../../../src/components/ErrorState';
+import {
+  formatExamDate,
+  examStatusColor,
+  formatExamType,
+} from '../../../../src/utils/examHelpers';
 
 const STATUS_FILTERS: Array<{
   label: string;
@@ -25,29 +30,6 @@ const STATUS_FILTERS: Array<{
   { label: 'Draft', value: 'DRAFT' as ClassroomExamStatusEnum },
   { label: 'Closed', value: 'CLOSED' as ClassroomExamStatusEnum },
 ];
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '--';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-function statusColor(status: string): string {
-  switch (status) {
-    case 'ACTIVE':
-      return '#4CAF50';
-    case 'DRAFT':
-      return '#FF9800';
-    case 'CLOSED':
-      return '#9E9E9E';
-    default:
-      return '#666';
-  }
-}
 
 export default function TeacherExamsListScreen() {
   const activeClassroomId = useAuthStore((s) => s.activeClassroomId);
@@ -140,7 +122,7 @@ export default function TeacherExamsListScreen() {
                 <View
                   style={[
                     styles.statusBadge,
-                    { backgroundColor: statusColor(item.status) },
+                    { backgroundColor: examStatusColor(item.status) },
                   ]}
                 >
                   <Text style={styles.statusBadgeText}>{item.status}</Text>
@@ -158,14 +140,14 @@ export default function TeacherExamsListScreen() {
                   <Ionicons name="calendar-outline" size={14} color="#888" />
                   <Text style={styles.metaText}>
                     {item.scheduledAt
-                      ? formatDate(item.scheduledAt)
+                      ? formatExamDate(item.scheduledAt)
                       : 'No date'}
                   </Text>
                 </View>
                 <View style={styles.metaItem}>
                   <Ionicons name="document-text-outline" size={14} color="#888" />
                   <Text style={styles.metaText}>
-                    {item.exam.examType.replaceAll('_', ' ')}
+                    {formatExamType(item.exam.examType)}
                   </Text>
                 </View>
               </View>
@@ -182,7 +164,7 @@ export default function TeacherExamsListScreen() {
 
               {item.dueAt ? (
                 <Text style={styles.dueDate}>
-                  Due: {formatDate(item.dueAt)}
+                  Due: {formatExamDate(item.dueAt)}
                 </Text>
               ) : null}
             </Pressable>

@@ -19,6 +19,7 @@ import {
 } from '../../../../src/graphql/generated/graphql';
 
 interface QuestionDraft {
+  id: string;
   questionText: string;
   options: string;
   correctAnswer: string;
@@ -26,9 +27,16 @@ interface QuestionDraft {
 }
 
 interface CriteriaDraft {
+  id: string;
   name: string;
   description: string;
   maxScore: string;
+}
+
+let nextId = 0;
+function uid(): string {
+  nextId += 1;
+  return `draft-${nextId}`;
 }
 
 const EXAM_TYPES: { value: ExamTypeEnum; label: string }[] = [
@@ -131,7 +139,7 @@ export default function CreateExamScreen() {
   const addQuestion = () => {
     setQuestions((prev) => [
       ...prev,
-      { questionText: '', options: '', correctAnswer: '', points: '1' },
+      { id: uid(), questionText: '', options: '', correctAnswer: '', points: '1' },
     ]);
   };
 
@@ -152,7 +160,7 @@ export default function CreateExamScreen() {
   const addCriteria = () => {
     setRubricCriteria((prev) => [
       ...prev,
-      { name: '', description: '', maxScore: '10' },
+      { id: uid(), name: '', description: '', maxScore: '10' },
     ]);
   };
 
@@ -333,7 +341,7 @@ export default function CreateExamScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Questions</Text>
           {questions.map((q, i) => (
-            <View key={i} style={styles.card}>
+            <View key={q.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <Text style={styles.cardLabel}>Question {i + 1}</Text>
                 <Pressable
@@ -396,7 +404,7 @@ export default function CreateExamScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Rubric Criteria</Text>
           {rubricCriteria.map((c, i) => (
-            <View key={i} style={styles.card}>
+            <View key={c.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <Text style={styles.cardLabel}>Criteria {i + 1}</Text>
                 <Pressable

@@ -5,37 +5,11 @@ import { useLocalSearchParams, router } from 'expo-router';
 import LoadingState from '../../../../../src/components/LoadingState';
 import ErrorState from '../../../../../src/components/ErrorState';
 import { useExamDetailQuery } from '../../../../../src/graphql/generated/graphql';
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '--';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-function statusColor(status: string): string {
-  switch (status) {
-    case 'ACTIVE':
-      return '#4CAF50';
-    case 'DRAFT':
-      return '#FF9800';
-    case 'CLOSED':
-      return '#9E9E9E';
-    case 'SUBMITTED':
-      return '#2196F3';
-    case 'GRADED':
-      return '#4CAF50';
-    case 'IN_PROGRESS':
-      return '#FF9800';
-    case 'NOT_STARTED':
-      return '#9E9E9E';
-    default:
-      return '#666';
-  }
-}
+import {
+  formatExamDate,
+  examStatusColor,
+  formatExamType,
+} from '../../../../../src/utils/examHelpers';
 
 export default function ExamDetailScreen() {
   const { examId } = useLocalSearchParams<{ examId: string }>();
@@ -85,7 +59,7 @@ export default function ExamDetailScreen() {
         <View style={styles.metaRow}>
           <View style={styles.metaChip}>
             <Text style={styles.metaChipText}>
-              {exam.examType.replaceAll('_', ' ')}
+              {formatExamType(exam.examType)}
             </Text>
           </View>
           {exam.maxScore ? (
@@ -160,7 +134,7 @@ export default function ExamDetailScreen() {
                   <View
                     style={[
                       styles.statusBadge,
-                      { backgroundColor: statusColor(ce.status) },
+                      { backgroundColor: examStatusColor(ce.status) },
                     ]}
                   >
                     <Text style={styles.statusBadgeText}>{ce.status}</Text>
@@ -170,12 +144,12 @@ export default function ExamDetailScreen() {
                 <View style={styles.dateRow}>
                   {ce.scheduledAt ? (
                     <Text style={styles.dateText}>
-                      Scheduled: {formatDate(ce.scheduledAt)}
+                      Scheduled: {formatExamDate(ce.scheduledAt)}
                     </Text>
                   ) : null}
                   {ce.dueAt ? (
                     <Text style={styles.dateText}>
-                      Due: {formatDate(ce.dueAt)}
+                      Due: {formatExamDate(ce.dueAt)}
                     </Text>
                   ) : null}
                 </View>
@@ -207,12 +181,12 @@ export default function ExamDetailScreen() {
                             style={[
                               styles.submissionBadge,
                               {
-                                backgroundColor: statusColor(sub.status),
+                                backgroundColor: examStatusColor(sub.status),
                               },
                             ]}
                           >
                             <Text style={styles.submissionBadgeText}>
-                              {sub.status.replaceAll('_', ' ')}
+                              {formatExamType(sub.status)}
                             </Text>
                           </View>
                         </View>
