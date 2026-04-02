@@ -1,0 +1,26 @@
+mutation BulkRecordAttendance(
+  $classroomId: ID!
+  $date: ISO8601Date!
+  $records: [AttendanceRecordInput!]!
+) {
+  bulkRecordAttendance(
+    classroomId: $classroomId
+    date: $date
+    records: $records
+  ) {
+    attendances {
+      id
+      date
+      status
+      notes
+      student {
+        id
+        name
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
