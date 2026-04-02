@@ -55,14 +55,6 @@ const classroomOverviewMock: MockedResponse = {
 const createCheckupSuccessMock: MockedResponse = {
   request: {
     query: CreateHealthCheckupDocument,
-    variables: {
-      studentId: 'st1',
-      measuredAt: expect.any(String),
-      weightKg: 15.5,
-      heightCm: 95.0,
-      headCircumferenceCm: undefined,
-      notes: undefined,
-    },
   },
   variableMatcher: (vars: Record<string, unknown>) =>
     vars.studentId === 'st1' &&
@@ -90,10 +82,6 @@ const createCheckupSuccessMock: MockedResponse = {
 const createCheckupErrorMock: MockedResponse = {
   request: {
     query: CreateHealthCheckupDocument,
-    variables: {
-      studentId: 'st1',
-      measuredAt: expect.any(String),
-    },
   },
   variableMatcher: (vars: Record<string, unknown>) =>
     vars.studentId === 'st1',

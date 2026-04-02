@@ -5,16 +5,26 @@ import TeacherProfileScreen from '../../app/(app)/teacher/profile';
 import ParentProfileScreen from '../../app/(app)/parent/profile';
 import { useAuthStore } from '../../src/auth/store';
 
-const mockReplace = jest.fn();
+jest.mock('expo-router', () => {
+  const mockReplaceFn = jest.fn();
+  return {
+    __esModule: true,
+    router: { replace: mockReplaceFn, push: jest.fn(), back: jest.fn() },
+    useRouter: () => ({ replace: mockReplaceFn, push: jest.fn(), back: jest.fn() }),
+    useLocalSearchParams: () => ({}),
+    Slot: () => null,
+    Tabs: () => null,
+    Stack: () => null,
+  };
+});
 
-jest.mock('expo-router', () => ({
-  router: { replace: mockReplace },
-}));
+// Re-import to get the mocked replace
+const { router: mockedRouter } = jest.requireMock('expo-router');
 
 jest.spyOn(Alert, 'alert');
 
 beforeEach(() => {
-  mockReplace.mockClear();
+  mockedRouter.replace.mockClear();
   (Alert.alert as jest.Mock).mockClear();
   useAuthStore.setState({
     token: 'tok',
@@ -62,7 +72,7 @@ describe('TeacherProfileScreen', () => {
     logoutAction.onPress();
 
     expect(useAuthStore.getState().token).toBeNull();
-    expect(mockReplace).toHaveBeenCalledWith('/login');
+    expect(mockedRouter.replace).toHaveBeenCalledWith('/login');
   });
 });
 
@@ -97,6 +107,6 @@ describe('ParentProfileScreen', () => {
     logoutAction.onPress();
 
     expect(useAuthStore.getState().token).toBeNull();
-    expect(mockReplace).toHaveBeenCalledWith('/login');
+    expect(mockedRouter.replace).toHaveBeenCalledWith('/login');
   });
 });
