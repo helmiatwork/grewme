@@ -1,0 +1,14 @@
+query ClassroomAttendance($classroomId: ID!, $date: ISO8601Date!) {
+  classroomAttendance(classroomId: $classroomId, date: $date) {
+    id
+    date
+    status
+    notes
+    student {
+      id
+      name
+    }
+    createdAt
+    updatedAt
+  }
+}

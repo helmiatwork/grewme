@@ -167,6 +167,17 @@ type AttendanceType {
   updatedAt: ISO8601DateTime!
 }
 
+input AttendanceRecordInput {
+  studentId: ID!
+  status: AttendanceStatusEnum!
+  notes: String
+}
+
+type BulkRecordAttendancePayload {
+  attendances: [AttendanceType!]!
+  errors: [UserErrorType!]!
+}
+
 # --- Exams ---
 
 enum ExamSubmissionStatusEnum {
@@ -488,6 +499,7 @@ type Query {
   classrooms: [ClassroomType!]!
   classroomOverview(classroomId: ID!): ClassroomOverviewType!
   classroomBehaviorToday(classroomId: ID!): [ClassroomBehaviorStudentType!]!
+  classroomAttendance(classroomId: ID!, date: ISO8601Date!): [AttendanceType!]!
   behaviorCategories(schoolId: ID!): [BehaviorCategoryType!]!
   studentBehaviorHistory(
     studentId: ID!
@@ -547,4 +559,11 @@ type Mutation {
     reason: String!
   ): CreateLeaveRequestPayload!
   deleteLeaveRequest(leaveRequestId: ID!): DeleteLeaveRequestPayload!
+
+  # Attendance
+  bulkRecordAttendance(
+    classroomId: ID!
+    date: ISO8601Date!
+    records: [AttendanceRecordInput!]!
+  ): BulkRecordAttendancePayload!
 }

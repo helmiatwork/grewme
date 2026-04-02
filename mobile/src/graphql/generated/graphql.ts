@@ -39,6 +39,12 @@ export type AccountDeletionRequestType = {
   status: Scalars['String']['output'];
 };
 
+export type AttendanceRecordInput = {
+  notes?: InputMaybe<Scalars['String']['input']>;
+  status: AttendanceStatusEnum;
+  studentId: Scalars['ID']['input'];
+};
+
 export enum AttendanceStatusEnum {
   Excused = 'EXCUSED',
   Present = 'PRESENT',
@@ -88,6 +94,12 @@ export type BehaviorPointType = {
   revokedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
   student: StudentType;
   teacher: TeacherType;
+};
+
+export type BulkRecordAttendancePayload = {
+  __typename?: 'BulkRecordAttendancePayload';
+  attendances: Array<AttendanceType>;
+  errors: Array<UserErrorType>;
 };
 
 export type ClassroomBehaviorStudentType = {
@@ -337,6 +349,7 @@ export type MessageType = {
 export type Mutation = {
   __typename?: 'Mutation';
   awardBehaviorPoint: AwardBehaviorPointPayload;
+  bulkRecordAttendance: BulkRecordAttendancePayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   createLeaveRequest: CreateLeaveRequestPayload;
   deleteLeaveRequest: DeleteLeaveRequestPayload;
@@ -353,6 +366,13 @@ export type MutationAwardBehaviorPointArgs = {
   classroomId: Scalars['ID']['input'];
   note?: InputMaybe<Scalars['String']['input']>;
   studentId: Scalars['ID']['input'];
+};
+
+
+export type MutationBulkRecordAttendanceArgs = {
+  classroomId: Scalars['ID']['input'];
+  date: Scalars['ISO8601Date']['input'];
+  records: Array<AttendanceRecordInput>;
 };
 
 
@@ -448,6 +468,7 @@ export type Query = {
   __typename?: 'Query';
   academicYears: Array<AcademicYearType>;
   behaviorCategories: Array<BehaviorCategoryType>;
+  classroomAttendance: Array<AttendanceType>;
   classroomBehaviorToday: Array<ClassroomBehaviorStudentType>;
   classroomEvents: Array<ClassroomEventType>;
   classroomOverview: ClassroomOverviewType;
@@ -477,6 +498,12 @@ export type QueryAcademicYearsArgs = {
 
 export type QueryBehaviorCategoriesArgs = {
   schoolId: Scalars['ID']['input'];
+};
+
+
+export type QueryClassroomAttendanceArgs = {
+  classroomId: Scalars['ID']['input'];
+  date: Scalars['ISO8601Date']['input'];
 };
 
 
@@ -680,6 +707,15 @@ export type UserErrorType = {
 };
 
 export type UserUnion = ParentType | TeacherType;
+
+export type BulkRecordAttendanceMutationVariables = Exact<{
+  classroomId: Scalars['ID']['input'];
+  date: Scalars['ISO8601Date']['input'];
+  records: Array<AttendanceRecordInput> | AttendanceRecordInput;
+}>;
+
+
+export type BulkRecordAttendanceMutation = { __typename?: 'Mutation', bulkRecordAttendance: { __typename?: 'BulkRecordAttendancePayload', attendances: Array<{ __typename?: 'AttendanceType', id: string, date: any, status: AttendanceStatusEnum, notes?: string | null, student: { __typename?: 'StudentType', id: string, name: string } }>, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -921,7 +957,63 @@ export type ConversationQueryVariables = Exact<{
 
 export type ConversationQuery = { __typename?: 'Query', conversation: { __typename?: 'ConversationType', id: string, student: { __typename?: 'StudentType', id: string, name: string }, parent: { __typename?: 'ParentType', id: string, name: string }, teacher: { __typename?: 'TeacherType', id: string, name: string }, messages: Array<{ __typename?: 'MessageType', id: string, body: string, senderName: string, senderType: string, senderId: string, mine: boolean, createdAt: any, attachments: Array<{ __typename?: 'MediaAttachmentType', url: string, filename: string, contentType: string }> }> } };
 
+export type ClassroomAttendanceQueryVariables = Exact<{
+  classroomId: Scalars['ID']['input'];
+  date: Scalars['ISO8601Date']['input'];
+}>;
 
+
+export type ClassroomAttendanceQuery = { __typename?: 'Query', classroomAttendance: Array<{ __typename?: 'AttendanceType', id: string, date: any, status: AttendanceStatusEnum, notes?: string | null, createdAt: any, updatedAt: any, student: { __typename?: 'StudentType', id: string, name: string } }> };
+
+
+export const BulkRecordAttendanceDocument = gql`
+    mutation BulkRecordAttendance($classroomId: ID!, $date: ISO8601Date!, $records: [AttendanceRecordInput!]!) {
+  bulkRecordAttendance(classroomId: $classroomId, date: $date, records: $records) {
+    attendances {
+      id
+      date
+      status
+      notes
+      student {
+        id
+        name
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type BulkRecordAttendanceMutationFn = Apollo.MutationFunction<BulkRecordAttendanceMutation, BulkRecordAttendanceMutationVariables>;
+
+/**
+ * __useBulkRecordAttendanceMutation__
+ *
+ * To run a mutation, you first call `useBulkRecordAttendanceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBulkRecordAttendanceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bulkRecordAttendanceMutation, { data, loading, error }] = useBulkRecordAttendanceMutation({
+ *   variables: {
+ *      classroomId: // value for 'classroomId'
+ *      date: // value for 'date'
+ *      records: // value for 'records'
+ *   },
+ * });
+ */
+export function useBulkRecordAttendanceMutation(baseOptions?: Apollo.MutationHookOptions<BulkRecordAttendanceMutation, BulkRecordAttendanceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BulkRecordAttendanceMutation, BulkRecordAttendanceMutationVariables>(BulkRecordAttendanceDocument, options);
+      }
+export type BulkRecordAttendanceMutationHookResult = ReturnType<typeof useBulkRecordAttendanceMutation>;
+export type BulkRecordAttendanceMutationResult = Apollo.MutationResult<BulkRecordAttendanceMutation>;
+export type BulkRecordAttendanceMutationOptions = Apollo.BaseMutationOptions<BulkRecordAttendanceMutation, BulkRecordAttendanceMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!, $role: String!) {
   login(email: $email, password: $password, role: $role) {
@@ -2573,3 +2665,56 @@ export type ConversationQueryHookResult = ReturnType<typeof useConversationQuery
 export type ConversationLazyQueryHookResult = ReturnType<typeof useConversationLazyQuery>;
 export type ConversationSuspenseQueryHookResult = ReturnType<typeof useConversationSuspenseQuery>;
 export type ConversationQueryResult = Apollo.QueryResult<ConversationQuery, ConversationQueryVariables>;
+export const ClassroomAttendanceDocument = gql`
+    query ClassroomAttendance($classroomId: ID!, $date: ISO8601Date!) {
+  classroomAttendance(classroomId: $classroomId, date: $date) {
+    id
+    date
+    status
+    notes
+    student {
+      id
+      name
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useClassroomAttendanceQuery__
+ *
+ * To run a query within a React component, call `useClassroomAttendanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useClassroomAttendanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useClassroomAttendanceQuery({
+ *   variables: {
+ *      classroomId: // value for 'classroomId'
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useClassroomAttendanceQuery(baseOptions: Apollo.QueryHookOptions<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables> & ({ variables: ClassroomAttendanceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>(ClassroomAttendanceDocument, options);
+      }
+export function useClassroomAttendanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>(ClassroomAttendanceDocument, options);
+        }
+// @ts-ignore
+export function useClassroomAttendanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>): Apollo.UseSuspenseQueryResult<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>;
+export function useClassroomAttendanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>): Apollo.UseSuspenseQueryResult<ClassroomAttendanceQuery | undefined, ClassroomAttendanceQueryVariables>;
+export function useClassroomAttendanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>(ClassroomAttendanceDocument, options);
+        }
+export type ClassroomAttendanceQueryHookResult = ReturnType<typeof useClassroomAttendanceQuery>;
+export type ClassroomAttendanceLazyQueryHookResult = ReturnType<typeof useClassroomAttendanceLazyQuery>;
+export type ClassroomAttendanceSuspenseQueryHookResult = ReturnType<typeof useClassroomAttendanceSuspenseQuery>;
+export type ClassroomAttendanceQueryResult = Apollo.QueryResult<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>;
