@@ -1,0 +1,23 @@
+# N+1 WARNING: Do NOT request student { ... } on this query.
+# The backend resolver does NOT preload :student on student_attendance.
+# The student is already known from the screen context (child detail tab).
+query StudentAttendance(
+  $studentId: ID!
+  $startDate: ISO8601Date
+  $endDate: ISO8601Date
+) {
+  studentAttendance(
+    studentId: $studentId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    id
+    date
+    status
+    notes
+    classroom {
+      id
+      name
+    }
+  }
+}

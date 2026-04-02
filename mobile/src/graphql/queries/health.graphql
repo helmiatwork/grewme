@@ -1,0 +1,22 @@
+# N+1 WARNING: Do NOT request student { ... } or teacher { ... } on this query.
+# The backend resolver does NOT preload these associations.
+query StudentHealthCheckups(
+  $studentId: ID!
+  $startDate: ISO8601Date
+  $endDate: ISO8601Date
+) {
+  studentHealthCheckups(
+    studentId: $studentId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    id
+    measuredAt
+    weightKg
+    heightCm
+    headCircumferenceCm
+    bmi
+    bmiCategory
+    notes
+  }
+}

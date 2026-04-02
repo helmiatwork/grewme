@@ -1,0 +1,20 @@
+query StudentMasteries($studentId: ID!, $subjectId: ID) {
+  studentMasteries(studentId: $studentId, subjectId: $subjectId) {
+    id
+    examMastered
+    dailyMastered
+    mastered
+    learningObjective {
+      id
+      description
+      topic {
+        id
+        name
+        subject {
+          id
+          name
+        }
+      }
+    }
+  }
+}

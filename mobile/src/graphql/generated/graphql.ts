@@ -19,6 +19,25 @@ export type Scalars = {
   ISO8601DateTime: { input: any; output: any; }
 };
 
+export enum AttendanceStatusEnum {
+  Excused = 'EXCUSED',
+  Present = 'PRESENT',
+  Sick = 'SICK',
+  Unexcused = 'UNEXCUSED'
+}
+
+export type AttendanceType = {
+  __typename?: 'AttendanceType';
+  classroom: ClassroomType;
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  date: Scalars['ISO8601Date']['output'];
+  id: Scalars['ID']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  status: AttendanceStatusEnum;
+  student: StudentType;
+  updatedAt: Scalars['ISO8601DateTime']['output'];
+};
+
 export type AwardBehaviorPointPayload = {
   __typename?: 'AwardBehaviorPointPayload';
   behaviorPoint?: Maybe<BehaviorPointType>;
@@ -58,6 +77,16 @@ export type ClassroomBehaviorStudentType = {
   recentPoints: Array<BehaviorPointType>;
   student: StudentType;
   totalPoints: Scalars['Int']['output'];
+};
+
+export type ClassroomExamType = {
+  __typename?: 'ClassroomExamType';
+  classroom: ClassroomType;
+  dueAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  exam: ExamObjectType;
+  id: Scalars['ID']['output'];
+  scheduledAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  status: Scalars['String']['output'];
 };
 
 export type ClassroomOverviewType = {
@@ -102,6 +131,38 @@ export type DailyScoreTypeEdge = {
   node: DailyScoreType;
 };
 
+export type ExamObjectType = {
+  __typename?: 'ExamObjectType';
+  description?: Maybe<Scalars['String']['output']>;
+  examType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  maxScore?: Maybe<Scalars['Int']['output']>;
+  title: Scalars['String']['output'];
+};
+
+export enum ExamSubmissionStatusEnum {
+  Graded = 'GRADED',
+  InProgress = 'IN_PROGRESS',
+  NotStarted = 'NOT_STARTED',
+  Submitted = 'SUBMITTED'
+}
+
+export type ExamSubmissionType = {
+  __typename?: 'ExamSubmissionType';
+  classroomExam: ClassroomExamType;
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  gradedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  passed?: Maybe<Scalars['Boolean']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
+  startedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  status: ExamSubmissionStatusEnum;
+  student: StudentType;
+  submittedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  teacherNotes?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['ISO8601DateTime']['output'];
+};
+
 export type HealthCheckupType = {
   __typename?: 'HealthCheckupType';
   bmi?: Maybe<Scalars['Float']['output']>;
@@ -112,6 +173,13 @@ export type HealthCheckupType = {
   measuredAt: Scalars['ISO8601Date']['output'];
   notes?: Maybe<Scalars['String']['output']>;
   weightKg?: Maybe<Scalars['Float']['output']>;
+};
+
+export type LearningObjectiveType = {
+  __typename?: 'LearningObjectiveType';
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  topic: TopicMasteryType;
 };
 
 export type LoginPayload = {
@@ -155,6 +223,15 @@ export type MutationLoginArgs = {
   role: Scalars['String']['input'];
 };
 
+export type ObjectiveMasteryType = {
+  __typename?: 'ObjectiveMasteryType';
+  dailyMastered: Scalars['Boolean']['output'];
+  examMastered: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  learningObjective: LearningObjectiveType;
+  mastered: Scalars['Boolean']['output'];
+};
+
 export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Scalars['String']['output']>;
@@ -190,8 +267,11 @@ export type Query = {
   classroomOverview: ClassroomOverviewType;
   classrooms: Array<ClassroomType>;
   myChildren: Array<StudentType>;
+  studentAttendance: Array<AttendanceType>;
   studentBehaviorHistory: Array<BehaviorPointType>;
   studentDailyScores: DailyScoreTypeConnection;
+  studentHealthCheckups: Array<HealthCheckupType>;
+  studentMasteries: Array<ObjectiveMasteryType>;
   studentProgress: ProgressDataType;
   studentRadar: RadarDataType;
 };
@@ -212,6 +292,13 @@ export type QueryClassroomOverviewArgs = {
 };
 
 
+export type QueryStudentAttendanceArgs = {
+  endDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+  startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+  studentId: Scalars['ID']['input'];
+};
+
+
 export type QueryStudentBehaviorHistoryArgs = {
   endDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
   startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
@@ -224,6 +311,19 @@ export type QueryStudentDailyScoresArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   skillCategory?: InputMaybe<SkillCategoryEnum>;
   studentId: Scalars['ID']['input'];
+};
+
+
+export type QueryStudentHealthCheckupsArgs = {
+  endDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+  startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+  studentId: Scalars['ID']['input'];
+};
+
+
+export type QueryStudentMasteriesArgs = {
+  studentId: Scalars['ID']['input'];
+  subjectId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -273,6 +373,12 @@ export type StudentType = {
   name: Scalars['String']['output'];
 };
 
+export type SubjectMasteryType = {
+  __typename?: 'SubjectMasteryType';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type TeacherType = {
   __typename?: 'TeacherType';
   classrooms: Array<ClassroomType>;
@@ -280,6 +386,13 @@ export type TeacherType = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   role: Scalars['String']['output'];
+};
+
+export type TopicMasteryType = {
+  __typename?: 'TopicMasteryType';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  subject: SubjectMasteryType;
 };
 
 export type UserErrorType = {
@@ -323,6 +436,15 @@ export type CreateHealthCheckupMutationVariables = Exact<{
 
 
 export type CreateHealthCheckupMutation = { __typename?: 'Mutation', createHealthCheckup: { __typename?: 'CreateHealthCheckupPayload', healthCheckup?: { __typename?: 'HealthCheckupType', id: string, measuredAt: any, weightKg?: number | null, heightCm?: number | null, headCircumferenceCm?: number | null, bmi?: number | null, bmiCategory?: string | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string }> } };
+
+export type StudentAttendanceQueryVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+  startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+  endDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+}>;
+
+
+export type StudentAttendanceQuery = { __typename?: 'Query', studentAttendance: Array<{ __typename?: 'AttendanceType', id: string, date: any, status: AttendanceStatusEnum, notes?: string | null, classroom: { __typename?: 'ClassroomType', id: string, name: string } }> };
 
 export type ClassroomBehaviorTodayQueryVariables = Exact<{
   classroomId: Scalars['ID']['input'];
@@ -387,6 +509,23 @@ export type ClassroomOverviewQueryVariables = Exact<{
 
 
 export type ClassroomOverviewQuery = { __typename?: 'Query', classroomOverview: { __typename?: 'ClassroomOverviewType', classroomId: string, classroomName: string, students: Array<{ __typename?: 'RadarDataType', studentId: string, studentName: string, skills: { __typename?: 'RadarSkillType', reading?: number | null, math?: number | null, writing?: number | null, logic?: number | null, social?: number | null } }> } };
+
+export type StudentMasteriesQueryVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+  subjectId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type StudentMasteriesQuery = { __typename?: 'Query', studentMasteries: Array<{ __typename?: 'ObjectiveMasteryType', id: string, examMastered: boolean, dailyMastered: boolean, mastered: boolean, learningObjective: { __typename?: 'LearningObjectiveType', id: string, description: string, topic: { __typename?: 'TopicMasteryType', id: string, name: string, subject: { __typename?: 'SubjectMasteryType', id: string, name: string } } } }> };
+
+export type StudentHealthCheckupsQueryVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+  startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+  endDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
+}>;
+
+
+export type StudentHealthCheckupsQuery = { __typename?: 'Query', studentHealthCheckups: Array<{ __typename?: 'HealthCheckupType', id: string, measuredAt: any, weightKg?: number | null, heightCm?: number | null, headCircumferenceCm?: number | null, bmi?: number | null, bmiCategory?: string | null, notes?: string | null }> };
 
 
 export const LoginDocument = gql`
@@ -550,6 +689,62 @@ export function useCreateHealthCheckupMutation(baseOptions?: Apollo.MutationHook
 export type CreateHealthCheckupMutationHookResult = ReturnType<typeof useCreateHealthCheckupMutation>;
 export type CreateHealthCheckupMutationResult = Apollo.MutationResult<CreateHealthCheckupMutation>;
 export type CreateHealthCheckupMutationOptions = Apollo.BaseMutationOptions<CreateHealthCheckupMutation, CreateHealthCheckupMutationVariables>;
+export const StudentAttendanceDocument = gql`
+    query StudentAttendance($studentId: ID!, $startDate: ISO8601Date, $endDate: ISO8601Date) {
+  studentAttendance(
+    studentId: $studentId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    id
+    date
+    status
+    notes
+    classroom {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useStudentAttendanceQuery__
+ *
+ * To run a query within a React component, call `useStudentAttendanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStudentAttendanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStudentAttendanceQuery({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *      startDate: // value for 'startDate'
+ *      endDate: // value for 'endDate'
+ *   },
+ * });
+ */
+export function useStudentAttendanceQuery(baseOptions: Apollo.QueryHookOptions<StudentAttendanceQuery, StudentAttendanceQueryVariables> & ({ variables: StudentAttendanceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<StudentAttendanceQuery, StudentAttendanceQueryVariables>(StudentAttendanceDocument, options);
+      }
+export function useStudentAttendanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StudentAttendanceQuery, StudentAttendanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<StudentAttendanceQuery, StudentAttendanceQueryVariables>(StudentAttendanceDocument, options);
+        }
+// @ts-ignore
+export function useStudentAttendanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<StudentAttendanceQuery, StudentAttendanceQueryVariables>): Apollo.UseSuspenseQueryResult<StudentAttendanceQuery, StudentAttendanceQueryVariables>;
+export function useStudentAttendanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudentAttendanceQuery, StudentAttendanceQueryVariables>): Apollo.UseSuspenseQueryResult<StudentAttendanceQuery | undefined, StudentAttendanceQueryVariables>;
+export function useStudentAttendanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudentAttendanceQuery, StudentAttendanceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<StudentAttendanceQuery, StudentAttendanceQueryVariables>(StudentAttendanceDocument, options);
+        }
+export type StudentAttendanceQueryHookResult = ReturnType<typeof useStudentAttendanceQuery>;
+export type StudentAttendanceLazyQueryHookResult = ReturnType<typeof useStudentAttendanceLazyQuery>;
+export type StudentAttendanceSuspenseQueryHookResult = ReturnType<typeof useStudentAttendanceSuspenseQuery>;
+export type StudentAttendanceQueryResult = Apollo.QueryResult<StudentAttendanceQuery, StudentAttendanceQueryVariables>;
 export const ClassroomBehaviorTodayDocument = gql`
     query ClassroomBehaviorToday($classroomId: ID!) {
   classroomBehaviorToday(classroomId: $classroomId) {
@@ -1033,3 +1228,118 @@ export type ClassroomOverviewQueryHookResult = ReturnType<typeof useClassroomOve
 export type ClassroomOverviewLazyQueryHookResult = ReturnType<typeof useClassroomOverviewLazyQuery>;
 export type ClassroomOverviewSuspenseQueryHookResult = ReturnType<typeof useClassroomOverviewSuspenseQuery>;
 export type ClassroomOverviewQueryResult = Apollo.QueryResult<ClassroomOverviewQuery, ClassroomOverviewQueryVariables>;
+export const StudentMasteriesDocument = gql`
+    query StudentMasteries($studentId: ID!, $subjectId: ID) {
+  studentMasteries(studentId: $studentId, subjectId: $subjectId) {
+    id
+    examMastered
+    dailyMastered
+    mastered
+    learningObjective {
+      id
+      description
+      topic {
+        id
+        name
+        subject {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useStudentMasteriesQuery__
+ *
+ * To run a query within a React component, call `useStudentMasteriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStudentMasteriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStudentMasteriesQuery({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *      subjectId: // value for 'subjectId'
+ *   },
+ * });
+ */
+export function useStudentMasteriesQuery(baseOptions: Apollo.QueryHookOptions<StudentMasteriesQuery, StudentMasteriesQueryVariables> & ({ variables: StudentMasteriesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<StudentMasteriesQuery, StudentMasteriesQueryVariables>(StudentMasteriesDocument, options);
+      }
+export function useStudentMasteriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StudentMasteriesQuery, StudentMasteriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<StudentMasteriesQuery, StudentMasteriesQueryVariables>(StudentMasteriesDocument, options);
+        }
+// @ts-ignore
+export function useStudentMasteriesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<StudentMasteriesQuery, StudentMasteriesQueryVariables>): Apollo.UseSuspenseQueryResult<StudentMasteriesQuery, StudentMasteriesQueryVariables>;
+export function useStudentMasteriesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudentMasteriesQuery, StudentMasteriesQueryVariables>): Apollo.UseSuspenseQueryResult<StudentMasteriesQuery | undefined, StudentMasteriesQueryVariables>;
+export function useStudentMasteriesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudentMasteriesQuery, StudentMasteriesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<StudentMasteriesQuery, StudentMasteriesQueryVariables>(StudentMasteriesDocument, options);
+        }
+export type StudentMasteriesQueryHookResult = ReturnType<typeof useStudentMasteriesQuery>;
+export type StudentMasteriesLazyQueryHookResult = ReturnType<typeof useStudentMasteriesLazyQuery>;
+export type StudentMasteriesSuspenseQueryHookResult = ReturnType<typeof useStudentMasteriesSuspenseQuery>;
+export type StudentMasteriesQueryResult = Apollo.QueryResult<StudentMasteriesQuery, StudentMasteriesQueryVariables>;
+export const StudentHealthCheckupsDocument = gql`
+    query StudentHealthCheckups($studentId: ID!, $startDate: ISO8601Date, $endDate: ISO8601Date) {
+  studentHealthCheckups(
+    studentId: $studentId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    id
+    measuredAt
+    weightKg
+    heightCm
+    headCircumferenceCm
+    bmi
+    bmiCategory
+    notes
+  }
+}
+    `;
+
+/**
+ * __useStudentHealthCheckupsQuery__
+ *
+ * To run a query within a React component, call `useStudentHealthCheckupsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStudentHealthCheckupsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStudentHealthCheckupsQuery({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *      startDate: // value for 'startDate'
+ *      endDate: // value for 'endDate'
+ *   },
+ * });
+ */
+export function useStudentHealthCheckupsQuery(baseOptions: Apollo.QueryHookOptions<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables> & ({ variables: StudentHealthCheckupsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>(StudentHealthCheckupsDocument, options);
+      }
+export function useStudentHealthCheckupsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>(StudentHealthCheckupsDocument, options);
+        }
+// @ts-ignore
+export function useStudentHealthCheckupsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>): Apollo.UseSuspenseQueryResult<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>;
+export function useStudentHealthCheckupsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>): Apollo.UseSuspenseQueryResult<StudentHealthCheckupsQuery | undefined, StudentHealthCheckupsQueryVariables>;
+export function useStudentHealthCheckupsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>(StudentHealthCheckupsDocument, options);
+        }
+export type StudentHealthCheckupsQueryHookResult = ReturnType<typeof useStudentHealthCheckupsQuery>;
+export type StudentHealthCheckupsLazyQueryHookResult = ReturnType<typeof useStudentHealthCheckupsLazyQuery>;
+export type StudentHealthCheckupsSuspenseQueryHookResult = ReturnType<typeof useStudentHealthCheckupsSuspenseQuery>;
+export type StudentHealthCheckupsQueryResult = Apollo.QueryResult<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>;
