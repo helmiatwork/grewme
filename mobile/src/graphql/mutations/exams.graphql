@@ -1,0 +1,50 @@
+mutation CreateExam($input: CreateExamInput!) {
+  createExam(input: $input) {
+    exam {
+      id
+      title
+      description
+      examType
+      maxScore
+      durationMinutes
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation AssignExamToClassroom($input: AssignExamInput!) {
+  assignExamToClassroom(input: $input) {
+    classroomExam {
+      id
+      status
+      scheduledAt
+      dueAt
+      accessCode
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation GradeExamSubmission($input: GradeSubmissionInput!) {
+  gradeExamSubmission(input: $input) {
+    examSubmission {
+      id
+      status
+      score
+      passed
+      gradedAt
+      teacherNotes
+    }
+    errors {
+      message
+      path
+    }
+  }
+}

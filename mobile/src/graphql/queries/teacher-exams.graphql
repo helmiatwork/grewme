@@ -1,0 +1,141 @@
+query ClassroomExams($classroomId: ID!, $status: ClassroomExamStatusEnum) {
+  classroomExams(classroomId: $classroomId, status: $status) {
+    id
+    status
+    scheduledAt
+    dueAt
+    accessCode
+    durationMinutes
+    showResults
+    createdAt
+    exam {
+      id
+      title
+      description
+      examType
+      maxScore
+    }
+    examSubmissions {
+      id
+      status
+    }
+  }
+}
+
+query ExamDetail($id: ID!) {
+  exam(id: $id) {
+    id
+    title
+    description
+    examType
+    maxScore
+    durationMinutes
+    createdAt
+    topic {
+      id
+      name
+      subject {
+        id
+        name
+      }
+    }
+    examQuestions {
+      id
+      questionText
+      points
+      position
+    }
+    rubricCriteria {
+      id
+      name
+      description
+      maxScore
+      position
+    }
+    classroomExams {
+      id
+      status
+      scheduledAt
+      dueAt
+      accessCode
+      classroom {
+        id
+        name
+      }
+      examSubmissions {
+        id
+        status
+        score
+        passed
+        submittedAt
+        gradedAt
+        student {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+query ExamSubmissionDetail($id: ID!) {
+  examSubmission(id: $id) {
+    id
+    status
+    score
+    passed
+    startedAt
+    submittedAt
+    gradedAt
+    teacherNotes
+    student {
+      id
+      name
+    }
+    classroomExam {
+      id
+      exam {
+        id
+        title
+        examType
+        maxScore
+        examQuestions {
+          id
+          questionText
+          points
+          position
+          correctAnswer
+        }
+        rubricCriteria {
+          id
+          name
+          description
+          maxScore
+          position
+        }
+      }
+    }
+    examAnswers {
+      id
+      examQuestion {
+        id
+        questionText
+        points
+        correctAnswer
+      }
+      selectedAnswer
+      correct
+      pointsAwarded
+    }
+    rubricScores {
+      id
+      rubricCriteria {
+        id
+        name
+        maxScore
+      }
+      score
+      feedback
+    }
+  }
+}
