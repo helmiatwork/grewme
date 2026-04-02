@@ -1,0 +1,23 @@
+mutation AwardBehaviorPoint(
+  $studentId: ID!
+  $classroomId: ID!
+  $behaviorCategoryId: ID!
+  $note: String
+) {
+  awardBehaviorPoint(
+    studentId: $studentId
+    classroomId: $classroomId
+    behaviorCategoryId: $behaviorCategoryId
+    note: $note
+  ) {
+    behaviorPoint {
+      id
+      pointValue
+      awardedAt
+    }
+    dailyTotal
+    errors {
+      message
+    }
+  }
+}

@@ -1,0 +1,30 @@
+mutation CreateHealthCheckup(
+  $studentId: ID!
+  $measuredAt: ISO8601Date!
+  $weightKg: Float
+  $heightCm: Float
+  $headCircumferenceCm: Float
+  $notes: String
+) {
+  createHealthCheckup(
+    studentId: $studentId
+    measuredAt: $measuredAt
+    weightKg: $weightKg
+    heightCm: $heightCm
+    headCircumferenceCm: $headCircumferenceCm
+    notes: $notes
+  ) {
+    healthCheckup {
+      id
+      measuredAt
+      weightKg
+      heightCm
+      headCircumferenceCm
+      bmi
+      bmiCategory
+    }
+    errors {
+      message
+    }
+  }
+}

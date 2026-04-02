@@ -1,0 +1,26 @@
+mutation Login($email: String!, $password: String!, $role: String!) {
+  login(email: $email, password: $password, role: $role) {
+    accessToken
+    refreshToken
+    expiresIn
+    user {
+      __typename
+      ... on TeacherType {
+        id
+        name
+        email
+        role
+      }
+      ... on ParentType {
+        id
+        name
+        email
+        role
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
