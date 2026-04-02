@@ -1,0 +1,22 @@
+mutation SendMessage($conversationId: ID!, $body: String!) {
+  sendMessage(conversationId: $conversationId, body: $body) {
+    message {
+      id
+      body
+      senderName
+      senderType
+      senderId
+      mine
+      createdAt
+      attachments {
+        url
+        filename
+        contentType
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}

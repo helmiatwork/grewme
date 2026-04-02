@@ -307,6 +307,52 @@ type HealthCheckupType {
   notes: String
 }
 
+# --- Calendar ---
+
+type ClassroomEventType {
+  id: ID!
+  title: String!
+  description: String
+  eventDate: ISO8601Date!
+  startTime: String
+  endTime: String
+  classroom: ClassroomType!
+  creatorName: String!
+  creatorType: String!
+  isMine: Boolean!
+  createdAt: ISO8601DateTime!
+}
+
+# --- Messaging ---
+
+type MediaAttachmentType {
+  url: String!
+  filename: String!
+  contentType: String!
+}
+
+type MessageType {
+  id: ID!
+  body: String!
+  senderName: String!
+  senderType: String!
+  senderId: ID!
+  mine: Boolean!
+  createdAt: ISO8601DateTime!
+  attachments: [MediaAttachmentType!]!
+}
+
+type ConversationType {
+  id: ID!
+  student: StudentType!
+  parent: ParentType!
+  teacher: TeacherType!
+  lastMessage: MessageType
+  unreadCount: Int!
+  messages: [MessageType!]!
+  createdAt: ISO8601DateTime!
+}
+
 # --- Shared error type ---
 
 type UserErrorType {
@@ -332,6 +378,11 @@ type AwardBehaviorPointPayload {
 
 type CreateHealthCheckupPayload {
   healthCheckup: HealthCheckupType
+  errors: [UserErrorType!]!
+}
+
+type SendMessagePayload {
+  message: MessageType
   errors: [UserErrorType!]!
 }
 
@@ -378,6 +429,16 @@ type Query {
     startDate: ISO8601Date
     endDate: ISO8601Date
   ): [BehaviorPointType!]!
+
+  # Calendar
+  classroomEvents(
+    month: ISO8601Date!
+    classroomIds: [ID!]
+  ): [ClassroomEventType!]!
+
+  # Messaging
+  conversations: [ConversationType!]!
+  conversation(id: ID!): ConversationType!
 }
 
 type Mutation {
@@ -396,4 +457,8 @@ type Mutation {
     headCircumferenceCm: Float
     notes: String
   ): CreateHealthCheckupPayload!
+  sendMessage(
+    conversationId: ID!
+    body: String!
+  ): SendMessagePayload!
 }

@@ -1,0 +1,18 @@
+query ClassroomEvents($month: ISO8601Date!, $classroomIds: [ID!]) {
+  classroomEvents(month: $month, classroomIds: $classroomIds) {
+    id
+    title
+    description
+    eventDate
+    startTime
+    endTime
+    classroom {
+      id
+      name
+    }
+    creatorName
+    creatorType
+    isMine
+    createdAt
+  }
+}
