@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
-  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -23,24 +22,12 @@ import {
   useTeacherStudentDetailQuery,
   useCreateDailyScoreMutation,
 } from '../../../../../src/graphql/generated/graphql';
-
-const SKILL_COLORS: Record<string, string> = {
-  Reading: '#4CAF50',
-  Math: '#2196F3',
-  Writing: '#FF9800',
-  Logic: '#9C27B0',
-  Social: '#F44336',
-};
-
-const SKILL_KEYS = ['reading', 'math', 'writing', 'logic', 'social'] as const;
-
-const SKILL_OPTIONS: { value: SkillCategoryEnum; label: string }[] = [
-  { value: SkillCategoryEnum.Reading, label: 'Reading' },
-  { value: SkillCategoryEnum.Math, label: 'Math' },
-  { value: SkillCategoryEnum.Writing, label: 'Writing' },
-  { value: SkillCategoryEnum.Logic, label: 'Logic' },
-  { value: SkillCategoryEnum.Social, label: 'Social' },
-];
+import {
+  SKILL_COLORS,
+  SKILL_KEYS,
+  SKILL_OPTIONS,
+  skillLabel,
+} from '../../../../../src/utils/skillHelpers';
 
 export default function StudentDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

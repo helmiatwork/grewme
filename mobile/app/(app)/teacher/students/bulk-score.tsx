@@ -20,20 +20,9 @@ import {
   useClassroomOverviewQuery,
   useBulkCreateDailyScoresMutation,
 } from '../../../../src/graphql/generated/graphql';
+import { SKILL_OPTIONS } from '../../../../src/utils/skillHelpers';
 
-const SKILL_OPTIONS: {
-  value: SkillCategoryEnum;
-  label: string;
-  color: string;
-}[] = [
-  { value: SkillCategoryEnum.Reading, label: 'Reading', color: '#4CAF50' },
-  { value: SkillCategoryEnum.Math, label: 'Math', color: '#2196F3' },
-  { value: SkillCategoryEnum.Writing, label: 'Writing', color: '#FF9800' },
-  { value: SkillCategoryEnum.Logic, label: 'Logic', color: '#9C27B0' },
-  { value: SkillCategoryEnum.Social, label: 'Social', color: '#F44336' },
-];
-
-const SKILL_KEYS: Record<SkillCategoryEnum, string> = {
+const ENUM_TO_KEY: Record<SkillCategoryEnum, string> = {
   [SkillCategoryEnum.Reading]: 'reading',
   [SkillCategoryEnum.Math]: 'math',
   [SkillCategoryEnum.Writing]: 'writing',
@@ -101,6 +90,7 @@ export default function BulkScoreScreen() {
   );
 
   const handleSubmit = async () => {
+    if (!activeClassroomId) return;
     const filledScores = Object.entries(scores)
       .filter(([, v]) => v.trim() !== '')
       .map(([studentId, v]) => {
@@ -157,7 +147,7 @@ export default function BulkScoreScreen() {
   const activeSkillOption = SKILL_OPTIONS.find(
     (o) => o.value === selectedSkill,
   );
-  const skillKey = SKILL_KEYS[selectedSkill] as keyof StudentItem['skills'];
+  const skillKey = ENUM_TO_KEY[selectedSkill] as keyof StudentItem['skills'];
 
   const filledCount = Object.values(scores).filter(
     (v) => v.trim() !== '',
