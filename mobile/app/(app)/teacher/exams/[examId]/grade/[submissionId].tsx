@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -54,7 +54,7 @@ function statusColor(status: string): string {
 }
 
 export default function GradeSubmissionScreen() {
-  const { examId, submissionId } = useLocalSearchParams<{
+  const { submissionId } = useLocalSearchParams<{
     examId: string;
     submissionId: string;
   }>();
@@ -71,14 +71,16 @@ export default function GradeSubmissionScreen() {
   const [passed, setPassed] = useState<boolean | null>(null);
   const [teacherNotes, setTeacherNotes] = useState('');
   const [rubricScores, setRubricScores] = useState<RubricScoreLocal[]>([]);
+  const hasInitialized = useRef(false);
 
   const submission = data?.examSubmission;
   const exam = submission?.classroomExam?.exam;
   const examType = exam?.examType ?? '';
 
-  // Pre-populate from existing grading data
+  // Pre-populate from existing grading data (once)
   useEffect(() => {
-    if (!submission) return;
+    if (!submission || hasInitialized.current) return;
+    hasInitialized.current = true;
 
     if (submission.score != null) {
       setScore(String(submission.score));
@@ -167,7 +169,10 @@ export default function GradeSubmissionScreen() {
         }));
       }
 
-      const result = await gradeSubmission({ variables: { input } });
+      const result = await gradeSubmission({
+        variables: { input },
+        refetchQueries: ['ExamDetail'],
+      });
       const errors = result.data?.gradeExamSubmission?.errors ?? [];
 
       if (errors.length > 0) {
@@ -214,7 +219,7 @@ export default function GradeSubmissionScreen() {
               ]}
             >
               <Text style={styles.statusBadgeText}>
-                {submission.status.replace('_', ' ')}
+                {submission.status.replaceAll('_', ' ')}
               </Text>
             </View>
             {submission.submittedAt ? (
@@ -225,7 +230,7 @@ export default function GradeSubmissionScreen() {
           </View>
           <Text style={styles.examInfo}>
             {exam.title} &middot;{' '}
-            {exam.examType.replace('_', ' ')}
+            {exam.examType.replaceAll('_', ' ')}
             {exam.maxScore ? ` &middot; ${exam.maxScore} pts` : ''}
           </Text>
         </View>

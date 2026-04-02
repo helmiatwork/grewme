@@ -85,7 +85,7 @@ export default function ExamDetailScreen() {
         <View style={styles.metaRow}>
           <View style={styles.metaChip}>
             <Text style={styles.metaChipText}>
-              {exam.examType.replace('_', ' ')}
+              {exam.examType.replaceAll('_', ' ')}
             </Text>
           </View>
           {exam.maxScore ? (
@@ -212,7 +212,7 @@ export default function ExamDetailScreen() {
                             ]}
                           >
                             <Text style={styles.submissionBadgeText}>
-                              {sub.status.replace('_', ' ')}
+                              {sub.status.replaceAll('_', ' ')}
                             </Text>
                           </View>
                         </View>

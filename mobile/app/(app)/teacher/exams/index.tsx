@@ -56,7 +56,7 @@ export default function TeacherExamsListScreen() {
 
   const { data, loading, error, refetch } = useClassroomExamsQuery({
     variables: {
-      classroomId: activeClassroomId!,
+      classroomId: activeClassroomId ?? '',
       ...(statusFilter ? { status: statusFilter } : {}),
     },
     skip: !activeClassroomId,
@@ -165,7 +165,7 @@ export default function TeacherExamsListScreen() {
                 <View style={styles.metaItem}>
                   <Ionicons name="document-text-outline" size={14} color="#888" />
                   <Text style={styles.metaText}>
-                    {item.exam.examType.replace('_', ' ')}
+                    {item.exam.examType.replaceAll('_', ' ')}
                   </Text>
                 </View>
               </View>

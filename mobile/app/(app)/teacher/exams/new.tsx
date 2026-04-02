@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAuthStore } from '../../../../src/auth/store';
+import { useTeacherSchoolId } from '../../../../src/hooks/useTeacherSchoolId';
 import {
   ExamTypeEnum,
   useCreateExamMutation,
@@ -39,7 +39,7 @@ const EXAM_TYPES: { value: ExamTypeEnum; label: string }[] = [
 ];
 
 export default function CreateExamScreen() {
-  const activeSchoolId = useAuthStore((s) => s.activeSchoolId);
+  const { schoolId: activeSchoolId } = useTeacherSchoolId();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -56,7 +56,7 @@ export default function CreateExamScreen() {
   const [rubricCriteria, setRubricCriteria] = useState<CriteriaDraft[]>([]);
 
   const { data: subjectsData, loading: subjectsLoading } = useSubjectsQuery({
-    variables: { schoolId: activeSchoolId! },
+    variables: { schoolId: activeSchoolId ?? '' },
     skip: !activeSchoolId,
   });
 
@@ -78,6 +78,7 @@ export default function CreateExamScreen() {
 
     try {
       const result = await createExam({
+        refetchQueries: ['ClassroomExams'],
         variables: {
           input: {
             title: title.trim(),
