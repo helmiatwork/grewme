@@ -180,6 +180,13 @@ type BulkRecordAttendancePayload {
 
 # --- Exams ---
 
+enum ExamTypeEnum {
+  SCORE_BASED
+  MULTIPLE_CHOICE
+  RUBRIC
+  PASS_FAIL
+}
+
 enum ExamSubmissionStatusEnum {
   NOT_STARTED
   IN_PROGRESS
@@ -187,21 +194,72 @@ enum ExamSubmissionStatusEnum {
   GRADED
 }
 
+enum ClassroomExamStatusEnum {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+type ExamQuestionType {
+  id: ID!
+  questionText: String
+  options: String
+  correctAnswer: String
+  points: Int!
+  position: Int!
+}
+
+type RubricCriteriaType {
+  id: ID!
+  name: String!
+  description: String
+  maxScore: Int!
+  position: Int!
+}
+
+type RubricScoreType {
+  id: ID!
+  rubricCriteria: RubricCriteriaType!
+  score: Int!
+  feedback: String
+}
+
+type ExamAnswerType {
+  id: ID!
+  examQuestion: ExamQuestionType!
+  selectedAnswer: String
+  correct: Boolean
+  pointsAwarded: Int!
+}
+
 type ExamObjectType {
   id: ID!
   title: String!
   description: String
-  examType: String!
+  examType: ExamTypeEnum!
   maxScore: Int
+  durationMinutes: Int
+  topic: TopicCurriculumType!
+  examQuestions: [ExamQuestionType!]!
+  rubricCriteria: [RubricCriteriaType!]!
+  classroomExams: [ClassroomExamType!]!
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
 }
 
 type ClassroomExamType {
   id: ID!
   exam: ExamObjectType!
   classroom: ClassroomType!
-  status: String!
+  status: ClassroomExamStatusEnum!
   scheduledAt: ISO8601DateTime
   dueAt: ISO8601DateTime
+  accessCode: String
+  durationMinutes: Int
+  showResults: Boolean!
+  examSubmissions: [ExamSubmissionType!]!
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
 }
 
 type ExamSubmissionType {
@@ -215,8 +273,61 @@ type ExamSubmissionType {
   submittedAt: ISO8601DateTime
   gradedAt: ISO8601DateTime
   teacherNotes: String
+  examAnswers: [ExamAnswerType!]!
+  rubricScores: [RubricScoreType!]!
   createdAt: ISO8601DateTime!
   updatedAt: ISO8601DateTime!
+}
+
+# --- Exam Inputs ---
+
+input ExamQuestionInput {
+  questionText: String
+  options: String
+  correctAnswer: String
+  points: Int
+  position: Int
+}
+
+input RubricCriteriaInput {
+  name: String!
+  description: String
+  maxScore: Int
+  position: Int
+}
+
+input CreateExamInput {
+  title: String!
+  description: String
+  examType: ExamTypeEnum!
+  topicId: ID!
+  maxScore: Int
+  durationMinutes: Int
+  questions: [ExamQuestionInput!]
+  rubricCriteria: [RubricCriteriaInput!]
+}
+
+input AssignExamInput {
+  examId: ID!
+  classroomId: ID!
+  scheduledAt: ISO8601DateTime
+  dueAt: ISO8601DateTime
+  durationMinutes: Int
+  showResults: Boolean
+}
+
+input RubricScoreInput {
+  rubricCriteriaId: ID!
+  score: Int!
+  feedback: String
+}
+
+input GradeSubmissionInput {
+  examSubmissionId: ID!
+  score: Float
+  passed: Boolean
+  teacherNotes: String
+  rubricScores: [RubricScoreInput!]
 }
 
 # --- Curriculum ---
@@ -462,6 +573,23 @@ type DeleteLeaveRequestPayload {
   errors: [UserErrorType!]!
 }
 
+# --- Exam Payloads ---
+
+type CreateExamPayload {
+  exam: ExamObjectType
+  errors: [UserErrorType!]!
+}
+
+type AssignExamPayload {
+  classroomExam: ClassroomExamType
+  errors: [UserErrorType!]!
+}
+
+type GradeExamSubmissionPayload {
+  examSubmission: ExamSubmissionType
+  errors: [UserErrorType!]!
+}
+
 # --- Root types ---
 
 type Query {
@@ -522,6 +650,11 @@ type Query {
     studentId: ID
     status: LeaveRequestStatusEnum
   ): [LeaveRequestType!]!
+
+  # Exams
+  exam(id: ID!): ExamObjectType
+  classroomExams(classroomId: ID!, status: ClassroomExamStatusEnum): [ClassroomExamType!]!
+  examSubmission(id: ID!): ExamSubmissionType
 }
 
 type Mutation {
@@ -566,4 +699,9 @@ type Mutation {
     date: ISO8601Date!
     records: [AttendanceRecordInput!]!
   ): BulkRecordAttendancePayload!
+
+  # Exams
+  createExam(input: CreateExamInput!): CreateExamPayload!
+  assignExamToClassroom(input: AssignExamInput!): AssignExamPayload!
+  gradeExamSubmission(input: GradeSubmissionInput!): GradeExamSubmissionPayload!
 }

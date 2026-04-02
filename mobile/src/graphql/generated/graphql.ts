@@ -39,6 +39,21 @@ export type AccountDeletionRequestType = {
   status: Scalars['String']['output'];
 };
 
+export type AssignExamInput = {
+  classroomId: Scalars['ID']['input'];
+  dueAt?: InputMaybe<Scalars['ISO8601DateTime']['input']>;
+  durationMinutes?: InputMaybe<Scalars['Int']['input']>;
+  examId: Scalars['ID']['input'];
+  scheduledAt?: InputMaybe<Scalars['ISO8601DateTime']['input']>;
+  showResults?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type AssignExamPayload = {
+  __typename?: 'AssignExamPayload';
+  classroomExam?: Maybe<ClassroomExamType>;
+  errors: Array<UserErrorType>;
+};
+
 export type AttendanceRecordInput = {
   notes?: InputMaybe<Scalars['String']['input']>;
   status: AttendanceStatusEnum;
@@ -126,14 +141,26 @@ export type ClassroomEventType = {
   title: Scalars['String']['output'];
 };
 
+export enum ClassroomExamStatusEnum {
+  Active = 'ACTIVE',
+  Closed = 'CLOSED',
+  Draft = 'DRAFT'
+}
+
 export type ClassroomExamType = {
   __typename?: 'ClassroomExamType';
+  accessCode?: Maybe<Scalars['String']['output']>;
   classroom: ClassroomType;
+  createdAt: Scalars['ISO8601DateTime']['output'];
   dueAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  durationMinutes?: Maybe<Scalars['Int']['output']>;
   exam: ExamObjectType;
+  examSubmissions: Array<ExamSubmissionType>;
   id: Scalars['ID']['output'];
   scheduledAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
-  status: Scalars['String']['output'];
+  showResults: Scalars['Boolean']['output'];
+  status: ClassroomExamStatusEnum;
+  updatedAt: Scalars['ISO8601DateTime']['output'];
 };
 
 export type ClassroomOverviewType = {
@@ -161,6 +188,23 @@ export type ConversationType = {
   student: StudentType;
   teacher: TeacherType;
   unreadCount: Scalars['Int']['output'];
+};
+
+export type CreateExamInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  durationMinutes?: InputMaybe<Scalars['Int']['input']>;
+  examType: ExamTypeEnum;
+  maxScore?: InputMaybe<Scalars['Int']['input']>;
+  questions?: InputMaybe<Array<ExamQuestionInput>>;
+  rubricCriteria?: InputMaybe<Array<RubricCriteriaInput>>;
+  title: Scalars['String']['input'];
+  topicId: Scalars['ID']['input'];
+};
+
+export type CreateExamPayload = {
+  __typename?: 'CreateExamPayload';
+  errors: Array<UserErrorType>;
+  exam?: Maybe<ExamObjectType>;
 };
 
 export type CreateHealthCheckupPayload = {
@@ -215,13 +259,47 @@ export type DeleteLeaveRequestPayload = {
   success: Scalars['Boolean']['output'];
 };
 
+export type ExamAnswerType = {
+  __typename?: 'ExamAnswerType';
+  correct?: Maybe<Scalars['Boolean']['output']>;
+  examQuestion: ExamQuestionType;
+  id: Scalars['ID']['output'];
+  pointsAwarded: Scalars['Int']['output'];
+  selectedAnswer?: Maybe<Scalars['String']['output']>;
+};
+
 export type ExamObjectType = {
   __typename?: 'ExamObjectType';
+  classroomExams: Array<ClassroomExamType>;
+  createdAt: Scalars['ISO8601DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  examType: Scalars['String']['output'];
+  durationMinutes?: Maybe<Scalars['Int']['output']>;
+  examQuestions: Array<ExamQuestionType>;
+  examType: ExamTypeEnum;
   id: Scalars['ID']['output'];
   maxScore?: Maybe<Scalars['Int']['output']>;
+  rubricCriteria: Array<RubricCriteriaType>;
   title: Scalars['String']['output'];
+  topic: TopicCurriculumType;
+  updatedAt: Scalars['ISO8601DateTime']['output'];
+};
+
+export type ExamQuestionInput = {
+  correctAnswer?: InputMaybe<Scalars['String']['input']>;
+  options?: InputMaybe<Scalars['String']['input']>;
+  points?: InputMaybe<Scalars['Int']['input']>;
+  position?: InputMaybe<Scalars['Int']['input']>;
+  questionText?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ExamQuestionType = {
+  __typename?: 'ExamQuestionType';
+  correctAnswer?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  options?: Maybe<Scalars['String']['output']>;
+  points: Scalars['Int']['output'];
+  position: Scalars['Int']['output'];
+  questionText?: Maybe<Scalars['String']['output']>;
 };
 
 export enum ExamSubmissionStatusEnum {
@@ -235,9 +313,11 @@ export type ExamSubmissionType = {
   __typename?: 'ExamSubmissionType';
   classroomExam: ClassroomExamType;
   createdAt: Scalars['ISO8601DateTime']['output'];
+  examAnswers: Array<ExamAnswerType>;
   gradedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
   id: Scalars['ID']['output'];
   passed?: Maybe<Scalars['Boolean']['output']>;
+  rubricScores: Array<RubricScoreType>;
   score?: Maybe<Scalars['Float']['output']>;
   startedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
   status: ExamSubmissionStatusEnum;
@@ -246,6 +326,13 @@ export type ExamSubmissionType = {
   teacherNotes?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['ISO8601DateTime']['output'];
 };
+
+export enum ExamTypeEnum {
+  MultipleChoice = 'MULTIPLE_CHOICE',
+  PassFail = 'PASS_FAIL',
+  Rubric = 'RUBRIC',
+  ScoreBased = 'SCORE_BASED'
+}
 
 export type ExportChildDataPayload = {
   __typename?: 'ExportChildDataPayload';
@@ -269,6 +356,20 @@ export type GradeCurriculumType = {
   grade: Scalars['Int']['output'];
   gradeCurriculumItems: Array<GradeCurriculumItemType>;
   id: Scalars['ID']['output'];
+};
+
+export type GradeExamSubmissionPayload = {
+  __typename?: 'GradeExamSubmissionPayload';
+  errors: Array<UserErrorType>;
+  examSubmission?: Maybe<ExamSubmissionType>;
+};
+
+export type GradeSubmissionInput = {
+  examSubmissionId: Scalars['ID']['input'];
+  passed?: InputMaybe<Scalars['Boolean']['input']>;
+  rubricScores?: InputMaybe<Array<RubricScoreInput>>;
+  score?: InputMaybe<Scalars['Float']['input']>;
+  teacherNotes?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type HealthCheckupType = {
@@ -348,16 +449,24 @@ export type MessageType = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  assignExamToClassroom: AssignExamPayload;
   awardBehaviorPoint: AwardBehaviorPointPayload;
   bulkRecordAttendance: BulkRecordAttendancePayload;
+  createExam: CreateExamPayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   createLeaveRequest: CreateLeaveRequestPayload;
   deleteLeaveRequest: DeleteLeaveRequestPayload;
   exportChildData: ExportChildDataPayload;
+  gradeExamSubmission: GradeExamSubmissionPayload;
   login: LoginPayload;
   requestAccountDeletion: RequestAccountDeletionPayload;
   requestChildDataDeletion: RequestChildDataDeletionPayload;
   sendMessage: SendMessagePayload;
+};
+
+
+export type MutationAssignExamToClassroomArgs = {
+  input: AssignExamInput;
 };
 
 
@@ -373,6 +482,11 @@ export type MutationBulkRecordAttendanceArgs = {
   classroomId: Scalars['ID']['input'];
   date: Scalars['ISO8601Date']['input'];
   records: Array<AttendanceRecordInput>;
+};
+
+
+export type MutationCreateExamArgs = {
+  input: CreateExamInput;
 };
 
 
@@ -402,6 +516,11 @@ export type MutationDeleteLeaveRequestArgs = {
 
 export type MutationExportChildDataArgs = {
   studentId: Scalars['ID']['input'];
+};
+
+
+export type MutationGradeExamSubmissionArgs = {
+  input: GradeSubmissionInput;
 };
 
 
@@ -471,10 +590,13 @@ export type Query = {
   classroomAttendance: Array<AttendanceType>;
   classroomBehaviorToday: Array<ClassroomBehaviorStudentType>;
   classroomEvents: Array<ClassroomEventType>;
+  classroomExams: Array<ClassroomExamType>;
   classroomOverview: ClassroomOverviewType;
   classrooms: Array<ClassroomType>;
   conversation: ConversationType;
   conversations: Array<ConversationType>;
+  exam?: Maybe<ExamObjectType>;
+  examSubmission?: Maybe<ExamSubmissionType>;
   gradeCurriculum?: Maybe<GradeCurriculumType>;
   myChildren: Array<StudentType>;
   parentLeaveRequests: Array<LeaveRequestType>;
@@ -518,12 +640,28 @@ export type QueryClassroomEventsArgs = {
 };
 
 
+export type QueryClassroomExamsArgs = {
+  classroomId: Scalars['ID']['input'];
+  status?: InputMaybe<ClassroomExamStatusEnum>;
+};
+
+
 export type QueryClassroomOverviewArgs = {
   classroomId: Scalars['ID']['input'];
 };
 
 
 export type QueryConversationArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryExamArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryExamSubmissionArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -625,6 +763,36 @@ export type RequestChildDataDeletionPayload = {
   __typename?: 'RequestChildDataDeletionPayload';
   errors: Array<UserErrorType>;
   success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type RubricCriteriaInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  maxScore?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  position?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type RubricCriteriaType = {
+  __typename?: 'RubricCriteriaType';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  maxScore: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  position: Scalars['Int']['output'];
+};
+
+export type RubricScoreInput = {
+  feedback?: InputMaybe<Scalars['String']['input']>;
+  rubricCriteriaId: Scalars['ID']['input'];
+  score: Scalars['Int']['input'];
+};
+
+export type RubricScoreType = {
+  __typename?: 'RubricScoreType';
+  feedback?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  rubricCriteria: RubricCriteriaType;
+  score: Scalars['Int']['output'];
 };
 
 export type SchoolType = {
@@ -759,6 +927,27 @@ export type RequestAccountDeletionMutationVariables = Exact<{
 
 
 export type RequestAccountDeletionMutation = { __typename?: 'Mutation', requestAccountDeletion: { __typename?: 'RequestAccountDeletionPayload', deletionRequest?: { __typename?: 'AccountDeletionRequestType', id: string, status: string, gracePeriodEndsAt: any, reason?: string | null, createdAt: any } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type CreateExamMutationVariables = Exact<{
+  input: CreateExamInput;
+}>;
+
+
+export type CreateExamMutation = { __typename?: 'Mutation', createExam: { __typename?: 'CreateExamPayload', exam?: { __typename?: 'ExamObjectType', id: string, title: string, description?: string | null, examType: ExamTypeEnum, maxScore?: number | null, durationMinutes?: number | null, createdAt: any } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type AssignExamToClassroomMutationVariables = Exact<{
+  input: AssignExamInput;
+}>;
+
+
+export type AssignExamToClassroomMutation = { __typename?: 'Mutation', assignExamToClassroom: { __typename?: 'AssignExamPayload', classroomExam?: { __typename?: 'ClassroomExamType', id: string, status: ClassroomExamStatusEnum, scheduledAt?: any | null, dueAt?: any | null, accessCode?: string | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type GradeExamSubmissionMutationVariables = Exact<{
+  input: GradeSubmissionInput;
+}>;
+
+
+export type GradeExamSubmissionMutation = { __typename?: 'Mutation', gradeExamSubmission: { __typename?: 'GradeExamSubmissionPayload', examSubmission?: { __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum, score?: number | null, passed?: boolean | null, gradedAt?: any | null, teacherNotes?: string | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
 
 export type CreateHealthCheckupMutationVariables = Exact<{
   studentId: Scalars['ID']['input'];
@@ -903,7 +1092,7 @@ export type TopicQueryVariables = Exact<{
 }>;
 
 
-export type TopicQuery = { __typename?: 'Query', topic?: { __typename?: 'TopicCurriculumType', id: string, name: string, description?: string | null, subject: { __typename?: 'SubjectCurriculumType', id: string, name: string }, learningObjectives: Array<{ __typename?: 'CurriculumLearningObjectiveType', id: string, name: string, description?: string | null, examPassThreshold: number, dailyScoreThreshold: number, position: number }>, exams: Array<{ __typename?: 'ExamObjectType', id: string, title: string, description?: string | null, examType: string, maxScore?: number | null }> } | null };
+export type TopicQuery = { __typename?: 'Query', topic?: { __typename?: 'TopicCurriculumType', id: string, name: string, description?: string | null, subject: { __typename?: 'SubjectCurriculumType', id: string, name: string }, learningObjectives: Array<{ __typename?: 'CurriculumLearningObjectiveType', id: string, name: string, description?: string | null, examPassThreshold: number, dailyScoreThreshold: number, position: number }>, exams: Array<{ __typename?: 'ExamObjectType', id: string, title: string, description?: string | null, examType: ExamTypeEnum, maxScore?: number | null }> } | null };
 
 export type AcademicYearsQueryVariables = Exact<{
   schoolId: Scalars['ID']['input'];
@@ -964,6 +1153,28 @@ export type ClassroomAttendanceQueryVariables = Exact<{
 
 
 export type ClassroomAttendanceQuery = { __typename?: 'Query', classroomAttendance: Array<{ __typename?: 'AttendanceType', id: string, date: any, status: AttendanceStatusEnum, notes?: string | null, createdAt: any, updatedAt: any, student: { __typename?: 'StudentType', id: string, name: string } }> };
+
+export type ClassroomExamsQueryVariables = Exact<{
+  classroomId: Scalars['ID']['input'];
+  status?: InputMaybe<ClassroomExamStatusEnum>;
+}>;
+
+
+export type ClassroomExamsQuery = { __typename?: 'Query', classroomExams: Array<{ __typename?: 'ClassroomExamType', id: string, status: ClassroomExamStatusEnum, scheduledAt?: any | null, dueAt?: any | null, accessCode?: string | null, durationMinutes?: number | null, showResults: boolean, createdAt: any, exam: { __typename?: 'ExamObjectType', id: string, title: string, description?: string | null, examType: ExamTypeEnum, maxScore?: number | null }, examSubmissions: Array<{ __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum }> }> };
+
+export type ExamDetailQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ExamDetailQuery = { __typename?: 'Query', exam?: { __typename?: 'ExamObjectType', id: string, title: string, description?: string | null, examType: ExamTypeEnum, maxScore?: number | null, durationMinutes?: number | null, createdAt: any, topic: { __typename?: 'TopicCurriculumType', id: string, name: string, subject: { __typename?: 'SubjectCurriculumType', id: string, name: string } }, examQuestions: Array<{ __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, position: number }>, rubricCriteria: Array<{ __typename?: 'RubricCriteriaType', id: string, name: string, description?: string | null, maxScore: number, position: number }>, classroomExams: Array<{ __typename?: 'ClassroomExamType', id: string, status: ClassroomExamStatusEnum, scheduledAt?: any | null, dueAt?: any | null, accessCode?: string | null, classroom: { __typename?: 'ClassroomType', id: string, name: string }, examSubmissions: Array<{ __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum, score?: number | null, passed?: boolean | null, submittedAt?: any | null, gradedAt?: any | null, student: { __typename?: 'StudentType', id: string, name: string } }> }> } | null };
+
+export type ExamSubmissionDetailQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ExamSubmissionDetailQuery = { __typename?: 'Query', examSubmission?: { __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum, score?: number | null, passed?: boolean | null, startedAt?: any | null, submittedAt?: any | null, gradedAt?: any | null, teacherNotes?: string | null, student: { __typename?: 'StudentType', id: string, name: string }, classroomExam: { __typename?: 'ClassroomExamType', id: string, exam: { __typename?: 'ExamObjectType', id: string, title: string, examType: ExamTypeEnum, maxScore?: number | null, examQuestions: Array<{ __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, position: number, correctAnswer?: string | null }>, rubricCriteria: Array<{ __typename?: 'RubricCriteriaType', id: string, name: string, description?: string | null, maxScore: number, position: number }> } }, examAnswers: Array<{ __typename?: 'ExamAnswerType', id: string, selectedAnswer?: string | null, correct?: boolean | null, pointsAwarded: number, examQuestion: { __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, correctAnswer?: string | null } }>, rubricScores: Array<{ __typename?: 'RubricScoreType', id: string, score: number, feedback?: string | null, rubricCriteria: { __typename?: 'RubricCriteriaType', id: string, name: string, maxScore: number } }> } | null };
 
 
 export const BulkRecordAttendanceDocument = gql`
@@ -1236,6 +1447,138 @@ export function useRequestAccountDeletionMutation(baseOptions?: Apollo.MutationH
 export type RequestAccountDeletionMutationHookResult = ReturnType<typeof useRequestAccountDeletionMutation>;
 export type RequestAccountDeletionMutationResult = Apollo.MutationResult<RequestAccountDeletionMutation>;
 export type RequestAccountDeletionMutationOptions = Apollo.BaseMutationOptions<RequestAccountDeletionMutation, RequestAccountDeletionMutationVariables>;
+export const CreateExamDocument = gql`
+    mutation CreateExam($input: CreateExamInput!) {
+  createExam(input: $input) {
+    exam {
+      id
+      title
+      description
+      examType
+      maxScore
+      durationMinutes
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CreateExamMutationFn = Apollo.MutationFunction<CreateExamMutation, CreateExamMutationVariables>;
+
+/**
+ * __useCreateExamMutation__
+ *
+ * To run a mutation, you first call `useCreateExamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateExamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createExamMutation, { data, loading, error }] = useCreateExamMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateExamMutation(baseOptions?: Apollo.MutationHookOptions<CreateExamMutation, CreateExamMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateExamMutation, CreateExamMutationVariables>(CreateExamDocument, options);
+      }
+export type CreateExamMutationHookResult = ReturnType<typeof useCreateExamMutation>;
+export type CreateExamMutationResult = Apollo.MutationResult<CreateExamMutation>;
+export type CreateExamMutationOptions = Apollo.BaseMutationOptions<CreateExamMutation, CreateExamMutationVariables>;
+export const AssignExamToClassroomDocument = gql`
+    mutation AssignExamToClassroom($input: AssignExamInput!) {
+  assignExamToClassroom(input: $input) {
+    classroomExam {
+      id
+      status
+      scheduledAt
+      dueAt
+      accessCode
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type AssignExamToClassroomMutationFn = Apollo.MutationFunction<AssignExamToClassroomMutation, AssignExamToClassroomMutationVariables>;
+
+/**
+ * __useAssignExamToClassroomMutation__
+ *
+ * To run a mutation, you first call `useAssignExamToClassroomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignExamToClassroomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignExamToClassroomMutation, { data, loading, error }] = useAssignExamToClassroomMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignExamToClassroomMutation(baseOptions?: Apollo.MutationHookOptions<AssignExamToClassroomMutation, AssignExamToClassroomMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AssignExamToClassroomMutation, AssignExamToClassroomMutationVariables>(AssignExamToClassroomDocument, options);
+      }
+export type AssignExamToClassroomMutationHookResult = ReturnType<typeof useAssignExamToClassroomMutation>;
+export type AssignExamToClassroomMutationResult = Apollo.MutationResult<AssignExamToClassroomMutation>;
+export type AssignExamToClassroomMutationOptions = Apollo.BaseMutationOptions<AssignExamToClassroomMutation, AssignExamToClassroomMutationVariables>;
+export const GradeExamSubmissionDocument = gql`
+    mutation GradeExamSubmission($input: GradeSubmissionInput!) {
+  gradeExamSubmission(input: $input) {
+    examSubmission {
+      id
+      status
+      score
+      passed
+      gradedAt
+      teacherNotes
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type GradeExamSubmissionMutationFn = Apollo.MutationFunction<GradeExamSubmissionMutation, GradeExamSubmissionMutationVariables>;
+
+/**
+ * __useGradeExamSubmissionMutation__
+ *
+ * To run a mutation, you first call `useGradeExamSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGradeExamSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [gradeExamSubmissionMutation, { data, loading, error }] = useGradeExamSubmissionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGradeExamSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<GradeExamSubmissionMutation, GradeExamSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GradeExamSubmissionMutation, GradeExamSubmissionMutationVariables>(GradeExamSubmissionDocument, options);
+      }
+export type GradeExamSubmissionMutationHookResult = ReturnType<typeof useGradeExamSubmissionMutation>;
+export type GradeExamSubmissionMutationResult = Apollo.MutationResult<GradeExamSubmissionMutation>;
+export type GradeExamSubmissionMutationOptions = Apollo.BaseMutationOptions<GradeExamSubmissionMutation, GradeExamSubmissionMutationVariables>;
 export const CreateHealthCheckupDocument = gql`
     mutation CreateHealthCheckup($studentId: ID!, $measuredAt: ISO8601Date!, $weightKg: Float, $heightCm: Float, $headCircumferenceCm: Float, $notes: String) {
   createHealthCheckup(
@@ -2718,3 +3061,257 @@ export type ClassroomAttendanceQueryHookResult = ReturnType<typeof useClassroomA
 export type ClassroomAttendanceLazyQueryHookResult = ReturnType<typeof useClassroomAttendanceLazyQuery>;
 export type ClassroomAttendanceSuspenseQueryHookResult = ReturnType<typeof useClassroomAttendanceSuspenseQuery>;
 export type ClassroomAttendanceQueryResult = Apollo.QueryResult<ClassroomAttendanceQuery, ClassroomAttendanceQueryVariables>;
+export const ClassroomExamsDocument = gql`
+    query ClassroomExams($classroomId: ID!, $status: ClassroomExamStatusEnum) {
+  classroomExams(classroomId: $classroomId, status: $status) {
+    id
+    status
+    scheduledAt
+    dueAt
+    accessCode
+    durationMinutes
+    showResults
+    createdAt
+    exam {
+      id
+      title
+      description
+      examType
+      maxScore
+    }
+    examSubmissions {
+      id
+      status
+    }
+  }
+}
+    `;
+
+/**
+ * __useClassroomExamsQuery__
+ *
+ * To run a query within a React component, call `useClassroomExamsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useClassroomExamsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useClassroomExamsQuery({
+ *   variables: {
+ *      classroomId: // value for 'classroomId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useClassroomExamsQuery(baseOptions: Apollo.QueryHookOptions<ClassroomExamsQuery, ClassroomExamsQueryVariables> & ({ variables: ClassroomExamsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ClassroomExamsQuery, ClassroomExamsQueryVariables>(ClassroomExamsDocument, options);
+      }
+export function useClassroomExamsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ClassroomExamsQuery, ClassroomExamsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ClassroomExamsQuery, ClassroomExamsQueryVariables>(ClassroomExamsDocument, options);
+        }
+// @ts-ignore
+export function useClassroomExamsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ClassroomExamsQuery, ClassroomExamsQueryVariables>): Apollo.UseSuspenseQueryResult<ClassroomExamsQuery, ClassroomExamsQueryVariables>;
+export function useClassroomExamsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ClassroomExamsQuery, ClassroomExamsQueryVariables>): Apollo.UseSuspenseQueryResult<ClassroomExamsQuery | undefined, ClassroomExamsQueryVariables>;
+export function useClassroomExamsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ClassroomExamsQuery, ClassroomExamsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ClassroomExamsQuery, ClassroomExamsQueryVariables>(ClassroomExamsDocument, options);
+        }
+export type ClassroomExamsQueryHookResult = ReturnType<typeof useClassroomExamsQuery>;
+export type ClassroomExamsLazyQueryHookResult = ReturnType<typeof useClassroomExamsLazyQuery>;
+export type ClassroomExamsSuspenseQueryHookResult = ReturnType<typeof useClassroomExamsSuspenseQuery>;
+export type ClassroomExamsQueryResult = Apollo.QueryResult<ClassroomExamsQuery, ClassroomExamsQueryVariables>;
+export const ExamDetailDocument = gql`
+    query ExamDetail($id: ID!) {
+  exam(id: $id) {
+    id
+    title
+    description
+    examType
+    maxScore
+    durationMinutes
+    createdAt
+    topic {
+      id
+      name
+      subject {
+        id
+        name
+      }
+    }
+    examQuestions {
+      id
+      questionText
+      points
+      position
+    }
+    rubricCriteria {
+      id
+      name
+      description
+      maxScore
+      position
+    }
+    classroomExams {
+      id
+      status
+      scheduledAt
+      dueAt
+      accessCode
+      classroom {
+        id
+        name
+      }
+      examSubmissions {
+        id
+        status
+        score
+        passed
+        submittedAt
+        gradedAt
+        student {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useExamDetailQuery__
+ *
+ * To run a query within a React component, call `useExamDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExamDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExamDetailQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useExamDetailQuery(baseOptions: Apollo.QueryHookOptions<ExamDetailQuery, ExamDetailQueryVariables> & ({ variables: ExamDetailQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ExamDetailQuery, ExamDetailQueryVariables>(ExamDetailDocument, options);
+      }
+export function useExamDetailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExamDetailQuery, ExamDetailQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ExamDetailQuery, ExamDetailQueryVariables>(ExamDetailDocument, options);
+        }
+// @ts-ignore
+export function useExamDetailSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExamDetailQuery, ExamDetailQueryVariables>): Apollo.UseSuspenseQueryResult<ExamDetailQuery, ExamDetailQueryVariables>;
+export function useExamDetailSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExamDetailQuery, ExamDetailQueryVariables>): Apollo.UseSuspenseQueryResult<ExamDetailQuery | undefined, ExamDetailQueryVariables>;
+export function useExamDetailSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExamDetailQuery, ExamDetailQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ExamDetailQuery, ExamDetailQueryVariables>(ExamDetailDocument, options);
+        }
+export type ExamDetailQueryHookResult = ReturnType<typeof useExamDetailQuery>;
+export type ExamDetailLazyQueryHookResult = ReturnType<typeof useExamDetailLazyQuery>;
+export type ExamDetailSuspenseQueryHookResult = ReturnType<typeof useExamDetailSuspenseQuery>;
+export type ExamDetailQueryResult = Apollo.QueryResult<ExamDetailQuery, ExamDetailQueryVariables>;
+export const ExamSubmissionDetailDocument = gql`
+    query ExamSubmissionDetail($id: ID!) {
+  examSubmission(id: $id) {
+    id
+    status
+    score
+    passed
+    startedAt
+    submittedAt
+    gradedAt
+    teacherNotes
+    student {
+      id
+      name
+    }
+    classroomExam {
+      id
+      exam {
+        id
+        title
+        examType
+        maxScore
+        examQuestions {
+          id
+          questionText
+          points
+          position
+          correctAnswer
+        }
+        rubricCriteria {
+          id
+          name
+          description
+          maxScore
+          position
+        }
+      }
+    }
+    examAnswers {
+      id
+      examQuestion {
+        id
+        questionText
+        points
+        correctAnswer
+      }
+      selectedAnswer
+      correct
+      pointsAwarded
+    }
+    rubricScores {
+      id
+      rubricCriteria {
+        id
+        name
+        maxScore
+      }
+      score
+      feedback
+    }
+  }
+}
+    `;
+
+/**
+ * __useExamSubmissionDetailQuery__
+ *
+ * To run a query within a React component, call `useExamSubmissionDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExamSubmissionDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExamSubmissionDetailQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useExamSubmissionDetailQuery(baseOptions: Apollo.QueryHookOptions<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables> & ({ variables: ExamSubmissionDetailQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>(ExamSubmissionDetailDocument, options);
+      }
+export function useExamSubmissionDetailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>(ExamSubmissionDetailDocument, options);
+        }
+// @ts-ignore
+export function useExamSubmissionDetailSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>): Apollo.UseSuspenseQueryResult<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>;
+export function useExamSubmissionDetailSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>): Apollo.UseSuspenseQueryResult<ExamSubmissionDetailQuery | undefined, ExamSubmissionDetailQueryVariables>;
+export function useExamSubmissionDetailSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>(ExamSubmissionDetailDocument, options);
+        }
+export type ExamSubmissionDetailQueryHookResult = ReturnType<typeof useExamSubmissionDetailQuery>;
+export type ExamSubmissionDetailLazyQueryHookResult = ReturnType<typeof useExamSubmissionDetailLazyQuery>;
+export type ExamSubmissionDetailSuspenseQueryHookResult = ReturnType<typeof useExamSubmissionDetailSuspenseQuery>;
+export type ExamSubmissionDetailQueryResult = Apollo.QueryResult<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>;
