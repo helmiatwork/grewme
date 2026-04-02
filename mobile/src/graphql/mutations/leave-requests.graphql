@@ -1,0 +1,44 @@
+mutation CreateLeaveRequest(
+  $studentId: ID!
+  $requestType: LeaveRequestTypeEnum!
+  $startDate: ISO8601Date!
+  $endDate: ISO8601Date!
+  $reason: String!
+) {
+  createLeaveRequest(
+    studentId: $studentId
+    requestType: $requestType
+    startDate: $startDate
+    endDate: $endDate
+    reason: $reason
+  ) {
+    leaveRequest {
+      id
+      requestType
+      startDate
+      endDate
+      reason
+      status
+      student {
+        id
+        name
+      }
+      daysCount
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteLeaveRequest($leaveRequestId: ID!) {
+  deleteLeaveRequest(leaveRequestId: $leaveRequestId) {
+    success
+    errors {
+      message
+      path
+    }
+  }
+}

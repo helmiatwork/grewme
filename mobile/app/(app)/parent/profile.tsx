@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
 import { useAuthStore } from '../../../src/auth/store';
 
 export default function ParentProfileScreen() {
@@ -26,6 +27,26 @@ export default function ParentProfileScreen() {
         <Text style={styles.roleLabel}>Role</Text>
         <Text style={styles.roleValue}>Parent</Text>
       </View>
+
+      <Pressable
+        style={styles.menuItem}
+        onPress={() => router.push('/parent/leave-requests')}
+        testID="leave-requests-link"
+      >
+        <Ionicons name="document-text-outline" size={20} color="#4CAF50" />
+        <Text style={styles.menuItemText}>Leave Requests</Text>
+        <Ionicons name="chevron-forward" size={20} color="#CCC" />
+      </Pressable>
+
+      <Pressable
+        style={styles.menuItem}
+        onPress={() => router.push('/parent/data-rights')}
+        testID="data-rights-link"
+      >
+        <Ionicons name="shield-checkmark-outline" size={20} color="#1565C0" />
+        <Text style={styles.menuItemText}>Data Rights (COPPA)</Text>
+        <Ionicons name="chevron-forward" size={20} color="#CCC" />
+      </Pressable>
 
       <Pressable
         style={styles.logoutButton}
@@ -67,6 +88,26 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#1A1A1A',
+  },
+  menuItem: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  menuItemText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1A1A1A',
+    marginLeft: 12,
   },
   logoutButton: {
     backgroundColor: '#C62828',

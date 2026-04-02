@@ -353,6 +353,46 @@ type ConversationType {
   createdAt: ISO8601DateTime!
 }
 
+# --- Leave Requests ---
+
+enum LeaveRequestTypeEnum {
+  SICK
+  EXCUSED
+}
+
+enum LeaveRequestStatusEnum {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+type LeaveRequestType {
+  id: ID!
+  requestType: LeaveRequestTypeEnum!
+  startDate: ISO8601Date!
+  endDate: ISO8601Date!
+  reason: String!
+  status: LeaveRequestStatusEnum!
+  rejectionReason: String
+  reviewedAt: ISO8601DateTime
+  student: StudentType!
+  parent: ParentType!
+  reviewedBy: TeacherType
+  daysCount: Int!
+  createdAt: ISO8601DateTime!
+}
+
+# --- Account Deletion ---
+
+type AccountDeletionRequestType {
+  id: ID!
+  status: String!
+  gracePeriodEndsAt: ISO8601DateTime!
+  completedAt: ISO8601DateTime
+  reason: String
+  createdAt: ISO8601DateTime!
+}
+
 # --- Shared error type ---
 
 type UserErrorType {
@@ -383,6 +423,31 @@ type CreateHealthCheckupPayload {
 
 type SendMessagePayload {
   message: MessageType
+  errors: [UserErrorType!]!
+}
+
+type ExportChildDataPayload {
+  data: String
+  errors: [UserErrorType!]!
+}
+
+type RequestChildDataDeletionPayload {
+  success: Boolean
+  errors: [UserErrorType!]!
+}
+
+type RequestAccountDeletionPayload {
+  deletionRequest: AccountDeletionRequestType
+  errors: [UserErrorType!]!
+}
+
+type CreateLeaveRequestPayload {
+  leaveRequest: LeaveRequestType
+  errors: [UserErrorType!]!
+}
+
+type DeleteLeaveRequestPayload {
+  success: Boolean!
   errors: [UserErrorType!]!
 }
 
@@ -439,6 +504,12 @@ type Query {
   # Messaging
   conversations: [ConversationType!]!
   conversation(id: ID!): ConversationType!
+
+  # Leave Requests (parent)
+  parentLeaveRequests(
+    studentId: ID
+    status: LeaveRequestStatusEnum
+  ): [LeaveRequestType!]!
 }
 
 type Mutation {
@@ -461,4 +532,19 @@ type Mutation {
     conversationId: ID!
     body: String!
   ): SendMessagePayload!
+
+  # Data Rights (COPPA)
+  exportChildData(studentId: ID!): ExportChildDataPayload!
+  requestChildDataDeletion(studentId: ID!): RequestChildDataDeletionPayload!
+  requestAccountDeletion(reason: String): RequestAccountDeletionPayload!
+
+  # Leave Requests
+  createLeaveRequest(
+    studentId: ID!
+    requestType: LeaveRequestTypeEnum!
+    startDate: ISO8601Date!
+    endDate: ISO8601Date!
+    reason: String!
+  ): CreateLeaveRequestPayload!
+  deleteLeaveRequest(leaveRequestId: ID!): DeleteLeaveRequestPayload!
 }

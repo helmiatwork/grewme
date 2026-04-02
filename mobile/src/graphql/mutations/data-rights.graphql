@@ -1,0 +1,35 @@
+mutation ExportChildData($studentId: ID!) {
+  exportChildData(studentId: $studentId) {
+    data
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation RequestChildDataDeletion($studentId: ID!) {
+  requestChildDataDeletion(studentId: $studentId) {
+    success
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation RequestAccountDeletion($reason: String) {
+  requestAccountDeletion(reason: $reason) {
+    deletionRequest {
+      id
+      status
+      gracePeriodEndsAt
+      reason
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}

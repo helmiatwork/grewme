@@ -55,6 +55,18 @@ export default function ParentLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="data-rights"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="leave-requests"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
