@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useClassroomOverviewQuery } from '../../../../src/graphql/generated/graphql';
 import { useAuthStore } from '../../../../src/auth/store';
@@ -18,7 +19,7 @@ export default function ClassOverviewScreen() {
   // classroomOverview returns ALL students + radar data in ONE call
   // Do NOT call studentRadar per student (N+1)
   const { data, loading, error } = useClassroomOverviewQuery({
-    variables: { classroomId: activeClassroomId! },
+    variables: { classroomId: activeClassroomId ?? '' },
     skip: !activeClassroomId,
   });
 
@@ -63,6 +64,15 @@ export default function ClassOverviewScreen() {
         <Text style={styles.subtitle}>{students.length} students</Text>
       </View>
 
+      <Pressable
+        style={styles.bulkScoreButton}
+        onPress={() => router.push('/(app)/teacher/students/bulk-score')}
+        testID="bulk-score-button"
+      >
+        <Ionicons name="create-outline" size={18} color="#FFFFFF" />
+        <Text style={styles.bulkScoreText}>Bulk Score</Text>
+      </Pressable>
+
       <FlatList
         testID="students-list"
         data={students}
@@ -80,10 +90,7 @@ export default function ClassOverviewScreen() {
             style={styles.studentCard}
             testID={`student-card-${item.studentId}`}
             onPress={() =>
-              router.push({
-                pathname: '/(app)/teacher/behavior',
-                params: { studentId: item.studentId },
-              })
+              router.push(`/(app)/teacher/students/${item.studentId}`)
             }
           >
             <Text style={styles.studentName}>{item.studentName}</Text>
@@ -120,6 +127,22 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+  },
+  bulkScoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+    paddingVertical: 10,
+    margin: 12,
+    marginBottom: 0,
+    gap: 6,
+  },
+  bulkScoreText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   classroomName: {
     fontSize: 22,

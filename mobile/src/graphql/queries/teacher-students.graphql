@@ -1,0 +1,36 @@
+query TeacherStudentDetail($studentId: ID!) {
+  studentRadar(studentId: $studentId) {
+    studentId
+    studentName
+    skills {
+      reading
+      math
+      writing
+      logic
+      social
+    }
+  }
+  studentProgress(studentId: $studentId) {
+    weeks {
+      period
+      skills {
+        reading
+        math
+        writing
+        logic
+        social
+      }
+    }
+  }
+  studentDailyScores(studentId: $studentId, first: 20) {
+    edges {
+      node {
+        id
+        date
+        skillCategory
+        score
+        notes
+      }
+    }
+  }
+}
