@@ -108,6 +108,7 @@ export type ClassroomOverviewType = {
 
 export type ClassroomType = {
   __typename?: 'ClassroomType';
+  grade?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   school: SchoolType;
@@ -608,7 +609,7 @@ export type ClassroomOverviewQuery = { __typename?: 'Query', classroomOverview: 
 export type MyChildrenWithSchoolQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyChildrenWithSchoolQuery = { __typename?: 'Query', myChildren: Array<{ __typename?: 'StudentType', id: string, name: string, classrooms: Array<{ __typename?: 'ClassroomType', id: string, school: { __typename?: 'SchoolType', id: string, name: string } }> }> };
+export type MyChildrenWithSchoolQuery = { __typename?: 'Query', myChildren: Array<{ __typename?: 'StudentType', id: string, name: string, classrooms: Array<{ __typename?: 'ClassroomType', id: string, grade?: number | null, school: { __typename?: 'SchoolType', id: string, name: string } }> }> };
 
 export type SubjectsQueryVariables = Exact<{
   schoolId: Scalars['ID']['input'];
@@ -1371,6 +1372,7 @@ export const MyChildrenWithSchoolDocument = gql`
     name
     classrooms {
       id
+      grade
       school {
         id
         name

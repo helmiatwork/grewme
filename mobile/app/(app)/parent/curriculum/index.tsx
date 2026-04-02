@@ -4,21 +4,16 @@ import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import ErrorState from '../../../../src/components/ErrorState';
 import LoadingState from '../../../../src/components/LoadingState';
-import {
-  useMyChildrenWithSchoolQuery,
-  useSubjectsQuery,
-} from '../../../../src/graphql/generated/graphql';
+import { useSubjectsQuery } from '../../../../src/graphql/generated/graphql';
+import { useParentSchoolId } from '../../../../src/hooks/useParentSchoolId';
 
 export default function SubjectsListScreen() {
   const {
-    data: childrenData,
+    schoolId,
     loading: childrenLoading,
     error: childrenError,
     refetch: refetchChildren,
-  } = useMyChildrenWithSchoolQuery();
-
-  const schoolId =
-    childrenData?.myChildren?.[0]?.classrooms?.[0]?.school?.id ?? null;
+  } = useParentSchoolId();
 
   const {
     data: subjectsData,

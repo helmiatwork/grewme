@@ -4,6 +4,7 @@ query MyChildrenWithSchool {
     name
     classrooms {
       id
+      grade
       school {
         id
         name

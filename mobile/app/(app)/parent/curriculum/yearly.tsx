@@ -13,21 +13,17 @@ import LoadingState from '../../../../src/components/LoadingState';
 import {
   useAcademicYearsQuery,
   useGradeCurriculumQuery,
-  useMyChildrenWithSchoolQuery,
 } from '../../../../src/graphql/generated/graphql';
-
-const GRADES = [1, 2, 3, 4, 5, 6];
+import { useParentSchoolId } from '../../../../src/hooks/useParentSchoolId';
 
 export default function YearlyCurriculumScreen() {
   const {
-    data: childrenData,
+    schoolId,
+    availableGrades,
     loading: childrenLoading,
     error: childrenError,
     refetch: refetchChildren,
-  } = useMyChildrenWithSchoolQuery();
-
-  const schoolId =
-    childrenData?.myChildren?.[0]?.classrooms?.[0]?.school?.id ?? null;
+  } = useParentSchoolId();
 
   const {
     data: yearsData,
@@ -160,7 +156,7 @@ export default function YearlyCurriculumScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.chipRow}
         >
-          {GRADES.map((g) => (
+          {availableGrades.map((g) => (
             <Pressable
               key={g}
               style={[styles.chip, selectedGrade === g && styles.chipActive]}
@@ -308,7 +304,7 @@ const styles = StyleSheet.create({
   itemIndex: {
     fontSize: 12,
     color: '#999',
-    fontFamily: 'monospace',
+    fontVariant: ['tabular-nums'],
     width: 24,
     textAlign: 'center',
   },

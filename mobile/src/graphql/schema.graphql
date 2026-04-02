@@ -51,6 +51,7 @@ type SchoolType {
 type ClassroomType {
   id: ID!
   name: String!
+  grade: Int
   school: SchoolType!
 }
 
