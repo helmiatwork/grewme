@@ -38,6 +38,7 @@ type StudentType {
   id: ID!
   name: String!
   avatar: String
+  classrooms: [ClassroomType!]!
 }
 
 # --- School & Classroom ---
@@ -50,6 +51,7 @@ type SchoolType {
 type ClassroomType {
   id: ID!
   name: String!
+  grade: Int
   school: SchoolType!
 }
 
@@ -206,6 +208,65 @@ type ExamSubmissionType {
   updatedAt: ISO8601DateTime!
 }
 
+# --- Curriculum ---
+
+type SubjectCurriculumType {
+  id: ID!
+  name: String!
+  description: String
+  topics: [TopicCurriculumType!]!
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
+}
+
+type TopicCurriculumType {
+  id: ID!
+  name: String!
+  description: String
+  position: Int!
+  subject: SubjectCurriculumType!
+  learningObjectives: [CurriculumLearningObjectiveType!]!
+  exams: [ExamObjectType!]!
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
+}
+
+type CurriculumLearningObjectiveType {
+  id: ID!
+  name: String!
+  description: String
+  examPassThreshold: Int!
+  dailyScoreThreshold: Int!
+  position: Int!
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
+}
+
+type AcademicYearType {
+  id: ID!
+  label: String!
+  startDate: ISO8601Date!
+  endDate: ISO8601Date!
+  current: Boolean!
+  createdAt: ISO8601DateTime!
+}
+
+type GradeCurriculumType {
+  id: ID!
+  grade: Int!
+  academicYear: AcademicYearType!
+  gradeCurriculumItems: [GradeCurriculumItemType!]!
+  createdAt: ISO8601DateTime!
+}
+
+type GradeCurriculumItemType {
+  id: ID!
+  subject: SubjectCurriculumType
+  topic: TopicCurriculumType
+  position: Int!
+  displayName: String!
+}
+
 # --- Mastery ---
 
 type LearningObjectiveType {
@@ -299,6 +360,13 @@ type Query {
     endDate: ISO8601Date
   ): [HealthCheckupType!]!
   studentMasteries(studentId: ID!, subjectId: ID): [ObjectiveMasteryType!]!
+
+  # Curriculum
+  subjects(schoolId: ID!): [SubjectCurriculumType!]!
+  subject(id: ID!): SubjectCurriculumType
+  topic(id: ID!): TopicCurriculumType
+  academicYears(schoolId: ID!): [AcademicYearType!]!
+  gradeCurriculum(academicYearId: ID!, grade: Int!): GradeCurriculumType
 
   # Teacher
   classrooms: [ClassroomType!]!

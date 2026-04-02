@@ -1,0 +1,102 @@
+query MyChildrenWithSchool {
+  myChildren {
+    id
+    name
+    classrooms {
+      id
+      grade
+      school {
+        id
+        name
+      }
+    }
+  }
+}
+
+query Subjects($schoolId: ID!) {
+  subjects(schoolId: $schoolId) {
+    id
+    name
+    description
+    topics {
+      id
+      name
+    }
+  }
+}
+
+query Subject($id: ID!) {
+  subject(id: $id) {
+    id
+    name
+    description
+    topics {
+      id
+      name
+      description
+      position
+      learningObjectives {
+        id
+      }
+    }
+  }
+}
+
+query Topic($id: ID!) {
+  topic(id: $id) {
+    id
+    name
+    description
+    subject {
+      id
+      name
+    }
+    learningObjectives {
+      id
+      name
+      description
+      examPassThreshold
+      dailyScoreThreshold
+      position
+    }
+    exams {
+      id
+      title
+      description
+      examType
+      maxScore
+    }
+  }
+}
+
+query AcademicYears($schoolId: ID!) {
+  academicYears(schoolId: $schoolId) {
+    id
+    label
+    current
+  }
+}
+
+query GradeCurriculum($academicYearId: ID!, $grade: Int!) {
+  gradeCurriculum(academicYearId: $academicYearId, grade: $grade) {
+    id
+    grade
+    gradeCurriculumItems {
+      id
+      displayName
+      position
+      subject {
+        id
+        name
+      }
+      topic {
+        id
+        name
+        subject {
+          id
+          name
+        }
+      }
+    }
+  }
+}

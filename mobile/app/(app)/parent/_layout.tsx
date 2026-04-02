@@ -20,6 +20,15 @@ export default function ParentLayout() {
         }}
       />
       <Tabs.Screen
+        name="curriculum"
+        options={{
+          title: 'Curriculum',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="book-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

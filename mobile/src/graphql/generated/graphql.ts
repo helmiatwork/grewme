@@ -19,6 +19,16 @@ export type Scalars = {
   ISO8601DateTime: { input: any; output: any; }
 };
 
+export type AcademicYearType = {
+  __typename?: 'AcademicYearType';
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  current: Scalars['Boolean']['output'];
+  endDate: Scalars['ISO8601Date']['output'];
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
+  startDate: Scalars['ISO8601Date']['output'];
+};
+
 export enum AttendanceStatusEnum {
   Excused = 'EXCUSED',
   Present = 'PRESENT',
@@ -98,6 +108,7 @@ export type ClassroomOverviewType = {
 
 export type ClassroomType = {
   __typename?: 'ClassroomType';
+  grade?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   school: SchoolType;
@@ -107,6 +118,18 @@ export type CreateHealthCheckupPayload = {
   __typename?: 'CreateHealthCheckupPayload';
   errors: Array<UserErrorType>;
   healthCheckup?: Maybe<HealthCheckupType>;
+};
+
+export type CurriculumLearningObjectiveType = {
+  __typename?: 'CurriculumLearningObjectiveType';
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  dailyScoreThreshold: Scalars['Int']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  examPassThreshold: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  position: Scalars['Int']['output'];
+  updatedAt: Scalars['ISO8601DateTime']['output'];
 };
 
 export type DailyScoreType = {
@@ -161,6 +184,24 @@ export type ExamSubmissionType = {
   submittedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
   teacherNotes?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['ISO8601DateTime']['output'];
+};
+
+export type GradeCurriculumItemType = {
+  __typename?: 'GradeCurriculumItemType';
+  displayName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  position: Scalars['Int']['output'];
+  subject?: Maybe<SubjectCurriculumType>;
+  topic?: Maybe<TopicCurriculumType>;
+};
+
+export type GradeCurriculumType = {
+  __typename?: 'GradeCurriculumType';
+  academicYear: AcademicYearType;
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  grade: Scalars['Int']['output'];
+  gradeCurriculumItems: Array<GradeCurriculumItemType>;
+  id: Scalars['ID']['output'];
 };
 
 export type HealthCheckupType = {
@@ -262,10 +303,12 @@ export type ProgressWeekType = {
 
 export type Query = {
   __typename?: 'Query';
+  academicYears: Array<AcademicYearType>;
   behaviorCategories: Array<BehaviorCategoryType>;
   classroomBehaviorToday: Array<ClassroomBehaviorStudentType>;
   classroomOverview: ClassroomOverviewType;
   classrooms: Array<ClassroomType>;
+  gradeCurriculum?: Maybe<GradeCurriculumType>;
   myChildren: Array<StudentType>;
   studentAttendance: Array<AttendanceType>;
   studentBehaviorHistory: Array<BehaviorPointType>;
@@ -274,6 +317,14 @@ export type Query = {
   studentMasteries: Array<ObjectiveMasteryType>;
   studentProgress: ProgressDataType;
   studentRadar: RadarDataType;
+  subject?: Maybe<SubjectCurriculumType>;
+  subjects: Array<SubjectCurriculumType>;
+  topic?: Maybe<TopicCurriculumType>;
+};
+
+
+export type QueryAcademicYearsArgs = {
+  schoolId: Scalars['ID']['input'];
 };
 
 
@@ -289,6 +340,12 @@ export type QueryClassroomBehaviorTodayArgs = {
 
 export type QueryClassroomOverviewArgs = {
   classroomId: Scalars['ID']['input'];
+};
+
+
+export type QueryGradeCurriculumArgs = {
+  academicYearId: Scalars['ID']['input'];
+  grade: Scalars['Int']['input'];
 };
 
 
@@ -336,6 +393,21 @@ export type QueryStudentRadarArgs = {
   studentId: Scalars['ID']['input'];
 };
 
+
+export type QuerySubjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QuerySubjectsArgs = {
+  schoolId: Scalars['ID']['input'];
+};
+
+
+export type QueryTopicArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type RadarDataType = {
   __typename?: 'RadarDataType';
   skills: RadarSkillType;
@@ -369,8 +441,19 @@ export enum SkillCategoryEnum {
 export type StudentType = {
   __typename?: 'StudentType';
   avatar?: Maybe<Scalars['String']['output']>;
+  classrooms: Array<ClassroomType>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type SubjectCurriculumType = {
+  __typename?: 'SubjectCurriculumType';
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  topics: Array<TopicCurriculumType>;
+  updatedAt: Scalars['ISO8601DateTime']['output'];
 };
 
 export type SubjectMasteryType = {
@@ -386,6 +469,19 @@ export type TeacherType = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   role: Scalars['String']['output'];
+};
+
+export type TopicCurriculumType = {
+  __typename?: 'TopicCurriculumType';
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  exams: Array<ExamObjectType>;
+  id: Scalars['ID']['output'];
+  learningObjectives: Array<CurriculumLearningObjectiveType>;
+  name: Scalars['String']['output'];
+  position: Scalars['Int']['output'];
+  subject: SubjectCurriculumType;
+  updatedAt: Scalars['ISO8601DateTime']['output'];
 };
 
 export type TopicMasteryType = {
@@ -509,6 +605,47 @@ export type ClassroomOverviewQueryVariables = Exact<{
 
 
 export type ClassroomOverviewQuery = { __typename?: 'Query', classroomOverview: { __typename?: 'ClassroomOverviewType', classroomId: string, classroomName: string, students: Array<{ __typename?: 'RadarDataType', studentId: string, studentName: string, skills: { __typename?: 'RadarSkillType', reading?: number | null, math?: number | null, writing?: number | null, logic?: number | null, social?: number | null } }> } };
+
+export type MyChildrenWithSchoolQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyChildrenWithSchoolQuery = { __typename?: 'Query', myChildren: Array<{ __typename?: 'StudentType', id: string, name: string, classrooms: Array<{ __typename?: 'ClassroomType', id: string, grade?: number | null, school: { __typename?: 'SchoolType', id: string, name: string } }> }> };
+
+export type SubjectsQueryVariables = Exact<{
+  schoolId: Scalars['ID']['input'];
+}>;
+
+
+export type SubjectsQuery = { __typename?: 'Query', subjects: Array<{ __typename?: 'SubjectCurriculumType', id: string, name: string, description?: string | null, topics: Array<{ __typename?: 'TopicCurriculumType', id: string, name: string }> }> };
+
+export type SubjectQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type SubjectQuery = { __typename?: 'Query', subject?: { __typename?: 'SubjectCurriculumType', id: string, name: string, description?: string | null, topics: Array<{ __typename?: 'TopicCurriculumType', id: string, name: string, description?: string | null, position: number, learningObjectives: Array<{ __typename?: 'CurriculumLearningObjectiveType', id: string }> }> } | null };
+
+export type TopicQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type TopicQuery = { __typename?: 'Query', topic?: { __typename?: 'TopicCurriculumType', id: string, name: string, description?: string | null, subject: { __typename?: 'SubjectCurriculumType', id: string, name: string }, learningObjectives: Array<{ __typename?: 'CurriculumLearningObjectiveType', id: string, name: string, description?: string | null, examPassThreshold: number, dailyScoreThreshold: number, position: number }>, exams: Array<{ __typename?: 'ExamObjectType', id: string, title: string, description?: string | null, examType: string, maxScore?: number | null }> } | null };
+
+export type AcademicYearsQueryVariables = Exact<{
+  schoolId: Scalars['ID']['input'];
+}>;
+
+
+export type AcademicYearsQuery = { __typename?: 'Query', academicYears: Array<{ __typename?: 'AcademicYearType', id: string, label: string, current: boolean }> };
+
+export type GradeCurriculumQueryVariables = Exact<{
+  academicYearId: Scalars['ID']['input'];
+  grade: Scalars['Int']['input'];
+}>;
+
+
+export type GradeCurriculumQuery = { __typename?: 'Query', gradeCurriculum?: { __typename?: 'GradeCurriculumType', id: string, grade: number, gradeCurriculumItems: Array<{ __typename?: 'GradeCurriculumItemType', id: string, displayName: string, position: number, subject?: { __typename?: 'SubjectCurriculumType', id: string, name: string } | null, topic?: { __typename?: 'TopicCurriculumType', id: string, name: string, subject: { __typename?: 'SubjectCurriculumType', id: string, name: string } } | null }> } | null };
 
 export type StudentMasteriesQueryVariables = Exact<{
   studentId: Scalars['ID']['input'];
@@ -1228,6 +1365,331 @@ export type ClassroomOverviewQueryHookResult = ReturnType<typeof useClassroomOve
 export type ClassroomOverviewLazyQueryHookResult = ReturnType<typeof useClassroomOverviewLazyQuery>;
 export type ClassroomOverviewSuspenseQueryHookResult = ReturnType<typeof useClassroomOverviewSuspenseQuery>;
 export type ClassroomOverviewQueryResult = Apollo.QueryResult<ClassroomOverviewQuery, ClassroomOverviewQueryVariables>;
+export const MyChildrenWithSchoolDocument = gql`
+    query MyChildrenWithSchool {
+  myChildren {
+    id
+    name
+    classrooms {
+      id
+      grade
+      school {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyChildrenWithSchoolQuery__
+ *
+ * To run a query within a React component, call `useMyChildrenWithSchoolQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyChildrenWithSchoolQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyChildrenWithSchoolQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyChildrenWithSchoolQuery(baseOptions?: Apollo.QueryHookOptions<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>(MyChildrenWithSchoolDocument, options);
+      }
+export function useMyChildrenWithSchoolLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>(MyChildrenWithSchoolDocument, options);
+        }
+// @ts-ignore
+export function useMyChildrenWithSchoolSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>): Apollo.UseSuspenseQueryResult<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>;
+export function useMyChildrenWithSchoolSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>): Apollo.UseSuspenseQueryResult<MyChildrenWithSchoolQuery | undefined, MyChildrenWithSchoolQueryVariables>;
+export function useMyChildrenWithSchoolSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>(MyChildrenWithSchoolDocument, options);
+        }
+export type MyChildrenWithSchoolQueryHookResult = ReturnType<typeof useMyChildrenWithSchoolQuery>;
+export type MyChildrenWithSchoolLazyQueryHookResult = ReturnType<typeof useMyChildrenWithSchoolLazyQuery>;
+export type MyChildrenWithSchoolSuspenseQueryHookResult = ReturnType<typeof useMyChildrenWithSchoolSuspenseQuery>;
+export type MyChildrenWithSchoolQueryResult = Apollo.QueryResult<MyChildrenWithSchoolQuery, MyChildrenWithSchoolQueryVariables>;
+export const SubjectsDocument = gql`
+    query Subjects($schoolId: ID!) {
+  subjects(schoolId: $schoolId) {
+    id
+    name
+    description
+    topics {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useSubjectsQuery__
+ *
+ * To run a query within a React component, call `useSubjectsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSubjectsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSubjectsQuery({
+ *   variables: {
+ *      schoolId: // value for 'schoolId'
+ *   },
+ * });
+ */
+export function useSubjectsQuery(baseOptions: Apollo.QueryHookOptions<SubjectsQuery, SubjectsQueryVariables> & ({ variables: SubjectsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SubjectsQuery, SubjectsQueryVariables>(SubjectsDocument, options);
+      }
+export function useSubjectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SubjectsQuery, SubjectsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SubjectsQuery, SubjectsQueryVariables>(SubjectsDocument, options);
+        }
+// @ts-ignore
+export function useSubjectsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SubjectsQuery, SubjectsQueryVariables>): Apollo.UseSuspenseQueryResult<SubjectsQuery, SubjectsQueryVariables>;
+export function useSubjectsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SubjectsQuery, SubjectsQueryVariables>): Apollo.UseSuspenseQueryResult<SubjectsQuery | undefined, SubjectsQueryVariables>;
+export function useSubjectsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SubjectsQuery, SubjectsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SubjectsQuery, SubjectsQueryVariables>(SubjectsDocument, options);
+        }
+export type SubjectsQueryHookResult = ReturnType<typeof useSubjectsQuery>;
+export type SubjectsLazyQueryHookResult = ReturnType<typeof useSubjectsLazyQuery>;
+export type SubjectsSuspenseQueryHookResult = ReturnType<typeof useSubjectsSuspenseQuery>;
+export type SubjectsQueryResult = Apollo.QueryResult<SubjectsQuery, SubjectsQueryVariables>;
+export const SubjectDocument = gql`
+    query Subject($id: ID!) {
+  subject(id: $id) {
+    id
+    name
+    description
+    topics {
+      id
+      name
+      description
+      position
+      learningObjectives {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useSubjectQuery__
+ *
+ * To run a query within a React component, call `useSubjectQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSubjectQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSubjectQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSubjectQuery(baseOptions: Apollo.QueryHookOptions<SubjectQuery, SubjectQueryVariables> & ({ variables: SubjectQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SubjectQuery, SubjectQueryVariables>(SubjectDocument, options);
+      }
+export function useSubjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SubjectQuery, SubjectQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SubjectQuery, SubjectQueryVariables>(SubjectDocument, options);
+        }
+// @ts-ignore
+export function useSubjectSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SubjectQuery, SubjectQueryVariables>): Apollo.UseSuspenseQueryResult<SubjectQuery, SubjectQueryVariables>;
+export function useSubjectSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SubjectQuery, SubjectQueryVariables>): Apollo.UseSuspenseQueryResult<SubjectQuery | undefined, SubjectQueryVariables>;
+export function useSubjectSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SubjectQuery, SubjectQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SubjectQuery, SubjectQueryVariables>(SubjectDocument, options);
+        }
+export type SubjectQueryHookResult = ReturnType<typeof useSubjectQuery>;
+export type SubjectLazyQueryHookResult = ReturnType<typeof useSubjectLazyQuery>;
+export type SubjectSuspenseQueryHookResult = ReturnType<typeof useSubjectSuspenseQuery>;
+export type SubjectQueryResult = Apollo.QueryResult<SubjectQuery, SubjectQueryVariables>;
+export const TopicDocument = gql`
+    query Topic($id: ID!) {
+  topic(id: $id) {
+    id
+    name
+    description
+    subject {
+      id
+      name
+    }
+    learningObjectives {
+      id
+      name
+      description
+      examPassThreshold
+      dailyScoreThreshold
+      position
+    }
+    exams {
+      id
+      title
+      description
+      examType
+      maxScore
+    }
+  }
+}
+    `;
+
+/**
+ * __useTopicQuery__
+ *
+ * To run a query within a React component, call `useTopicQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTopicQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTopicQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useTopicQuery(baseOptions: Apollo.QueryHookOptions<TopicQuery, TopicQueryVariables> & ({ variables: TopicQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TopicQuery, TopicQueryVariables>(TopicDocument, options);
+      }
+export function useTopicLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TopicQuery, TopicQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TopicQuery, TopicQueryVariables>(TopicDocument, options);
+        }
+// @ts-ignore
+export function useTopicSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TopicQuery, TopicQueryVariables>): Apollo.UseSuspenseQueryResult<TopicQuery, TopicQueryVariables>;
+export function useTopicSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TopicQuery, TopicQueryVariables>): Apollo.UseSuspenseQueryResult<TopicQuery | undefined, TopicQueryVariables>;
+export function useTopicSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TopicQuery, TopicQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TopicQuery, TopicQueryVariables>(TopicDocument, options);
+        }
+export type TopicQueryHookResult = ReturnType<typeof useTopicQuery>;
+export type TopicLazyQueryHookResult = ReturnType<typeof useTopicLazyQuery>;
+export type TopicSuspenseQueryHookResult = ReturnType<typeof useTopicSuspenseQuery>;
+export type TopicQueryResult = Apollo.QueryResult<TopicQuery, TopicQueryVariables>;
+export const AcademicYearsDocument = gql`
+    query AcademicYears($schoolId: ID!) {
+  academicYears(schoolId: $schoolId) {
+    id
+    label
+    current
+  }
+}
+    `;
+
+/**
+ * __useAcademicYearsQuery__
+ *
+ * To run a query within a React component, call `useAcademicYearsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAcademicYearsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAcademicYearsQuery({
+ *   variables: {
+ *      schoolId: // value for 'schoolId'
+ *   },
+ * });
+ */
+export function useAcademicYearsQuery(baseOptions: Apollo.QueryHookOptions<AcademicYearsQuery, AcademicYearsQueryVariables> & ({ variables: AcademicYearsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AcademicYearsQuery, AcademicYearsQueryVariables>(AcademicYearsDocument, options);
+      }
+export function useAcademicYearsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AcademicYearsQuery, AcademicYearsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AcademicYearsQuery, AcademicYearsQueryVariables>(AcademicYearsDocument, options);
+        }
+// @ts-ignore
+export function useAcademicYearsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AcademicYearsQuery, AcademicYearsQueryVariables>): Apollo.UseSuspenseQueryResult<AcademicYearsQuery, AcademicYearsQueryVariables>;
+export function useAcademicYearsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AcademicYearsQuery, AcademicYearsQueryVariables>): Apollo.UseSuspenseQueryResult<AcademicYearsQuery | undefined, AcademicYearsQueryVariables>;
+export function useAcademicYearsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AcademicYearsQuery, AcademicYearsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AcademicYearsQuery, AcademicYearsQueryVariables>(AcademicYearsDocument, options);
+        }
+export type AcademicYearsQueryHookResult = ReturnType<typeof useAcademicYearsQuery>;
+export type AcademicYearsLazyQueryHookResult = ReturnType<typeof useAcademicYearsLazyQuery>;
+export type AcademicYearsSuspenseQueryHookResult = ReturnType<typeof useAcademicYearsSuspenseQuery>;
+export type AcademicYearsQueryResult = Apollo.QueryResult<AcademicYearsQuery, AcademicYearsQueryVariables>;
+export const GradeCurriculumDocument = gql`
+    query GradeCurriculum($academicYearId: ID!, $grade: Int!) {
+  gradeCurriculum(academicYearId: $academicYearId, grade: $grade) {
+    id
+    grade
+    gradeCurriculumItems {
+      id
+      displayName
+      position
+      subject {
+        id
+        name
+      }
+      topic {
+        id
+        name
+        subject {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGradeCurriculumQuery__
+ *
+ * To run a query within a React component, call `useGradeCurriculumQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGradeCurriculumQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGradeCurriculumQuery({
+ *   variables: {
+ *      academicYearId: // value for 'academicYearId'
+ *      grade: // value for 'grade'
+ *   },
+ * });
+ */
+export function useGradeCurriculumQuery(baseOptions: Apollo.QueryHookOptions<GradeCurriculumQuery, GradeCurriculumQueryVariables> & ({ variables: GradeCurriculumQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GradeCurriculumQuery, GradeCurriculumQueryVariables>(GradeCurriculumDocument, options);
+      }
+export function useGradeCurriculumLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GradeCurriculumQuery, GradeCurriculumQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GradeCurriculumQuery, GradeCurriculumQueryVariables>(GradeCurriculumDocument, options);
+        }
+// @ts-ignore
+export function useGradeCurriculumSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GradeCurriculumQuery, GradeCurriculumQueryVariables>): Apollo.UseSuspenseQueryResult<GradeCurriculumQuery, GradeCurriculumQueryVariables>;
+export function useGradeCurriculumSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GradeCurriculumQuery, GradeCurriculumQueryVariables>): Apollo.UseSuspenseQueryResult<GradeCurriculumQuery | undefined, GradeCurriculumQueryVariables>;
+export function useGradeCurriculumSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GradeCurriculumQuery, GradeCurriculumQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GradeCurriculumQuery, GradeCurriculumQueryVariables>(GradeCurriculumDocument, options);
+        }
+export type GradeCurriculumQueryHookResult = ReturnType<typeof useGradeCurriculumQuery>;
+export type GradeCurriculumLazyQueryHookResult = ReturnType<typeof useGradeCurriculumLazyQuery>;
+export type GradeCurriculumSuspenseQueryHookResult = ReturnType<typeof useGradeCurriculumSuspenseQuery>;
+export type GradeCurriculumQueryResult = Apollo.QueryResult<GradeCurriculumQuery, GradeCurriculumQueryVariables>;
 export const StudentMasteriesDocument = gql`
     query StudentMasteries($studentId: ID!, $subjectId: ID) {
   studentMasteries(studentId: $studentId, subjectId: $subjectId) {
