@@ -31,12 +31,16 @@ describe('AuthStore', () => {
       expect(state.userType).toBe('parent');
     });
 
-    it('persists token to SecureStore', () => {
+    it('persists token and userType to SecureStore', () => {
       useAuthStore.getState().setAuth('jwt-token-123', 'teacher');
 
       expect(mockedSecureStore.setItemAsync).toHaveBeenCalledWith(
         'auth_token',
         'jwt-token-123'
+      );
+      expect(mockedSecureStore.setItemAsync).toHaveBeenCalledWith(
+        'user_type',
+        'teacher'
       );
     });
   });
@@ -59,25 +63,32 @@ describe('AuthStore', () => {
       expect(state.activeSchoolId).toBeNull();
     });
 
-    it('calls SecureStore.deleteItemAsync to remove persisted token', () => {
+    it('calls SecureStore.deleteItemAsync to remove persisted token and userType', () => {
       useAuthStore.getState().clearAuth();
 
       expect(mockedSecureStore.deleteItemAsync).toHaveBeenCalledWith(
         'auth_token'
       );
+      expect(mockedSecureStore.deleteItemAsync).toHaveBeenCalledWith(
+        'user_type'
+      );
     });
   });
 
   describe('hydrate', () => {
-    it('reads token from SecureStore and sets hydrated true', async () => {
-      mockedSecureStore.getItemAsync.mockResolvedValue('stored-token');
+    it('reads token and userType from SecureStore and sets hydrated true', async () => {
+      mockedSecureStore.getItemAsync
+        .mockResolvedValueOnce('stored-token')
+        .mockResolvedValueOnce('parent');
 
       await useAuthStore.getState().hydrate();
 
       const state = useAuthStore.getState();
       expect(state.token).toBe('stored-token');
+      expect(state.userType).toBe('parent');
       expect(state.hydrated).toBe(true);
       expect(mockedSecureStore.getItemAsync).toHaveBeenCalledWith('auth_token');
+      expect(mockedSecureStore.getItemAsync).toHaveBeenCalledWith('user_type');
     });
 
     it('sets hydrated true even when no token is stored', async () => {
@@ -87,6 +98,7 @@ describe('AuthStore', () => {
 
       const state = useAuthStore.getState();
       expect(state.token).toBeNull();
+      expect(state.userType).toBeNull();
       expect(state.hydrated).toBe(true);
     });
   });
