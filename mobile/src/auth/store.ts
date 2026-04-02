@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
 
 const AUTH_TOKEN_KEY = 'auth_token';
+const USER_TYPE_KEY = 'user_type';
 
 export interface AuthState {
   token: string | null;
@@ -25,6 +26,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setAuth: (token, userType) => {
     SecureStore.setItemAsync(AUTH_TOKEN_KEY, token);
+    SecureStore.setItemAsync(USER_TYPE_KEY, userType);
     set({ token, userType });
   },
 
@@ -38,6 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearAuth: () => {
     SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
+    SecureStore.deleteItemAsync(USER_TYPE_KEY);
     set({
       token: null,
       userType: null,
@@ -48,6 +51,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   hydrate: async () => {
     const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
-    set({ token: token ?? null, hydrated: true });
+    const userType = await SecureStore.getItemAsync(USER_TYPE_KEY);
+    set({
+      token: token ?? null,
+      userType: (userType as 'parent' | 'teacher') ?? null,
+      hydrated: true,
+    });
   },
 }));
