@@ -145,6 +145,94 @@ type ClassroomBehaviorStudentType {
   recentPoints: [BehaviorPointType!]!
 }
 
+# --- Attendance ---
+
+enum AttendanceStatusEnum {
+  PRESENT
+  SICK
+  EXCUSED
+  UNEXCUSED
+}
+
+type AttendanceType {
+  id: ID!
+  date: ISO8601Date!
+  status: AttendanceStatusEnum!
+  notes: String
+  student: StudentType!
+  classroom: ClassroomType!
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
+}
+
+# --- Exams ---
+
+enum ExamSubmissionStatusEnum {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+}
+
+type ExamObjectType {
+  id: ID!
+  title: String!
+  description: String
+  examType: String!
+  maxScore: Int
+}
+
+type ClassroomExamType {
+  id: ID!
+  exam: ExamObjectType!
+  classroom: ClassroomType!
+  status: String!
+  scheduledAt: ISO8601DateTime
+  dueAt: ISO8601DateTime
+}
+
+type ExamSubmissionType {
+  id: ID!
+  student: StudentType!
+  classroomExam: ClassroomExamType!
+  status: ExamSubmissionStatusEnum!
+  score: Float
+  passed: Boolean
+  startedAt: ISO8601DateTime
+  submittedAt: ISO8601DateTime
+  gradedAt: ISO8601DateTime
+  teacherNotes: String
+  createdAt: ISO8601DateTime!
+  updatedAt: ISO8601DateTime!
+}
+
+# --- Mastery ---
+
+type LearningObjectiveType {
+  id: ID!
+  description: String!
+  topic: TopicMasteryType!
+}
+
+type TopicMasteryType {
+  id: ID!
+  name: String!
+  subject: SubjectMasteryType!
+}
+
+type SubjectMasteryType {
+  id: ID!
+  name: String!
+}
+
+type ObjectiveMasteryType {
+  id: ID!
+  learningObjective: LearningObjectiveType!
+  examMastered: Boolean!
+  dailyMastered: Boolean!
+  mastered: Boolean!
+}
+
 # --- Health ---
 
 type HealthCheckupType {
@@ -199,6 +287,18 @@ type Query {
     first: Int
     after: String
   ): DailyScoreTypeConnection!
+
+  studentAttendance(
+    studentId: ID!
+    startDate: ISO8601Date
+    endDate: ISO8601Date
+  ): [AttendanceType!]!
+  studentHealthCheckups(
+    studentId: ID!
+    startDate: ISO8601Date
+    endDate: ISO8601Date
+  ): [HealthCheckupType!]!
+  studentMasteries(studentId: ID!, subjectId: ID): [ObjectiveMasteryType!]!
 
   # Teacher
   classrooms: [ClassroomType!]!
