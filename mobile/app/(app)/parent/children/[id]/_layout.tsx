@@ -40,8 +40,8 @@ export default function ChildDetailLayout() {
       </View>
       <View style={styles.content}>
         {activeTab === 'radar' && <RadarScreen id={id ?? ''} />}
-        {activeTab === 'progress' && <ProgressScreen />}
-        {activeTab === 'history' && <HistoryScreen />}
+        {activeTab === 'progress' && <ProgressScreen id={id ?? ''} />}
+        {activeTab === 'history' && <HistoryScreen id={id ?? ''} />}
       </View>
     </View>
   );
