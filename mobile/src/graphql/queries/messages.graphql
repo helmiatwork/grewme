@@ -1,0 +1,58 @@
+query Conversations {
+  conversations {
+    id
+    student {
+      id
+      name
+    }
+    parent {
+      id
+      name
+    }
+    teacher {
+      id
+      name
+    }
+    lastMessage {
+      id
+      body
+      senderName
+      mine
+      createdAt
+    }
+    unreadCount
+    createdAt
+  }
+}
+
+query Conversation($id: ID!) {
+  conversation(id: $id) {
+    id
+    student {
+      id
+      name
+    }
+    parent {
+      id
+      name
+    }
+    teacher {
+      id
+      name
+    }
+    messages {
+      id
+      body
+      senderName
+      senderType
+      senderId
+      mine
+      createdAt
+      attachments {
+        url
+        filename
+        contentType
+      }
+    }
+  }
+}

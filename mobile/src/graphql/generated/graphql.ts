@@ -89,6 +89,21 @@ export type ClassroomBehaviorStudentType = {
   totalPoints: Scalars['Int']['output'];
 };
 
+export type ClassroomEventType = {
+  __typename?: 'ClassroomEventType';
+  classroom: ClassroomType;
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  creatorName: Scalars['String']['output'];
+  creatorType: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  endTime?: Maybe<Scalars['String']['output']>;
+  eventDate: Scalars['ISO8601Date']['output'];
+  id: Scalars['ID']['output'];
+  isMine: Scalars['Boolean']['output'];
+  startTime?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+};
+
 export type ClassroomExamType = {
   __typename?: 'ClassroomExamType';
   classroom: ClassroomType;
@@ -112,6 +127,18 @@ export type ClassroomType = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   school: SchoolType;
+};
+
+export type ConversationType = {
+  __typename?: 'ConversationType';
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  id: Scalars['ID']['output'];
+  lastMessage?: Maybe<MessageType>;
+  messages: Array<MessageType>;
+  parent: ParentType;
+  student: StudentType;
+  teacher: TeacherType;
+  unreadCount: Scalars['Int']['output'];
 };
 
 export type CreateHealthCheckupPayload = {
@@ -232,11 +259,31 @@ export type LoginPayload = {
   user?: Maybe<UserUnion>;
 };
 
+export type MediaAttachmentType = {
+  __typename?: 'MediaAttachmentType';
+  contentType: Scalars['String']['output'];
+  filename: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type MessageType = {
+  __typename?: 'MessageType';
+  attachments: Array<MediaAttachmentType>;
+  body: Scalars['String']['output'];
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  id: Scalars['ID']['output'];
+  mine: Scalars['Boolean']['output'];
+  senderId: Scalars['ID']['output'];
+  senderName: Scalars['String']['output'];
+  senderType: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   awardBehaviorPoint: AwardBehaviorPointPayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   login: LoginPayload;
+  sendMessage: SendMessagePayload;
 };
 
 
@@ -262,6 +309,12 @@ export type MutationLoginArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: Scalars['String']['input'];
+};
+
+
+export type MutationSendMessageArgs = {
+  body: Scalars['String']['input'];
+  conversationId: Scalars['ID']['input'];
 };
 
 export type ObjectiveMasteryType = {
@@ -306,8 +359,11 @@ export type Query = {
   academicYears: Array<AcademicYearType>;
   behaviorCategories: Array<BehaviorCategoryType>;
   classroomBehaviorToday: Array<ClassroomBehaviorStudentType>;
+  classroomEvents: Array<ClassroomEventType>;
   classroomOverview: ClassroomOverviewType;
   classrooms: Array<ClassroomType>;
+  conversation: ConversationType;
+  conversations: Array<ConversationType>;
   gradeCurriculum?: Maybe<GradeCurriculumType>;
   myChildren: Array<StudentType>;
   studentAttendance: Array<AttendanceType>;
@@ -338,8 +394,19 @@ export type QueryClassroomBehaviorTodayArgs = {
 };
 
 
+export type QueryClassroomEventsArgs = {
+  classroomIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  month: Scalars['ISO8601Date']['input'];
+};
+
+
 export type QueryClassroomOverviewArgs = {
   classroomId: Scalars['ID']['input'];
+};
+
+
+export type QueryConversationArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -428,6 +495,12 @@ export type SchoolType = {
   __typename?: 'SchoolType';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type SendMessagePayload = {
+  __typename?: 'SendMessagePayload';
+  errors: Array<UserErrorType>;
+  message?: Maybe<MessageType>;
 };
 
 export enum SkillCategoryEnum {
@@ -533,6 +606,14 @@ export type CreateHealthCheckupMutationVariables = Exact<{
 
 export type CreateHealthCheckupMutation = { __typename?: 'Mutation', createHealthCheckup: { __typename?: 'CreateHealthCheckupPayload', healthCheckup?: { __typename?: 'HealthCheckupType', id: string, measuredAt: any, weightKg?: number | null, heightCm?: number | null, headCircumferenceCm?: number | null, bmi?: number | null, bmiCategory?: string | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string }> } };
 
+export type SendMessageMutationVariables = Exact<{
+  conversationId: Scalars['ID']['input'];
+  body: Scalars['String']['input'];
+}>;
+
+
+export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'SendMessagePayload', message?: { __typename?: 'MessageType', id: string, body: string, senderName: string, senderType: string, senderId: string, mine: boolean, createdAt: any, attachments: Array<{ __typename?: 'MediaAttachmentType', url: string, filename: string, contentType: string }> } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
 export type StudentAttendanceQueryVariables = Exact<{
   studentId: Scalars['ID']['input'];
   startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
@@ -564,6 +645,14 @@ export type StudentBehaviorHistoryQueryVariables = Exact<{
 
 
 export type StudentBehaviorHistoryQuery = { __typename?: 'Query', studentBehaviorHistory: Array<{ __typename?: 'BehaviorPointType', id: string, pointValue: number, note?: string | null, awardedAt: any, revokable: boolean, teacher: { __typename?: 'TeacherType', id: string, name: string }, behaviorCategory: { __typename?: 'BehaviorCategoryType', name: string, isPositive: boolean, icon: string, color: string } }> };
+
+export type ClassroomEventsQueryVariables = Exact<{
+  month: Scalars['ISO8601Date']['input'];
+  classroomIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+}>;
+
+
+export type ClassroomEventsQuery = { __typename?: 'Query', classroomEvents: Array<{ __typename?: 'ClassroomEventType', id: string, title: string, description?: string | null, eventDate: any, startTime?: string | null, endTime?: string | null, creatorName: string, creatorType: string, isMine: boolean, createdAt: any, classroom: { __typename?: 'ClassroomType', id: string, name: string } }> };
 
 export type MyChildrenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -663,6 +752,18 @@ export type StudentHealthCheckupsQueryVariables = Exact<{
 
 
 export type StudentHealthCheckupsQuery = { __typename?: 'Query', studentHealthCheckups: Array<{ __typename?: 'HealthCheckupType', id: string, measuredAt: any, weightKg?: number | null, heightCm?: number | null, headCircumferenceCm?: number | null, bmi?: number | null, bmiCategory?: string | null, notes?: string | null }> };
+
+export type ConversationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ConversationsQuery = { __typename?: 'Query', conversations: Array<{ __typename?: 'ConversationType', id: string, unreadCount: number, createdAt: any, student: { __typename?: 'StudentType', id: string, name: string }, parent: { __typename?: 'ParentType', id: string, name: string }, teacher: { __typename?: 'TeacherType', id: string, name: string }, lastMessage?: { __typename?: 'MessageType', id: string, body: string, senderName: string, mine: boolean, createdAt: any } | null }> };
+
+export type ConversationQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ConversationQuery = { __typename?: 'Query', conversation: { __typename?: 'ConversationType', id: string, student: { __typename?: 'StudentType', id: string, name: string }, parent: { __typename?: 'ParentType', id: string, name: string }, teacher: { __typename?: 'TeacherType', id: string, name: string }, messages: Array<{ __typename?: 'MessageType', id: string, body: string, senderName: string, senderType: string, senderId: string, mine: boolean, createdAt: any, attachments: Array<{ __typename?: 'MediaAttachmentType', url: string, filename: string, contentType: string }> }> } };
 
 
 export const LoginDocument = gql`
@@ -826,6 +927,57 @@ export function useCreateHealthCheckupMutation(baseOptions?: Apollo.MutationHook
 export type CreateHealthCheckupMutationHookResult = ReturnType<typeof useCreateHealthCheckupMutation>;
 export type CreateHealthCheckupMutationResult = Apollo.MutationResult<CreateHealthCheckupMutation>;
 export type CreateHealthCheckupMutationOptions = Apollo.BaseMutationOptions<CreateHealthCheckupMutation, CreateHealthCheckupMutationVariables>;
+export const SendMessageDocument = gql`
+    mutation SendMessage($conversationId: ID!, $body: String!) {
+  sendMessage(conversationId: $conversationId, body: $body) {
+    message {
+      id
+      body
+      senderName
+      senderType
+      senderId
+      mine
+      createdAt
+      attachments {
+        url
+        filename
+        contentType
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
+
+/**
+ * __useSendMessageMutation__
+ *
+ * To run a mutation, you first call `useSendMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
+ *   variables: {
+ *      conversationId: // value for 'conversationId'
+ *      body: // value for 'body'
+ *   },
+ * });
+ */
+export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendMessageMutation, SendMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument, options);
+      }
+export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
+export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
+export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
 export const StudentAttendanceDocument = gql`
     query StudentAttendance($studentId: ID!, $startDate: ISO8601Date, $endDate: ISO8601Date) {
   studentAttendance(
@@ -1053,6 +1205,63 @@ export type StudentBehaviorHistoryQueryHookResult = ReturnType<typeof useStudent
 export type StudentBehaviorHistoryLazyQueryHookResult = ReturnType<typeof useStudentBehaviorHistoryLazyQuery>;
 export type StudentBehaviorHistorySuspenseQueryHookResult = ReturnType<typeof useStudentBehaviorHistorySuspenseQuery>;
 export type StudentBehaviorHistoryQueryResult = Apollo.QueryResult<StudentBehaviorHistoryQuery, StudentBehaviorHistoryQueryVariables>;
+export const ClassroomEventsDocument = gql`
+    query ClassroomEvents($month: ISO8601Date!, $classroomIds: [ID!]) {
+  classroomEvents(month: $month, classroomIds: $classroomIds) {
+    id
+    title
+    description
+    eventDate
+    startTime
+    endTime
+    classroom {
+      id
+      name
+    }
+    creatorName
+    creatorType
+    isMine
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useClassroomEventsQuery__
+ *
+ * To run a query within a React component, call `useClassroomEventsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useClassroomEventsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useClassroomEventsQuery({
+ *   variables: {
+ *      month: // value for 'month'
+ *      classroomIds: // value for 'classroomIds'
+ *   },
+ * });
+ */
+export function useClassroomEventsQuery(baseOptions: Apollo.QueryHookOptions<ClassroomEventsQuery, ClassroomEventsQueryVariables> & ({ variables: ClassroomEventsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ClassroomEventsQuery, ClassroomEventsQueryVariables>(ClassroomEventsDocument, options);
+      }
+export function useClassroomEventsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ClassroomEventsQuery, ClassroomEventsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ClassroomEventsQuery, ClassroomEventsQueryVariables>(ClassroomEventsDocument, options);
+        }
+// @ts-ignore
+export function useClassroomEventsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ClassroomEventsQuery, ClassroomEventsQueryVariables>): Apollo.UseSuspenseQueryResult<ClassroomEventsQuery, ClassroomEventsQueryVariables>;
+export function useClassroomEventsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ClassroomEventsQuery, ClassroomEventsQueryVariables>): Apollo.UseSuspenseQueryResult<ClassroomEventsQuery | undefined, ClassroomEventsQueryVariables>;
+export function useClassroomEventsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ClassroomEventsQuery, ClassroomEventsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ClassroomEventsQuery, ClassroomEventsQueryVariables>(ClassroomEventsDocument, options);
+        }
+export type ClassroomEventsQueryHookResult = ReturnType<typeof useClassroomEventsQuery>;
+export type ClassroomEventsLazyQueryHookResult = ReturnType<typeof useClassroomEventsLazyQuery>;
+export type ClassroomEventsSuspenseQueryHookResult = ReturnType<typeof useClassroomEventsSuspenseQuery>;
+export type ClassroomEventsQueryResult = Apollo.QueryResult<ClassroomEventsQuery, ClassroomEventsQueryVariables>;
 export const MyChildrenDocument = gql`
     query MyChildren {
   myChildren {
@@ -1805,3 +2014,135 @@ export type StudentHealthCheckupsQueryHookResult = ReturnType<typeof useStudentH
 export type StudentHealthCheckupsLazyQueryHookResult = ReturnType<typeof useStudentHealthCheckupsLazyQuery>;
 export type StudentHealthCheckupsSuspenseQueryHookResult = ReturnType<typeof useStudentHealthCheckupsSuspenseQuery>;
 export type StudentHealthCheckupsQueryResult = Apollo.QueryResult<StudentHealthCheckupsQuery, StudentHealthCheckupsQueryVariables>;
+export const ConversationsDocument = gql`
+    query Conversations {
+  conversations {
+    id
+    student {
+      id
+      name
+    }
+    parent {
+      id
+      name
+    }
+    teacher {
+      id
+      name
+    }
+    lastMessage {
+      id
+      body
+      senderName
+      mine
+      createdAt
+    }
+    unreadCount
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useConversationsQuery__
+ *
+ * To run a query within a React component, call `useConversationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConversationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConversationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useConversationsQuery(baseOptions?: Apollo.QueryHookOptions<ConversationsQuery, ConversationsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConversationsQuery, ConversationsQueryVariables>(ConversationsDocument, options);
+      }
+export function useConversationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConversationsQuery, ConversationsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConversationsQuery, ConversationsQueryVariables>(ConversationsDocument, options);
+        }
+// @ts-ignore
+export function useConversationsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ConversationsQuery, ConversationsQueryVariables>): Apollo.UseSuspenseQueryResult<ConversationsQuery, ConversationsQueryVariables>;
+export function useConversationsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ConversationsQuery, ConversationsQueryVariables>): Apollo.UseSuspenseQueryResult<ConversationsQuery | undefined, ConversationsQueryVariables>;
+export function useConversationsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ConversationsQuery, ConversationsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ConversationsQuery, ConversationsQueryVariables>(ConversationsDocument, options);
+        }
+export type ConversationsQueryHookResult = ReturnType<typeof useConversationsQuery>;
+export type ConversationsLazyQueryHookResult = ReturnType<typeof useConversationsLazyQuery>;
+export type ConversationsSuspenseQueryHookResult = ReturnType<typeof useConversationsSuspenseQuery>;
+export type ConversationsQueryResult = Apollo.QueryResult<ConversationsQuery, ConversationsQueryVariables>;
+export const ConversationDocument = gql`
+    query Conversation($id: ID!) {
+  conversation(id: $id) {
+    id
+    student {
+      id
+      name
+    }
+    parent {
+      id
+      name
+    }
+    teacher {
+      id
+      name
+    }
+    messages {
+      id
+      body
+      senderName
+      senderType
+      senderId
+      mine
+      createdAt
+      attachments {
+        url
+        filename
+        contentType
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useConversationQuery__
+ *
+ * To run a query within a React component, call `useConversationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConversationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConversationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useConversationQuery(baseOptions: Apollo.QueryHookOptions<ConversationQuery, ConversationQueryVariables> & ({ variables: ConversationQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConversationQuery, ConversationQueryVariables>(ConversationDocument, options);
+      }
+export function useConversationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConversationQuery, ConversationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConversationQuery, ConversationQueryVariables>(ConversationDocument, options);
+        }
+// @ts-ignore
+export function useConversationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ConversationQuery, ConversationQueryVariables>): Apollo.UseSuspenseQueryResult<ConversationQuery, ConversationQueryVariables>;
+export function useConversationSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ConversationQuery, ConversationQueryVariables>): Apollo.UseSuspenseQueryResult<ConversationQuery | undefined, ConversationQueryVariables>;
+export function useConversationSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ConversationQuery, ConversationQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ConversationQuery, ConversationQueryVariables>(ConversationDocument, options);
+        }
+export type ConversationQueryHookResult = ReturnType<typeof useConversationQuery>;
+export type ConversationLazyQueryHookResult = ReturnType<typeof useConversationLazyQuery>;
+export type ConversationSuspenseQueryHookResult = ReturnType<typeof useConversationSuspenseQuery>;
+export type ConversationQueryResult = Apollo.QueryResult<ConversationQuery, ConversationQueryVariables>;
