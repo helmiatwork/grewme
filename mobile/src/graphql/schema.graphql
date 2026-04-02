@@ -95,6 +95,7 @@ type DailyScoreType {
   score: Int!
   notes: String
   studentId: ID!
+  student: StudentType!
 }
 
 type DailyScoreTypeEdge {
@@ -573,6 +574,31 @@ type DeleteLeaveRequestPayload {
   errors: [UserErrorType!]!
 }
 
+# --- Daily Score Inputs & Payloads ---
+
+input CreateDailyScoreInput {
+  studentId: ID!
+  date: ISO8601Date!
+  skillCategory: SkillCategoryEnum!
+  score: Int!
+  notes: String
+}
+
+input BulkScoreInput {
+  studentId: ID!
+  score: Int!
+}
+
+type CreateDailyScorePayload {
+  dailyScore: DailyScoreType
+  errors: [UserErrorType!]!
+}
+
+type BulkCreateDailyScoresPayload {
+  dailyScores: [DailyScoreType!]!
+  errors: [UserErrorType!]!
+}
+
 # --- Exam Payloads ---
 
 type CreateExamPayload {
@@ -699,6 +725,15 @@ type Mutation {
     date: ISO8601Date!
     records: [AttendanceRecordInput!]!
   ): BulkRecordAttendancePayload!
+
+  # Daily Scores
+  createDailyScore(input: CreateDailyScoreInput!): CreateDailyScorePayload!
+  bulkCreateDailyScores(
+    classroomId: ID!
+    date: ISO8601Date!
+    skillCategory: SkillCategoryEnum!
+    scores: [BulkScoreInput!]!
+  ): BulkCreateDailyScoresPayload!
 
   # Exams
   createExam(input: CreateExamInput!): CreateExamPayload!

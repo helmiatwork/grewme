@@ -1,0 +1,44 @@
+mutation CreateDailyScore($input: CreateDailyScoreInput!) {
+  createDailyScore(input: $input) {
+    dailyScore {
+      id
+      date
+      skillCategory
+      score
+      notes
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation BulkCreateDailyScores(
+  $classroomId: ID!
+  $date: ISO8601Date!
+  $skillCategory: SkillCategoryEnum!
+  $scores: [BulkScoreInput!]!
+) {
+  bulkCreateDailyScores(
+    classroomId: $classroomId
+    date: $date
+    skillCategory: $skillCategory
+    scores: $scores
+  ) {
+    dailyScores {
+      id
+      date
+      skillCategory
+      score
+      student {
+        id
+        name
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}

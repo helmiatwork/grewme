@@ -111,10 +111,21 @@ export type BehaviorPointType = {
   teacher: TeacherType;
 };
 
+export type BulkCreateDailyScoresPayload = {
+  __typename?: 'BulkCreateDailyScoresPayload';
+  dailyScores: Array<DailyScoreType>;
+  errors: Array<UserErrorType>;
+};
+
 export type BulkRecordAttendancePayload = {
   __typename?: 'BulkRecordAttendancePayload';
   attendances: Array<AttendanceType>;
   errors: Array<UserErrorType>;
+};
+
+export type BulkScoreInput = {
+  score: Scalars['Int']['input'];
+  studentId: Scalars['ID']['input'];
 };
 
 export type ClassroomBehaviorStudentType = {
@@ -190,6 +201,20 @@ export type ConversationType = {
   unreadCount: Scalars['Int']['output'];
 };
 
+export type CreateDailyScoreInput = {
+  date: Scalars['ISO8601Date']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  score: Scalars['Int']['input'];
+  skillCategory: SkillCategoryEnum;
+  studentId: Scalars['ID']['input'];
+};
+
+export type CreateDailyScorePayload = {
+  __typename?: 'CreateDailyScorePayload';
+  dailyScore?: Maybe<DailyScoreType>;
+  errors: Array<UserErrorType>;
+};
+
 export type CreateExamInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   durationMinutes?: InputMaybe<Scalars['Int']['input']>;
@@ -238,6 +263,7 @@ export type DailyScoreType = {
   notes?: Maybe<Scalars['String']['output']>;
   score: Scalars['Int']['output'];
   skillCategory: SkillCategoryEnum;
+  student: StudentType;
   studentId: Scalars['ID']['output'];
 };
 
@@ -451,7 +477,9 @@ export type Mutation = {
   __typename?: 'Mutation';
   assignExamToClassroom: AssignExamPayload;
   awardBehaviorPoint: AwardBehaviorPointPayload;
+  bulkCreateDailyScores: BulkCreateDailyScoresPayload;
   bulkRecordAttendance: BulkRecordAttendancePayload;
+  createDailyScore: CreateDailyScorePayload;
   createExam: CreateExamPayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   createLeaveRequest: CreateLeaveRequestPayload;
@@ -478,10 +506,23 @@ export type MutationAwardBehaviorPointArgs = {
 };
 
 
+export type MutationBulkCreateDailyScoresArgs = {
+  classroomId: Scalars['ID']['input'];
+  date: Scalars['ISO8601Date']['input'];
+  scores: Array<BulkScoreInput>;
+  skillCategory: SkillCategoryEnum;
+};
+
+
 export type MutationBulkRecordAttendanceArgs = {
   classroomId: Scalars['ID']['input'];
   date: Scalars['ISO8601Date']['input'];
   records: Array<AttendanceRecordInput>;
+};
+
+
+export type MutationCreateDailyScoreArgs = {
+  input: CreateDailyScoreInput;
 };
 
 
@@ -907,6 +948,23 @@ export type AwardBehaviorPointMutationVariables = Exact<{
 
 export type AwardBehaviorPointMutation = { __typename?: 'Mutation', awardBehaviorPoint: { __typename?: 'AwardBehaviorPointPayload', dailyTotal: number, behaviorPoint?: { __typename?: 'BehaviorPointType', id: string, pointValue: number, awardedAt: any } | null, errors: Array<{ __typename?: 'UserErrorType', message: string }> } };
 
+export type CreateDailyScoreMutationVariables = Exact<{
+  input: CreateDailyScoreInput;
+}>;
+
+
+export type CreateDailyScoreMutation = { __typename?: 'Mutation', createDailyScore: { __typename?: 'CreateDailyScorePayload', dailyScore?: { __typename?: 'DailyScoreType', id: string, date: any, skillCategory: SkillCategoryEnum, score: number, notes?: string | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type BulkCreateDailyScoresMutationVariables = Exact<{
+  classroomId: Scalars['ID']['input'];
+  date: Scalars['ISO8601Date']['input'];
+  skillCategory: SkillCategoryEnum;
+  scores: Array<BulkScoreInput> | BulkScoreInput;
+}>;
+
+
+export type BulkCreateDailyScoresMutation = { __typename?: 'Mutation', bulkCreateDailyScores: { __typename?: 'BulkCreateDailyScoresPayload', dailyScores: Array<{ __typename?: 'DailyScoreType', id: string, date: any, skillCategory: SkillCategoryEnum, score: number, student: { __typename?: 'StudentType', id: string, name: string } }>, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
 export type ExportChildDataMutationVariables = Exact<{
   studentId: Scalars['ID']['input'];
 }>;
@@ -1176,6 +1234,13 @@ export type ExamSubmissionDetailQueryVariables = Exact<{
 
 export type ExamSubmissionDetailQuery = { __typename?: 'Query', examSubmission?: { __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum, score?: number | null, passed?: boolean | null, startedAt?: any | null, submittedAt?: any | null, gradedAt?: any | null, teacherNotes?: string | null, student: { __typename?: 'StudentType', id: string, name: string }, classroomExam: { __typename?: 'ClassroomExamType', id: string, exam: { __typename?: 'ExamObjectType', id: string, title: string, examType: ExamTypeEnum, maxScore?: number | null, examQuestions: Array<{ __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, position: number, correctAnswer?: string | null }>, rubricCriteria: Array<{ __typename?: 'RubricCriteriaType', id: string, name: string, description?: string | null, maxScore: number, position: number }> } }, examAnswers: Array<{ __typename?: 'ExamAnswerType', id: string, selectedAnswer?: string | null, correct?: boolean | null, pointsAwarded: number, examQuestion: { __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, correctAnswer?: string | null } }>, rubricScores: Array<{ __typename?: 'RubricScoreType', id: string, score: number, feedback?: string | null, rubricCriteria: { __typename?: 'RubricCriteriaType', id: string, name: string, maxScore: number } }> } | null };
 
+export type TeacherStudentDetailQueryVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+}>;
+
+
+export type TeacherStudentDetailQuery = { __typename?: 'Query', studentRadar: { __typename?: 'RadarDataType', studentId: string, studentName: string, skills: { __typename?: 'RadarSkillType', reading?: number | null, math?: number | null, writing?: number | null, logic?: number | null, social?: number | null } }, studentProgress: { __typename?: 'ProgressDataType', weeks: Array<{ __typename?: 'ProgressWeekType', period: string, skills: { __typename?: 'RadarSkillType', reading?: number | null, math?: number | null, writing?: number | null, logic?: number | null, social?: number | null } }> }, studentDailyScores: { __typename?: 'DailyScoreTypeConnection', edges: Array<{ __typename?: 'DailyScoreTypeEdge', node: { __typename?: 'DailyScoreType', id: string, date: any, skillCategory: SkillCategoryEnum, score: number, notes?: string | null } }> } };
+
 
 export const BulkRecordAttendanceDocument = gql`
     mutation BulkRecordAttendance($classroomId: ID!, $date: ISO8601Date!, $records: [AttendanceRecordInput!]!) {
@@ -1330,6 +1395,103 @@ export function useAwardBehaviorPointMutation(baseOptions?: Apollo.MutationHookO
 export type AwardBehaviorPointMutationHookResult = ReturnType<typeof useAwardBehaviorPointMutation>;
 export type AwardBehaviorPointMutationResult = Apollo.MutationResult<AwardBehaviorPointMutation>;
 export type AwardBehaviorPointMutationOptions = Apollo.BaseMutationOptions<AwardBehaviorPointMutation, AwardBehaviorPointMutationVariables>;
+export const CreateDailyScoreDocument = gql`
+    mutation CreateDailyScore($input: CreateDailyScoreInput!) {
+  createDailyScore(input: $input) {
+    dailyScore {
+      id
+      date
+      skillCategory
+      score
+      notes
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CreateDailyScoreMutationFn = Apollo.MutationFunction<CreateDailyScoreMutation, CreateDailyScoreMutationVariables>;
+
+/**
+ * __useCreateDailyScoreMutation__
+ *
+ * To run a mutation, you first call `useCreateDailyScoreMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDailyScoreMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDailyScoreMutation, { data, loading, error }] = useCreateDailyScoreMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDailyScoreMutation(baseOptions?: Apollo.MutationHookOptions<CreateDailyScoreMutation, CreateDailyScoreMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDailyScoreMutation, CreateDailyScoreMutationVariables>(CreateDailyScoreDocument, options);
+      }
+export type CreateDailyScoreMutationHookResult = ReturnType<typeof useCreateDailyScoreMutation>;
+export type CreateDailyScoreMutationResult = Apollo.MutationResult<CreateDailyScoreMutation>;
+export type CreateDailyScoreMutationOptions = Apollo.BaseMutationOptions<CreateDailyScoreMutation, CreateDailyScoreMutationVariables>;
+export const BulkCreateDailyScoresDocument = gql`
+    mutation BulkCreateDailyScores($classroomId: ID!, $date: ISO8601Date!, $skillCategory: SkillCategoryEnum!, $scores: [BulkScoreInput!]!) {
+  bulkCreateDailyScores(
+    classroomId: $classroomId
+    date: $date
+    skillCategory: $skillCategory
+    scores: $scores
+  ) {
+    dailyScores {
+      id
+      date
+      skillCategory
+      score
+      student {
+        id
+        name
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type BulkCreateDailyScoresMutationFn = Apollo.MutationFunction<BulkCreateDailyScoresMutation, BulkCreateDailyScoresMutationVariables>;
+
+/**
+ * __useBulkCreateDailyScoresMutation__
+ *
+ * To run a mutation, you first call `useBulkCreateDailyScoresMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBulkCreateDailyScoresMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bulkCreateDailyScoresMutation, { data, loading, error }] = useBulkCreateDailyScoresMutation({
+ *   variables: {
+ *      classroomId: // value for 'classroomId'
+ *      date: // value for 'date'
+ *      skillCategory: // value for 'skillCategory'
+ *      scores: // value for 'scores'
+ *   },
+ * });
+ */
+export function useBulkCreateDailyScoresMutation(baseOptions?: Apollo.MutationHookOptions<BulkCreateDailyScoresMutation, BulkCreateDailyScoresMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BulkCreateDailyScoresMutation, BulkCreateDailyScoresMutationVariables>(BulkCreateDailyScoresDocument, options);
+      }
+export type BulkCreateDailyScoresMutationHookResult = ReturnType<typeof useBulkCreateDailyScoresMutation>;
+export type BulkCreateDailyScoresMutationResult = Apollo.MutationResult<BulkCreateDailyScoresMutation>;
+export type BulkCreateDailyScoresMutationOptions = Apollo.BaseMutationOptions<BulkCreateDailyScoresMutation, BulkCreateDailyScoresMutationVariables>;
 export const ExportChildDataDocument = gql`
     mutation ExportChildData($studentId: ID!) {
   exportChildData(studentId: $studentId) {
@@ -3315,3 +3477,77 @@ export type ExamSubmissionDetailQueryHookResult = ReturnType<typeof useExamSubmi
 export type ExamSubmissionDetailLazyQueryHookResult = ReturnType<typeof useExamSubmissionDetailLazyQuery>;
 export type ExamSubmissionDetailSuspenseQueryHookResult = ReturnType<typeof useExamSubmissionDetailSuspenseQuery>;
 export type ExamSubmissionDetailQueryResult = Apollo.QueryResult<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>;
+export const TeacherStudentDetailDocument = gql`
+    query TeacherStudentDetail($studentId: ID!) {
+  studentRadar(studentId: $studentId) {
+    studentId
+    studentName
+    skills {
+      reading
+      math
+      writing
+      logic
+      social
+    }
+  }
+  studentProgress(studentId: $studentId) {
+    weeks {
+      period
+      skills {
+        reading
+        math
+        writing
+        logic
+        social
+      }
+    }
+  }
+  studentDailyScores(studentId: $studentId, first: 20) {
+    edges {
+      node {
+        id
+        date
+        skillCategory
+        score
+        notes
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTeacherStudentDetailQuery__
+ *
+ * To run a query within a React component, call `useTeacherStudentDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTeacherStudentDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTeacherStudentDetailQuery({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *   },
+ * });
+ */
+export function useTeacherStudentDetailQuery(baseOptions: Apollo.QueryHookOptions<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables> & ({ variables: TeacherStudentDetailQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>(TeacherStudentDetailDocument, options);
+      }
+export function useTeacherStudentDetailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>(TeacherStudentDetailDocument, options);
+        }
+// @ts-ignore
+export function useTeacherStudentDetailSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>): Apollo.UseSuspenseQueryResult<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>;
+export function useTeacherStudentDetailSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>): Apollo.UseSuspenseQueryResult<TeacherStudentDetailQuery | undefined, TeacherStudentDetailQueryVariables>;
+export function useTeacherStudentDetailSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>(TeacherStudentDetailDocument, options);
+        }
+export type TeacherStudentDetailQueryHookResult = ReturnType<typeof useTeacherStudentDetailQuery>;
+export type TeacherStudentDetailLazyQueryHookResult = ReturnType<typeof useTeacherStudentDetailLazyQuery>;
+export type TeacherStudentDetailSuspenseQueryHookResult = ReturnType<typeof useTeacherStudentDetailSuspenseQuery>;
+export type TeacherStudentDetailQueryResult = Apollo.QueryResult<TeacherStudentDetailQuery, TeacherStudentDetailQueryVariables>;
