@@ -408,7 +408,7 @@ export type FeedPostCommentType = {
 export type FeedPostConnection = {
   __typename?: 'FeedPostConnection';
   nodes: Array<FeedPostType>;
-  pageInfo: PageInfoType;
+  pageInfo: PageInfo;
 };
 
 export type FeedPostType = {
@@ -701,12 +701,6 @@ export type PageInfo = {
   hasNextPage: Scalars['Boolean']['output'];
   hasPreviousPage: Scalars['Boolean']['output'];
   startCursor?: Maybe<Scalars['String']['output']>;
-};
-
-export type PageInfoType = {
-  __typename?: 'PageInfoType';
-  endCursor?: Maybe<Scalars['String']['output']>;
-  hasNextPage: Scalars['Boolean']['output'];
 };
 
 export type ParentType = {
@@ -1351,7 +1345,7 @@ export type FeedPostsQueryVariables = Exact<{
 }>;
 
 
-export type FeedPostsQuery = { __typename?: 'Query', feedPosts: { __typename?: 'FeedPostConnection', nodes: Array<{ __typename?: 'FeedPostType', id: string, body: string, mediaUrls: Array<string>, likesCount: number, commentsCount: number, likedByMe: boolean, createdAt: any, teacher: { __typename?: 'TeacherMiniType', name: string }, classroom: { __typename?: 'ClassroomMiniType', id: string, name: string }, taggedStudents: Array<{ __typename?: 'StudentMiniType', id: string, name: string }> }>, pageInfo: { __typename?: 'PageInfoType', hasNextPage: boolean, endCursor?: string | null } } };
+export type FeedPostsQuery = { __typename?: 'Query', feedPosts: { __typename?: 'FeedPostConnection', nodes: Array<{ __typename?: 'FeedPostType', id: string, body: string, mediaUrls: Array<string>, likesCount: number, commentsCount: number, likedByMe: boolean, createdAt: any, teacher: { __typename?: 'TeacherMiniType', name: string }, classroom: { __typename?: 'ClassroomMiniType', id: string, name: string }, taggedStudents: Array<{ __typename?: 'StudentMiniType', id: string, name: string }> }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type FeedPostQueryVariables = Exact<{
   id: Scalars['ID']['input'];

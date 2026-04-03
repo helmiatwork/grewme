@@ -647,12 +647,6 @@ type StudentMiniType {
   name: String!
 }
 
-type MediaAttachmentType {
-  url: String!
-  filename: String!
-  contentType: String!
-}
-
 type FeedPostCommentType {
   id: ID!
   body: String!
@@ -665,12 +659,7 @@ type FeedPostCommentType {
 
 type FeedPostConnection {
   nodes: [FeedPostType!]!
-  pageInfo: PageInfoType!
-}
-
-type PageInfoType {
-  hasNextPage: Boolean!
-  endCursor: String
+  pageInfo: PageInfo!
 }
 
 type CreateFeedPostPayload {

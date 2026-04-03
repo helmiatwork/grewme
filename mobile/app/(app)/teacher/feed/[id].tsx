@@ -48,9 +48,21 @@ export default function FeedPostDetailScreen() {
     });
 
   const handleLike = useCallback(() => {
-    if (!id) return;
-    likeFeedPost({ variables: { id } });
-  }, [id, likeFeedPost]);
+    if (!id || !post) return;
+    likeFeedPost({
+      variables: { id },
+      optimisticResponse: {
+        likeFeedPost: {
+          feedPost: {
+            __typename: 'FeedPostType',
+            id,
+            likesCount: post.likedByMe ? post.likesCount - 1 : post.likesCount + 1,
+            likedByMe: !post.likedByMe,
+          },
+        },
+      },
+    });
+  }, [id, post, likeFeedPost]);
 
   const handleComment = useCallback(async () => {
     const trimmed = commentBody.trim();

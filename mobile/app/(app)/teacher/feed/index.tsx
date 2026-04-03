@@ -11,7 +11,6 @@ import {
 import ErrorState from '../../../../src/components/ErrorState';
 import LoadingState from '../../../../src/components/LoadingState';
 import {
-  FeedPostsDocument,
   useFeedPostsQuery,
   useLikeFeedPostMutation,
 } from '../../../../src/graphql/generated/graphql';
@@ -35,8 +34,20 @@ export default function FeedScreen() {
   const [likeFeedPost] = useLikeFeedPostMutation();
 
   const handleLike = useCallback(
-    (postId: string) => {
-      likeFeedPost({ variables: { id: postId } });
+    (postId: string, currentLiked: boolean, currentCount: number) => {
+      likeFeedPost({
+        variables: { id: postId },
+        optimisticResponse: {
+          likeFeedPost: {
+            feedPost: {
+              __typename: 'FeedPostType',
+              id: postId,
+              likesCount: currentLiked ? currentCount - 1 : currentCount + 1,
+              likedByMe: !currentLiked,
+            },
+          },
+        },
+      });
     },
     [likeFeedPost]
   );
@@ -139,7 +150,7 @@ export default function FeedScreen() {
               <View style={styles.actions}>
                 <Pressable
                   style={styles.actionButton}
-                  onPress={() => handleLike(item.id)}
+                  onPress={() => handleLike(item.id, item.likedByMe, item.likesCount)}
                   testID={`like-${item.id}`}
                 >
                   <Ionicons
