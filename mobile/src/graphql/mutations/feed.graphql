@@ -1,0 +1,48 @@
+mutation CreateFeedPost($classroomIds: [ID!]!, $body: String!, $studentIds: [ID!]) {
+  createFeedPost(classroomIds: $classroomIds, body: $body, studentIds: $studentIds) {
+    feedPosts {
+      id
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation LikeFeedPost($id: ID!) {
+  likeFeedPost(id: $id) {
+    feedPost {
+      id
+      likesCount
+      likedByMe
+    }
+  }
+}
+
+mutation CommentOnFeedPost($id: ID!, $body: String!) {
+  commentOnFeedPost(id: $id, body: $body) {
+    comment {
+      id
+      body
+      commenterName
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteFeedPost($id: ID!) {
+  deleteFeedPost(id: $id) {
+    success
+  }
+}
+
+mutation DeleteFeedComment($id: ID!) {
+  deleteFeedComment(id: $id) {
+    success
+  }
+}
