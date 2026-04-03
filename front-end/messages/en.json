@@ -860,5 +860,40 @@
   "behavior_most_negative": "Most Common Negative",
   "behavior_revoke": "Undo",
   "behavior_classroom_name": "Classroom",
-  "behavior_net_points": "Net Points"
+  "behavior_net_points": "Net Points",
+
+  "behavior_display_page_title": "Behavior Display",
+  "behavior_display_header_title": "Behavior Points",
+  "behavior_display_reconnecting": "Reconnecting...",
+  "behavior_display_live": "LIVE",
+
+  "exam_entry_hint": "Enter the exam code from your teacher",
+  "exam_entry_placeholder": "Enter code",
+  "exam_entry_join_btn": "Join Exam",
+  "exam_entry_invalid_code": "Please enter a 6-character exam code",
+
+  "exam_not_found_title": "Exam Not Found",
+  "exam_not_found_body": "Code \"{code}\" is invalid or the exam has ended.",
+  "exam_not_found_try_again": "Try Another Code",
+
+  "exam_pick_student_prompt": "Who are you?",
+
+  "exam_confirm_greeting": "Hi, {name}!",
+  "exam_confirm_questions_label": "Questions:",
+  "exam_confirm_time_limit_label": "Time limit:",
+  "exam_confirm_time_limit_value": "{minutes} minutes",
+  "exam_confirm_no_limit": "No limit",
+  "exam_confirm_start_btn": "Start Exam",
+  "exam_confirm_wrong_name": "Not you? Pick a different name",
+
+  "exam_taking_answered": "{answered}/{total} answered",
+  "exam_taking_saving": "Saving...",
+  "exam_taking_answer_placeholder": "Type your answer...",
+  "exam_taking_submit_btn": "Submit Exam",
+  "exam_taking_submitting": "Submitting...",
+
+  "exam_submitted_title": "Exam Submitted!",
+  "exam_submitted_your_score": "Your Score",
+  "exam_submitted_review_msg": "Your answers have been submitted. Your teacher will review them.",
+  "exam_submitted_close_hint": "You can close this page now."
 }

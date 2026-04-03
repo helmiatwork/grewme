@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import * as m from '$lib/paraglide/messages.js';
   import type { ExamAccessInfo } from '$lib/api/types';
   import {
     START_EXAM_MUTATION,
@@ -158,10 +159,10 @@
   <div class="flex min-h-screen items-center justify-center p-4">
     <div class="text-center">
       <p class="text-6xl">😕</p>
-      <h1 class="mt-4 text-2xl font-bold text-gray-900">Exam Not Found</h1>
-      <p class="mt-2 text-gray-500">Code "{data.code}" is invalid or the exam has ended.</p>
+      <h1 class="mt-4 text-2xl font-bold text-gray-900">{m.exam_not_found_title()}</h1>
+      <p class="mt-2 text-gray-500">{m.exam_not_found_body({ code: data.code })}</p>
       <a href="/exam" class="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
-        Try Another Code
+        {m.exam_not_found_try_again()}
       </a>
     </div>
   </div>
@@ -173,7 +174,7 @@
       <p class="text-gray-500">{examAccess?.classroom.name}</p>
     </div>
 
-    <p class="mb-4 text-center text-sm font-medium text-gray-700">Who are you?</p>
+    <p class="mb-4 text-center text-sm font-medium text-gray-700">{m.exam_pick_student_prompt()}</p>
 
     <div class="grid grid-cols-2 gap-3">
       {#each students as student}
@@ -192,14 +193,14 @@
     <div class="w-full max-w-md text-center">
       <p class="text-5xl">📝</p>
       <h1 class="mt-4 text-2xl font-bold text-gray-900">{examAccess?.exam.title}</h1>
-      <p class="mt-1 text-gray-500">Hi, {selectedStudent?.firstName}!</p>
+      <p class="mt-1 text-gray-500">{m.exam_confirm_greeting({ name: selectedStudent?.firstName ?? '' })}</p>
 
       <div class="mt-6 rounded-xl bg-gray-50 p-4 text-left text-sm">
-        <p><span class="font-medium">Questions:</span> {questions.length}</p>
+        <p><span class="font-medium">{m.exam_confirm_questions_label()}</span> {questions.length}</p>
         {#if examAccess?.durationMinutes}
-          <p><span class="font-medium">Time limit:</span> {examAccess.durationMinutes} minutes</p>
+          <p><span class="font-medium">{m.exam_confirm_time_limit_label()}</span> {m.exam_confirm_time_limit_value({ minutes: examAccess.durationMinutes })}</p>
         {:else}
-          <p><span class="font-medium">Time limit:</span> No limit</p>
+          <p><span class="font-medium">{m.exam_confirm_time_limit_label()}</span> {m.exam_confirm_no_limit()}</p>
         {/if}
       </div>
 
@@ -211,14 +212,14 @@
         onclick={startExam}
         class="mt-6 w-full rounded-xl bg-blue-600 px-6 py-3 text-lg font-semibold text-white hover:bg-blue-700"
       >
-        Start Exam
+        {m.exam_confirm_start_btn()}
       </button>
 
       <button
         onclick={() => { examState = 'pick_student'; selectedStudentId = null; }}
         class="mt-2 text-sm text-gray-500 hover:text-gray-700"
       >
-        Not you? Pick a different name
+        {m.exam_confirm_wrong_name()}
       </button>
     </div>
   </div>
@@ -228,11 +229,11 @@
     <div class="sticky top-0 z-10 mb-6 flex items-center justify-between rounded-xl bg-white p-4 shadow-sm">
       <div>
         <h1 class="font-bold text-gray-900">{examAccess?.exam.title}</h1>
-        <p class="text-sm text-gray-500">{answeredCount}/{questions.length} answered</p>
+        <p class="text-sm text-gray-500">{m.exam_taking_answered({ answered: answeredCount, total: questions.length })}</p>
       </div>
       <div class="flex items-center gap-3">
         {#if saving}
-          <span class="text-xs text-gray-400">Saving...</span>
+          <span class="text-xs text-gray-400">{m.exam_taking_saving()}</span>
         {/if}
         {#if timeRemaining !== null}
           <span
@@ -275,7 +276,7 @@
             oninput={(e: Event) => { answers[question.id] = (e.target as HTMLTextAreaElement).value; }}
             rows={3}
             class="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-blue-500 focus:outline-none"
-            placeholder="Type your answer..."
+            placeholder={m.exam_taking_answer_placeholder()}
           ></textarea>
         {/if}
       </div>
@@ -287,7 +288,7 @@
         disabled={submitting}
         class="w-full rounded-xl bg-green-600 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-700 disabled:opacity-50"
       >
-        {submitting ? 'Submitting...' : 'Submit Exam'}
+        {submitting ? m.exam_taking_submitting() : m.exam_taking_submit_btn()}
       </button>
     </div>
   </div>
@@ -296,18 +297,18 @@
   <div class="flex min-h-screen items-center justify-center p-4">
     <div class="w-full max-w-md text-center">
       <p class="text-6xl">🎉</p>
-      <h1 class="mt-4 text-2xl font-bold text-gray-900">Exam Submitted!</h1>
+      <h1 class="mt-4 text-2xl font-bold text-gray-900">{m.exam_submitted_title()}</h1>
 
       {#if submissionResult?.score !== null && submissionResult?.score !== undefined && examAccess?.showResults}
         <div class="mt-6 rounded-xl bg-green-50 p-6">
-          <p class="text-sm text-green-600">Your Score</p>
+          <p class="text-sm text-green-600">{m.exam_submitted_your_score()}</p>
           <p class="text-4xl font-bold text-green-700">{submissionResult.score}%</p>
         </div>
       {:else}
-        <p class="mt-4 text-gray-500">Your answers have been submitted. Your teacher will review them.</p>
+        <p class="mt-4 text-gray-500">{m.exam_submitted_review_msg()}</p>
       {/if}
 
-      <p class="mt-8 text-sm text-gray-400">You can close this page now.</p>
+      <p class="mt-8 text-sm text-gray-400">{m.exam_submitted_close_hint()}</p>
     </div>
   </div>
 {/if}
