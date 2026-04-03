@@ -278,7 +278,8 @@ ActiveRecord::Base.transaction do
       date = Date.current - days_ago
       skill_categories.each { |sk| candidates << [date, sk] }
     end
-    candidates.shuffle!
+    # Deterministic shuffle using student id as seed for reproducibility
+    candidates.shuffle!(random: Random.new(student.id))
 
     count = 0
     candidates.each do |date, skill|
@@ -308,7 +309,8 @@ ActiveRecord::Base.transaction do
   students.each do |entry|
     student = entry[:student]
     teacher = entry[:teacher]
-    measured_at = Date.current - rand(7..60)
+    # Deterministic date based on student id for idempotency
+    measured_at = Date.current - (student.id.hash.abs % 54 + 7)
 
     unless HealthCheckup.exists?(student: student, measured_at: measured_at)
       HealthCheckup.create!(
@@ -364,9 +366,14 @@ ActiveRecord::Base.transaction do
     classroom = entry[:classroom]
     cats      = behavior_categories_by_school[entry[:school].id]
 
+    # Skip if student already has 3+ behavior points (idempotency guard)
+    existing_count = BehaviorPoint.where(student: student).count
+    next if existing_count >= 3
+
+    rng = Random.new(student.id)
     3.times do |i|
-      category   = cats.sample
-      awarded_at = Time.current - rand(1..20).days - rand(0..23).hours
+      category   = cats[rng.rand(cats.size)]
+      awarded_at = Time.current - (i + 1).days - rng.rand(0..23).hours
 
       BehaviorPoint.create!(
         student:           student,
