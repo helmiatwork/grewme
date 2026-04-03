@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import {
+  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -45,9 +46,14 @@ export default function TeacherConversationChatScreen() {
     if (!trimmed || !id) return;
 
     setBody('');
-    await sendMessage({
-      variables: { conversationId: id, body: trimmed },
-    });
+    try {
+      await sendMessage({
+        variables: { conversationId: id, body: trimmed },
+      });
+    } catch {
+      setBody(trimmed);
+      Alert.alert('Error', 'Failed to send message. Please try again.');
+    }
   }, [body, id, sendMessage]);
 
   if (loading) {
