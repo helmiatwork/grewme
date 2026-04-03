@@ -616,6 +616,74 @@ type GradeExamSubmissionPayload {
   errors: [UserErrorType!]!
 }
 
+# --- Feed types ---
+
+type FeedPostType {
+  id: ID!
+  body: String!
+  teacher: TeacherMiniType!
+  classroom: ClassroomMiniType!
+  mediaUrls: [String!]!
+  mediaAttachments: [MediaAttachmentType!]!
+  taggedStudents: [StudentMiniType!]!
+  likesCount: Int!
+  commentsCount: Int!
+  likedByMe: Boolean!
+  comments: [FeedPostCommentType!]!
+  createdAt: ISO8601DateTime!
+}
+
+type TeacherMiniType {
+  name: String!
+}
+
+type ClassroomMiniType {
+  id: ID!
+  name: String!
+}
+
+type StudentMiniType {
+  id: ID!
+  name: String!
+}
+
+type FeedPostCommentType {
+  id: ID!
+  body: String!
+  commenterName: String!
+  commenterType: String!
+  commenterId: ID!
+  isMine: Boolean!
+  createdAt: ISO8601DateTime!
+}
+
+type FeedPostConnection {
+  nodes: [FeedPostType!]!
+  pageInfo: PageInfo!
+}
+
+type CreateFeedPostPayload {
+  feedPosts: [FeedPostType!]
+  errors: [UserErrorType!]!
+}
+
+type LikeFeedPostPayload {
+  feedPost: FeedPostType
+}
+
+type CommentOnFeedPostPayload {
+  comment: FeedPostCommentType
+  errors: [UserErrorType!]!
+}
+
+type DeleteFeedPostPayload {
+  success: Boolean!
+}
+
+type DeleteFeedCommentPayload {
+  success: Boolean!
+}
+
 # --- Root types ---
 
 type Query {
@@ -681,6 +749,10 @@ type Query {
   exam(id: ID!): ExamObjectType
   classroomExams(classroomId: ID!, status: ClassroomExamStatusEnum): [ClassroomExamType!]!
   examSubmission(id: ID!): ExamSubmissionType
+
+  # Feed
+  feedPosts(classroomIds: [ID!], studentIds: [ID!], first: Int, after: String): FeedPostConnection!
+  feedPost(id: ID!): FeedPostType!
 }
 
 type Mutation {
@@ -739,4 +811,11 @@ type Mutation {
   createExam(input: CreateExamInput!): CreateExamPayload!
   assignExamToClassroom(input: AssignExamInput!): AssignExamPayload!
   gradeExamSubmission(input: GradeSubmissionInput!): GradeExamSubmissionPayload!
+
+  # Feed
+  createFeedPost(classroomIds: [ID!]!, body: String!, studentIds: [ID!]): CreateFeedPostPayload!
+  likeFeedPost(id: ID!): LikeFeedPostPayload!
+  commentOnFeedPost(id: ID!, body: String!): CommentOnFeedPostPayload!
+  deleteFeedPost(id: ID!): DeleteFeedPostPayload!
+  deleteFeedComment(id: ID!): DeleteFeedCommentPayload!
 }

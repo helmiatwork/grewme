@@ -1,0 +1,64 @@
+query FeedPosts($classroomIds: [ID!], $first: Int, $after: String) {
+  feedPosts(classroomIds: $classroomIds, first: $first, after: $after) {
+    nodes {
+      id
+      body
+      teacher {
+        name
+      }
+      classroom {
+        id
+        name
+      }
+      taggedStudents {
+        id
+        name
+      }
+      mediaUrls
+      likesCount
+      commentsCount
+      likedByMe
+      createdAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+query FeedPost($id: ID!) {
+  feedPost(id: $id) {
+    id
+    body
+    teacher {
+      name
+    }
+    classroom {
+      id
+      name
+    }
+    taggedStudents {
+      id
+      name
+    }
+    mediaUrls
+    mediaAttachments {
+      url
+      filename
+      contentType
+    }
+    likesCount
+    commentsCount
+    likedByMe
+    comments {
+      id
+      body
+      commenterName
+      commenterType
+      isMine
+      createdAt
+    }
+    createdAt
+  }
+}

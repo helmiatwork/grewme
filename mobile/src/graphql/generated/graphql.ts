@@ -174,6 +174,12 @@ export type ClassroomExamType = {
   updatedAt: Scalars['ISO8601DateTime']['output'];
 };
 
+export type ClassroomMiniType = {
+  __typename?: 'ClassroomMiniType';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type ClassroomOverviewType = {
   __typename?: 'ClassroomOverviewType';
   classroomId: Scalars['ID']['output'];
@@ -187,6 +193,12 @@ export type ClassroomType = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   school: SchoolType;
+};
+
+export type CommentOnFeedPostPayload = {
+  __typename?: 'CommentOnFeedPostPayload';
+  comment?: Maybe<FeedPostCommentType>;
+  errors: Array<UserErrorType>;
 };
 
 export type ConversationType = {
@@ -230,6 +242,12 @@ export type CreateExamPayload = {
   __typename?: 'CreateExamPayload';
   errors: Array<UserErrorType>;
   exam?: Maybe<ExamObjectType>;
+};
+
+export type CreateFeedPostPayload = {
+  __typename?: 'CreateFeedPostPayload';
+  errors: Array<UserErrorType>;
+  feedPosts?: Maybe<Array<FeedPostType>>;
 };
 
 export type CreateHealthCheckupPayload = {
@@ -277,6 +295,16 @@ export type DailyScoreTypeEdge = {
   __typename?: 'DailyScoreTypeEdge';
   cursor: Scalars['String']['output'];
   node: DailyScoreType;
+};
+
+export type DeleteFeedCommentPayload = {
+  __typename?: 'DeleteFeedCommentPayload';
+  success: Scalars['Boolean']['output'];
+};
+
+export type DeleteFeedPostPayload = {
+  __typename?: 'DeleteFeedPostPayload';
+  success: Scalars['Boolean']['output'];
 };
 
 export type DeleteLeaveRequestPayload = {
@@ -366,6 +394,39 @@ export type ExportChildDataPayload = {
   errors: Array<UserErrorType>;
 };
 
+export type FeedPostCommentType = {
+  __typename?: 'FeedPostCommentType';
+  body: Scalars['String']['output'];
+  commenterId: Scalars['ID']['output'];
+  commenterName: Scalars['String']['output'];
+  commenterType: Scalars['String']['output'];
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isMine: Scalars['Boolean']['output'];
+};
+
+export type FeedPostConnection = {
+  __typename?: 'FeedPostConnection';
+  nodes: Array<FeedPostType>;
+  pageInfo: PageInfo;
+};
+
+export type FeedPostType = {
+  __typename?: 'FeedPostType';
+  body: Scalars['String']['output'];
+  classroom: ClassroomMiniType;
+  comments: Array<FeedPostCommentType>;
+  commentsCount: Scalars['Int']['output'];
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  id: Scalars['ID']['output'];
+  likedByMe: Scalars['Boolean']['output'];
+  likesCount: Scalars['Int']['output'];
+  mediaAttachments: Array<MediaAttachmentType>;
+  mediaUrls: Array<Scalars['String']['output']>;
+  taggedStudents: Array<StudentMiniType>;
+  teacher: TeacherMiniType;
+};
+
 export type GradeCurriculumItemType = {
   __typename?: 'GradeCurriculumItemType';
   displayName: Scalars['String']['output'];
@@ -445,6 +506,11 @@ export enum LeaveRequestTypeEnum {
   Sick = 'SICK'
 }
 
+export type LikeFeedPostPayload = {
+  __typename?: 'LikeFeedPostPayload';
+  feedPost?: Maybe<FeedPostType>;
+};
+
 export type LoginPayload = {
   __typename?: 'LoginPayload';
   accessToken?: Maybe<Scalars['String']['output']>;
@@ -479,13 +545,18 @@ export type Mutation = {
   awardBehaviorPoint: AwardBehaviorPointPayload;
   bulkCreateDailyScores: BulkCreateDailyScoresPayload;
   bulkRecordAttendance: BulkRecordAttendancePayload;
+  commentOnFeedPost: CommentOnFeedPostPayload;
   createDailyScore: CreateDailyScorePayload;
   createExam: CreateExamPayload;
+  createFeedPost: CreateFeedPostPayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   createLeaveRequest: CreateLeaveRequestPayload;
+  deleteFeedComment: DeleteFeedCommentPayload;
+  deleteFeedPost: DeleteFeedPostPayload;
   deleteLeaveRequest: DeleteLeaveRequestPayload;
   exportChildData: ExportChildDataPayload;
   gradeExamSubmission: GradeExamSubmissionPayload;
+  likeFeedPost: LikeFeedPostPayload;
   login: LoginPayload;
   requestAccountDeletion: RequestAccountDeletionPayload;
   requestChildDataDeletion: RequestChildDataDeletionPayload;
@@ -521,6 +592,12 @@ export type MutationBulkRecordAttendanceArgs = {
 };
 
 
+export type MutationCommentOnFeedPostArgs = {
+  body: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationCreateDailyScoreArgs = {
   input: CreateDailyScoreInput;
 };
@@ -528,6 +605,13 @@ export type MutationCreateDailyScoreArgs = {
 
 export type MutationCreateExamArgs = {
   input: CreateExamInput;
+};
+
+
+export type MutationCreateFeedPostArgs = {
+  body: Scalars['String']['input'];
+  classroomIds: Array<Scalars['ID']['input']>;
+  studentIds?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 
@@ -550,6 +634,16 @@ export type MutationCreateLeaveRequestArgs = {
 };
 
 
+export type MutationDeleteFeedCommentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFeedPostArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteLeaveRequestArgs = {
   leaveRequestId: Scalars['ID']['input'];
 };
@@ -562,6 +656,11 @@ export type MutationExportChildDataArgs = {
 
 export type MutationGradeExamSubmissionArgs = {
   input: GradeSubmissionInput;
+};
+
+
+export type MutationLikeFeedPostArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -638,6 +737,8 @@ export type Query = {
   conversations: Array<ConversationType>;
   exam?: Maybe<ExamObjectType>;
   examSubmission?: Maybe<ExamSubmissionType>;
+  feedPost: FeedPostType;
+  feedPosts: FeedPostConnection;
   gradeCurriculum?: Maybe<GradeCurriculumType>;
   myChildren: Array<StudentType>;
   parentLeaveRequests: Array<LeaveRequestType>;
@@ -704,6 +805,19 @@ export type QueryExamArgs = {
 
 export type QueryExamSubmissionArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryFeedPostArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryFeedPostsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  classroomIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  studentIds?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 
@@ -856,6 +970,12 @@ export enum SkillCategoryEnum {
   Writing = 'WRITING'
 }
 
+export type StudentMiniType = {
+  __typename?: 'StudentMiniType';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type StudentType = {
   __typename?: 'StudentType';
   avatar?: Maybe<Scalars['String']['output']>;
@@ -877,6 +997,11 @@ export type SubjectCurriculumType = {
 export type SubjectMasteryType = {
   __typename?: 'SubjectMasteryType';
   id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type TeacherMiniType = {
+  __typename?: 'TeacherMiniType';
   name: Scalars['String']['output'];
 };
 
@@ -1006,6 +1131,44 @@ export type GradeExamSubmissionMutationVariables = Exact<{
 
 
 export type GradeExamSubmissionMutation = { __typename?: 'Mutation', gradeExamSubmission: { __typename?: 'GradeExamSubmissionPayload', examSubmission?: { __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum, score?: number | null, passed?: boolean | null, gradedAt?: any | null, teacherNotes?: string | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type CreateFeedPostMutationVariables = Exact<{
+  classroomIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  body: Scalars['String']['input'];
+  studentIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+}>;
+
+
+export type CreateFeedPostMutation = { __typename?: 'Mutation', createFeedPost: { __typename?: 'CreateFeedPostPayload', feedPosts?: Array<{ __typename?: 'FeedPostType', id: string }> | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type LikeFeedPostMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type LikeFeedPostMutation = { __typename?: 'Mutation', likeFeedPost: { __typename?: 'LikeFeedPostPayload', feedPost?: { __typename?: 'FeedPostType', id: string, likesCount: number, likedByMe: boolean } | null } };
+
+export type CommentOnFeedPostMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  body: Scalars['String']['input'];
+}>;
+
+
+export type CommentOnFeedPostMutation = { __typename?: 'Mutation', commentOnFeedPost: { __typename?: 'CommentOnFeedPostPayload', comment?: { __typename?: 'FeedPostCommentType', id: string, body: string, commenterName: string, createdAt: any } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type DeleteFeedPostMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteFeedPostMutation = { __typename?: 'Mutation', deleteFeedPost: { __typename?: 'DeleteFeedPostPayload', success: boolean } };
+
+export type DeleteFeedCommentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteFeedCommentMutation = { __typename?: 'Mutation', deleteFeedComment: { __typename?: 'DeleteFeedCommentPayload', success: boolean } };
 
 export type CreateHealthCheckupMutationVariables = Exact<{
   studentId: Scalars['ID']['input'];
@@ -1174,6 +1337,22 @@ export type StudentMasteriesQueryVariables = Exact<{
 
 
 export type StudentMasteriesQuery = { __typename?: 'Query', studentMasteries: Array<{ __typename?: 'ObjectiveMasteryType', id: string, examMastered: boolean, dailyMastered: boolean, mastered: boolean, learningObjective: { __typename?: 'LearningObjectiveType', id: string, description: string, topic: { __typename?: 'TopicMasteryType', id: string, name: string, subject: { __typename?: 'SubjectMasteryType', id: string, name: string } } } }> };
+
+export type FeedPostsQueryVariables = Exact<{
+  classroomIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type FeedPostsQuery = { __typename?: 'Query', feedPosts: { __typename?: 'FeedPostConnection', nodes: Array<{ __typename?: 'FeedPostType', id: string, body: string, mediaUrls: Array<string>, likesCount: number, commentsCount: number, likedByMe: boolean, createdAt: any, teacher: { __typename?: 'TeacherMiniType', name: string }, classroom: { __typename?: 'ClassroomMiniType', id: string, name: string }, taggedStudents: Array<{ __typename?: 'StudentMiniType', id: string, name: string }> }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+
+export type FeedPostQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type FeedPostQuery = { __typename?: 'Query', feedPost: { __typename?: 'FeedPostType', id: string, body: string, mediaUrls: Array<string>, likesCount: number, commentsCount: number, likedByMe: boolean, createdAt: any, teacher: { __typename?: 'TeacherMiniType', name: string }, classroom: { __typename?: 'ClassroomMiniType', id: string, name: string }, taggedStudents: Array<{ __typename?: 'StudentMiniType', id: string, name: string }>, mediaAttachments: Array<{ __typename?: 'MediaAttachmentType', url: string, filename: string, contentType: string }>, comments: Array<{ __typename?: 'FeedPostCommentType', id: string, body: string, commenterName: string, commenterType: string, isMine: boolean, createdAt: any }> } };
 
 export type StudentHealthCheckupsQueryVariables = Exact<{
   studentId: Scalars['ID']['input'];
@@ -1741,6 +1920,197 @@ export function useGradeExamSubmissionMutation(baseOptions?: Apollo.MutationHook
 export type GradeExamSubmissionMutationHookResult = ReturnType<typeof useGradeExamSubmissionMutation>;
 export type GradeExamSubmissionMutationResult = Apollo.MutationResult<GradeExamSubmissionMutation>;
 export type GradeExamSubmissionMutationOptions = Apollo.BaseMutationOptions<GradeExamSubmissionMutation, GradeExamSubmissionMutationVariables>;
+export const CreateFeedPostDocument = gql`
+    mutation CreateFeedPost($classroomIds: [ID!]!, $body: String!, $studentIds: [ID!]) {
+  createFeedPost(
+    classroomIds: $classroomIds
+    body: $body
+    studentIds: $studentIds
+  ) {
+    feedPosts {
+      id
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CreateFeedPostMutationFn = Apollo.MutationFunction<CreateFeedPostMutation, CreateFeedPostMutationVariables>;
+
+/**
+ * __useCreateFeedPostMutation__
+ *
+ * To run a mutation, you first call `useCreateFeedPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFeedPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFeedPostMutation, { data, loading, error }] = useCreateFeedPostMutation({
+ *   variables: {
+ *      classroomIds: // value for 'classroomIds'
+ *      body: // value for 'body'
+ *      studentIds: // value for 'studentIds'
+ *   },
+ * });
+ */
+export function useCreateFeedPostMutation(baseOptions?: Apollo.MutationHookOptions<CreateFeedPostMutation, CreateFeedPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateFeedPostMutation, CreateFeedPostMutationVariables>(CreateFeedPostDocument, options);
+      }
+export type CreateFeedPostMutationHookResult = ReturnType<typeof useCreateFeedPostMutation>;
+export type CreateFeedPostMutationResult = Apollo.MutationResult<CreateFeedPostMutation>;
+export type CreateFeedPostMutationOptions = Apollo.BaseMutationOptions<CreateFeedPostMutation, CreateFeedPostMutationVariables>;
+export const LikeFeedPostDocument = gql`
+    mutation LikeFeedPost($id: ID!) {
+  likeFeedPost(id: $id) {
+    feedPost {
+      id
+      likesCount
+      likedByMe
+    }
+  }
+}
+    `;
+export type LikeFeedPostMutationFn = Apollo.MutationFunction<LikeFeedPostMutation, LikeFeedPostMutationVariables>;
+
+/**
+ * __useLikeFeedPostMutation__
+ *
+ * To run a mutation, you first call `useLikeFeedPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLikeFeedPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [likeFeedPostMutation, { data, loading, error }] = useLikeFeedPostMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useLikeFeedPostMutation(baseOptions?: Apollo.MutationHookOptions<LikeFeedPostMutation, LikeFeedPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LikeFeedPostMutation, LikeFeedPostMutationVariables>(LikeFeedPostDocument, options);
+      }
+export type LikeFeedPostMutationHookResult = ReturnType<typeof useLikeFeedPostMutation>;
+export type LikeFeedPostMutationResult = Apollo.MutationResult<LikeFeedPostMutation>;
+export type LikeFeedPostMutationOptions = Apollo.BaseMutationOptions<LikeFeedPostMutation, LikeFeedPostMutationVariables>;
+export const CommentOnFeedPostDocument = gql`
+    mutation CommentOnFeedPost($id: ID!, $body: String!) {
+  commentOnFeedPost(id: $id, body: $body) {
+    comment {
+      id
+      body
+      commenterName
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CommentOnFeedPostMutationFn = Apollo.MutationFunction<CommentOnFeedPostMutation, CommentOnFeedPostMutationVariables>;
+
+/**
+ * __useCommentOnFeedPostMutation__
+ *
+ * To run a mutation, you first call `useCommentOnFeedPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCommentOnFeedPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [commentOnFeedPostMutation, { data, loading, error }] = useCommentOnFeedPostMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      body: // value for 'body'
+ *   },
+ * });
+ */
+export function useCommentOnFeedPostMutation(baseOptions?: Apollo.MutationHookOptions<CommentOnFeedPostMutation, CommentOnFeedPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CommentOnFeedPostMutation, CommentOnFeedPostMutationVariables>(CommentOnFeedPostDocument, options);
+      }
+export type CommentOnFeedPostMutationHookResult = ReturnType<typeof useCommentOnFeedPostMutation>;
+export type CommentOnFeedPostMutationResult = Apollo.MutationResult<CommentOnFeedPostMutation>;
+export type CommentOnFeedPostMutationOptions = Apollo.BaseMutationOptions<CommentOnFeedPostMutation, CommentOnFeedPostMutationVariables>;
+export const DeleteFeedPostDocument = gql`
+    mutation DeleteFeedPost($id: ID!) {
+  deleteFeedPost(id: $id) {
+    success
+  }
+}
+    `;
+export type DeleteFeedPostMutationFn = Apollo.MutationFunction<DeleteFeedPostMutation, DeleteFeedPostMutationVariables>;
+
+/**
+ * __useDeleteFeedPostMutation__
+ *
+ * To run a mutation, you first call `useDeleteFeedPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFeedPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFeedPostMutation, { data, loading, error }] = useDeleteFeedPostMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteFeedPostMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFeedPostMutation, DeleteFeedPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteFeedPostMutation, DeleteFeedPostMutationVariables>(DeleteFeedPostDocument, options);
+      }
+export type DeleteFeedPostMutationHookResult = ReturnType<typeof useDeleteFeedPostMutation>;
+export type DeleteFeedPostMutationResult = Apollo.MutationResult<DeleteFeedPostMutation>;
+export type DeleteFeedPostMutationOptions = Apollo.BaseMutationOptions<DeleteFeedPostMutation, DeleteFeedPostMutationVariables>;
+export const DeleteFeedCommentDocument = gql`
+    mutation DeleteFeedComment($id: ID!) {
+  deleteFeedComment(id: $id) {
+    success
+  }
+}
+    `;
+export type DeleteFeedCommentMutationFn = Apollo.MutationFunction<DeleteFeedCommentMutation, DeleteFeedCommentMutationVariables>;
+
+/**
+ * __useDeleteFeedCommentMutation__
+ *
+ * To run a mutation, you first call `useDeleteFeedCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFeedCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFeedCommentMutation, { data, loading, error }] = useDeleteFeedCommentMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteFeedCommentMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFeedCommentMutation, DeleteFeedCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteFeedCommentMutation, DeleteFeedCommentMutationVariables>(DeleteFeedCommentDocument, options);
+      }
+export type DeleteFeedCommentMutationHookResult = ReturnType<typeof useDeleteFeedCommentMutation>;
+export type DeleteFeedCommentMutationResult = Apollo.MutationResult<DeleteFeedCommentMutation>;
+export type DeleteFeedCommentMutationOptions = Apollo.BaseMutationOptions<DeleteFeedCommentMutation, DeleteFeedCommentMutationVariables>;
 export const CreateHealthCheckupDocument = gql`
     mutation CreateHealthCheckup($studentId: ID!, $measuredAt: ISO8601Date!, $weightKg: Float, $heightCm: Float, $headCircumferenceCm: Float, $notes: String) {
   createHealthCheckup(
@@ -2925,6 +3295,147 @@ export type StudentMasteriesQueryHookResult = ReturnType<typeof useStudentMaster
 export type StudentMasteriesLazyQueryHookResult = ReturnType<typeof useStudentMasteriesLazyQuery>;
 export type StudentMasteriesSuspenseQueryHookResult = ReturnType<typeof useStudentMasteriesSuspenseQuery>;
 export type StudentMasteriesQueryResult = Apollo.QueryResult<StudentMasteriesQuery, StudentMasteriesQueryVariables>;
+export const FeedPostsDocument = gql`
+    query FeedPosts($classroomIds: [ID!], $first: Int, $after: String) {
+  feedPosts(classroomIds: $classroomIds, first: $first, after: $after) {
+    nodes {
+      id
+      body
+      teacher {
+        name
+      }
+      classroom {
+        id
+        name
+      }
+      taggedStudents {
+        id
+        name
+      }
+      mediaUrls
+      likesCount
+      commentsCount
+      likedByMe
+      createdAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useFeedPostsQuery__
+ *
+ * To run a query within a React component, call `useFeedPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFeedPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeedPostsQuery({
+ *   variables: {
+ *      classroomIds: // value for 'classroomIds'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useFeedPostsQuery(baseOptions?: Apollo.QueryHookOptions<FeedPostsQuery, FeedPostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FeedPostsQuery, FeedPostsQueryVariables>(FeedPostsDocument, options);
+      }
+export function useFeedPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeedPostsQuery, FeedPostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FeedPostsQuery, FeedPostsQueryVariables>(FeedPostsDocument, options);
+        }
+// @ts-ignore
+export function useFeedPostsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<FeedPostsQuery, FeedPostsQueryVariables>): Apollo.UseSuspenseQueryResult<FeedPostsQuery, FeedPostsQueryVariables>;
+export function useFeedPostsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FeedPostsQuery, FeedPostsQueryVariables>): Apollo.UseSuspenseQueryResult<FeedPostsQuery | undefined, FeedPostsQueryVariables>;
+export function useFeedPostsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FeedPostsQuery, FeedPostsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FeedPostsQuery, FeedPostsQueryVariables>(FeedPostsDocument, options);
+        }
+export type FeedPostsQueryHookResult = ReturnType<typeof useFeedPostsQuery>;
+export type FeedPostsLazyQueryHookResult = ReturnType<typeof useFeedPostsLazyQuery>;
+export type FeedPostsSuspenseQueryHookResult = ReturnType<typeof useFeedPostsSuspenseQuery>;
+export type FeedPostsQueryResult = Apollo.QueryResult<FeedPostsQuery, FeedPostsQueryVariables>;
+export const FeedPostDocument = gql`
+    query FeedPost($id: ID!) {
+  feedPost(id: $id) {
+    id
+    body
+    teacher {
+      name
+    }
+    classroom {
+      id
+      name
+    }
+    taggedStudents {
+      id
+      name
+    }
+    mediaUrls
+    mediaAttachments {
+      url
+      filename
+      contentType
+    }
+    likesCount
+    commentsCount
+    likedByMe
+    comments {
+      id
+      body
+      commenterName
+      commenterType
+      isMine
+      createdAt
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useFeedPostQuery__
+ *
+ * To run a query within a React component, call `useFeedPostQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFeedPostQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeedPostQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useFeedPostQuery(baseOptions: Apollo.QueryHookOptions<FeedPostQuery, FeedPostQueryVariables> & ({ variables: FeedPostQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FeedPostQuery, FeedPostQueryVariables>(FeedPostDocument, options);
+      }
+export function useFeedPostLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeedPostQuery, FeedPostQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FeedPostQuery, FeedPostQueryVariables>(FeedPostDocument, options);
+        }
+// @ts-ignore
+export function useFeedPostSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<FeedPostQuery, FeedPostQueryVariables>): Apollo.UseSuspenseQueryResult<FeedPostQuery, FeedPostQueryVariables>;
+export function useFeedPostSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FeedPostQuery, FeedPostQueryVariables>): Apollo.UseSuspenseQueryResult<FeedPostQuery | undefined, FeedPostQueryVariables>;
+export function useFeedPostSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FeedPostQuery, FeedPostQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FeedPostQuery, FeedPostQueryVariables>(FeedPostDocument, options);
+        }
+export type FeedPostQueryHookResult = ReturnType<typeof useFeedPostQuery>;
+export type FeedPostLazyQueryHookResult = ReturnType<typeof useFeedPostLazyQuery>;
+export type FeedPostSuspenseQueryHookResult = ReturnType<typeof useFeedPostSuspenseQuery>;
+export type FeedPostQueryResult = Apollo.QueryResult<FeedPostQuery, FeedPostQueryVariables>;
 export const StudentHealthCheckupsDocument = gql`
     query StudentHealthCheckups($studentId: ID!, $startDate: ISO8601Date, $endDate: ISO8601Date) {
   studentHealthCheckups(
