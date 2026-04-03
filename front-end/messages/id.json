@@ -860,5 +860,40 @@
   "behavior_most_negative": "Perilaku Negatif Terbanyak",
   "behavior_revoke": "Batalkan",
   "behavior_classroom_name": "Kelas",
-  "behavior_net_points": "Poin Bersih"
+  "behavior_net_points": "Poin Bersih",
+
+  "behavior_display_page_title": "Tampilan Perilaku",
+  "behavior_display_header_title": "Poin Perilaku",
+  "behavior_display_reconnecting": "Menyambungkan ulang...",
+  "behavior_display_live": "LANGSUNG",
+
+  "exam_entry_hint": "Masukkan kode ujian dari guru Anda",
+  "exam_entry_placeholder": "Masukkan kode",
+  "exam_entry_join_btn": "Ikuti Ujian",
+  "exam_entry_invalid_code": "Masukkan kode ujian 6 karakter",
+
+  "exam_not_found_title": "Ujian Tidak Ditemukan",
+  "exam_not_found_body": "Kode \"{code}\" tidak valid atau ujian telah berakhir.",
+  "exam_not_found_try_again": "Coba Kode Lain",
+
+  "exam_pick_student_prompt": "Siapa kamu?",
+
+  "exam_confirm_greeting": "Halo, {name}!",
+  "exam_confirm_questions_label": "Soal:",
+  "exam_confirm_time_limit_label": "Batas waktu:",
+  "exam_confirm_time_limit_value": "{minutes} menit",
+  "exam_confirm_no_limit": "Tidak ada batas",
+  "exam_confirm_start_btn": "Mulai Ujian",
+  "exam_confirm_wrong_name": "Bukan kamu? Pilih nama lain",
+
+  "exam_taking_answered": "{answered}/{total} dijawab",
+  "exam_taking_saving": "Menyimpan...",
+  "exam_taking_answer_placeholder": "Ketik jawabanmu...",
+  "exam_taking_submit_btn": "Kumpulkan Ujian",
+  "exam_taking_submitting": "Mengumpulkan...",
+
+  "exam_submitted_title": "Ujian Terkumpul!",
+  "exam_submitted_your_score": "Nilaimu",
+  "exam_submitted_review_msg": "Jawabanmu telah dikumpulkan. Gurumu akan memeriksanya.",
+  "exam_submitted_close_hint": "Kamu bisa menutup halaman ini sekarang."
 }

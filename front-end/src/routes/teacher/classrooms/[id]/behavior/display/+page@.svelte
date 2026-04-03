@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { createConsumer } from '@rails/actioncable';
   import type { Consumer, Subscription } from '@rails/actioncable';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
@@ -150,7 +151,7 @@
 </script>
 
 <svelte:head>
-  <title>Behavior Display</title>
+  <title>{m.behavior_display_page_title()}</title>
 </svelte:head>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -160,21 +161,21 @@
   <div class="top-bar">
     <div class="header-left">
       <span class="school-icon">⭐</span>
-      <span class="header-title">Behavior Points</span>
+      <span class="header-title">{m.behavior_display_header_title()}</span>
     </div>
     <div class="header-right">
       {#if !wsConnected}
         <span class="reconnecting-badge">
           <span class="pulse-dot"></span>
-          Reconnecting...
+          {m.behavior_display_reconnecting()}
         </span>
       {:else}
         <span class="live-badge">
           <span class="live-dot"></span>
-          LIVE
+          {m.behavior_display_live()}
         </span>
       {/if}
-      <button class="close-btn" onclick={close} aria-label="Close">✕</button>
+      <button class="close-btn" onclick={close} aria-label={m.common_close()}>✕</button>
     </div>
   </div>
 
