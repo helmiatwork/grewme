@@ -113,7 +113,7 @@ describe('ClassOverviewScreen', () => {
     expect(charts).toHaveLength(2);
   });
 
-  it('navigates to behavior screen on student card press', async () => {
+  it('navigates to student detail on card press', async () => {
     useAuthStore.getState().setActiveClassroomId('c1');
     const { getByTestId } = renderScreen([overviewMock]);
 
@@ -123,10 +123,7 @@ describe('ClassOverviewScreen', () => {
 
     fireEvent.press(getByTestId('student-card-st1'));
 
-    expect(mockPush).toHaveBeenCalledWith({
-      pathname: '/(app)/teacher/behavior',
-      params: { studentId: 'st1' },
-    });
+    expect(mockPush).toHaveBeenCalledWith('/(app)/teacher/students/st1');
   });
 
   it('shows error state on query failure', async () => {
