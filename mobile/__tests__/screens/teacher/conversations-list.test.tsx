@@ -4,11 +4,6 @@ import React from 'react';
 import TeacherConversationsScreen from '../../../app/(app)/teacher/messages/index';
 import { ConversationsDocument } from '../../../src/graphql/generated/graphql';
 
-jest.mock('expo-router', () => ({
-  router: { push: jest.fn() },
-}));
-
-// Capture push mock for assertion
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
   router: { push: (...args: unknown[]) => mockPush(...args) },
