@@ -19,7 +19,12 @@ import {
   useReviewLeaveRequestMutation,
   useTeacherStudentLeaveRequestsQuery,
 } from '../../../../src/graphql/generated/graphql';
-import { STATUS_COLORS, STATUS_FILTERS, formatDate } from './shared';
+import {
+  STATUS_COLORS,
+  STATUS_FILTERS,
+  formatDate,
+  sharedStyles,
+} from './shared';
 
 const TYPE_LABELS: Record<string, string> = {
   EXCUSED: 'Excused',
@@ -118,50 +123,48 @@ export default function StudentLeaveTab() {
     const isPending = item.status === LeaveRequestStatusEnum.Pending;
 
     return (
-      <View style={styles.requestCard} testID={`student-leave-item-${item.id}`}>
-        <View style={styles.requestHeader}>
-          <View style={[styles.typeBadge, { backgroundColor: '#E3F2FD' }]}>
-            <Text style={styles.typeBadgeText}>
+      <View style={s.requestCard} testID={`student-leave-item-${item.id}`}>
+        <View style={s.requestHeader}>
+          <View style={[s.typeBadge, { backgroundColor: '#E3F2FD' }]}>
+            <Text style={s.typeBadgeText}>
               {TYPE_LABELS[item.requestType] ?? item.requestType}
             </Text>
           </View>
-          <View
-            style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}
-          >
-            <Text style={[styles.statusText, { color: statusStyle.text }]}>
+          <View style={[s.statusBadge, { backgroundColor: statusStyle.bg }]}>
+            <Text style={[s.statusText, { color: statusStyle.text }]}>
               {item.status}
             </Text>
           </View>
         </View>
 
-        <View style={styles.requestDetails}>
-          <View style={styles.detailRow}>
+        <View style={s.requestDetails}>
+          <View style={s.detailRow}>
             <Ionicons name="person-outline" size={16} color="#666" />
-            <Text style={styles.detailText}>
+            <Text style={s.detailText}>
               <Text style={styles.bold}>{item.student.name}</Text>
               {' · Parent: '}
               {item.parent.name}
             </Text>
           </View>
-          <View style={styles.detailRow}>
+          <View style={s.detailRow}>
             <Ionicons name="calendar-outline" size={16} color="#666" />
-            <Text style={styles.detailText}>
+            <Text style={s.detailText}>
               {formatDate(item.startDate)} — {formatDate(item.endDate)} (
               {item.daysCount} day{item.daysCount !== 1 ? 's' : ''})
             </Text>
           </View>
-          <View style={styles.detailRow}>
+          <View style={s.detailRow}>
             <Ionicons
               name="chatbubble-ellipses-outline"
               size={16}
               color="#666"
             />
-            <Text style={styles.detailText}>{item.reason}</Text>
+            <Text style={s.detailText}>{item.reason}</Text>
           </View>
           {item.rejectionReason ? (
-            <View style={styles.detailRow}>
+            <View style={s.detailRow}>
               <Ionicons name="alert-circle-outline" size={16} color="#C62828" />
-              <Text style={[styles.detailText, { color: '#C62828' }]}>
+              <Text style={[s.detailText, { color: '#C62828' }]}>
                 Rejection: {item.rejectionReason}
               </Text>
             </View>
@@ -199,13 +202,13 @@ export default function StudentLeaveTab() {
   };
 
   return (
-    <View style={styles.container} testID="student-leave-tab">
+    <View style={s.container} testID="student-leave-tab">
       {/* Filter Chips */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.filterContainer}
-        contentContainerStyle={styles.filterContent}
+        style={s.filterContainer}
+        contentContainerStyle={s.filterContent}
       >
         {STATUS_FILTERS.map((f) => {
           const isActive = activeFilter === f.value;
@@ -215,7 +218,7 @@ export default function StudentLeaveTab() {
           return (
             <Pressable
               key={f.label}
-              style={[styles.filterChip, isActive && styles.filterChipActive]}
+              style={[s.filterChip, isActive && s.filterChipActive]}
               onPress={() => {
                 setActiveFilter(f.value);
                 refetch({ status: f.value ?? undefined });
@@ -223,10 +226,7 @@ export default function StudentLeaveTab() {
               testID={testId}
             >
               <Text
-                style={[
-                  styles.filterChipText,
-                  isActive && styles.filterChipTextActive,
-                ]}
+                style={[s.filterChipText, isActive && s.filterChipTextActive]}
               >
                 {f.label}
               </Text>
@@ -237,16 +237,16 @@ export default function StudentLeaveTab() {
 
       {/* List / Empty State */}
       {requests.length === 0 ? (
-        <View style={styles.emptyState} testID="student-leave-empty-state">
+        <View style={s.emptyState} testID="student-leave-empty-state">
           <Ionicons name="document-outline" size={48} color="#CCC" />
-          <Text style={styles.emptyText}>No student leave requests</Text>
+          <Text style={s.emptyText}>No student leave requests</Text>
         </View>
       ) : (
         <FlatList
           data={requests}
           keyExtractor={(item) => item.id}
           renderItem={renderRequest}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={s.list}
           testID="student-leave-requests-list"
         />
       )}
@@ -304,108 +304,12 @@ export default function StudentLeaveTab() {
   );
 }
 
+const s = sharedStyles;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    padding: 16,
-  },
-  filterContainer: {
-    flexGrow: 0,
-    marginBottom: 12,
-  },
-  filterContent: {
-    gap: 8,
-    paddingVertical: 2,
-  },
-  filterChip: {
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    backgroundColor: '#FFFFFF',
-  },
-  filterChipActive: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#E8F5E9',
-  },
-  filterChipText: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
-  },
-  filterChipTextActive: {
-    color: '#2E7D32',
-    fontWeight: '600',
-  },
-  list: {
-    paddingBottom: 16,
-  },
-  requestCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  requestHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  typeBadge: {
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  typeBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1565C0',
-  },
-  statusBadge: {
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  requestDetails: {
-    gap: 6,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  detailText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#444',
-    lineHeight: 20,
-  },
   bold: {
     fontWeight: '600',
     color: '#1A1A1A',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-    marginTop: 12,
   },
   actionRow: {
     flexDirection: 'row',
