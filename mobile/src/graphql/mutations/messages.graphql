@@ -1,3 +1,31 @@
+mutation CreateConversation($studentId: ID!, $parentId: ID, $teacherId: ID) {
+  createConversation(
+    studentId: $studentId
+    parentId: $parentId
+    teacherId: $teacherId
+  ) {
+    conversation {
+      id
+      student {
+        id
+        name
+      }
+      parent {
+        id
+        name
+      }
+      teacher {
+        id
+        name
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
 mutation SendMessage($conversationId: ID!, $body: String!) {
   sendMessage(conversationId: $conversationId, body: $body) {
     message {

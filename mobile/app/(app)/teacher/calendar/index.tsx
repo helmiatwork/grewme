@@ -1,8 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import ErrorState from '../../../../src/components/ErrorState';
 import LoadingState from '../../../../src/components/LoadingState';
-import { useClassroomEventsQuery } from '../../../../src/graphql/generated/graphql';
+import {
+  useClassroomEventsQuery,
+  useDeleteClassroomEventMutation,
+} from '../../../../src/graphql/generated/graphql';
+import CreateEventModal from './CreateEventModal';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -48,11 +60,16 @@ export default function TeacherCalendarScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(
     toDateString(today.getFullYear(), today.getMonth(), today.getDate())
   );
+  const [modalVisible, setModalVisible] = useState(false);
 
   const monthParam = formatMonthDate(viewDate);
 
   const { data, loading, error, refetch } = useClassroomEventsQuery({
     variables: { month: monthParam },
+  });
+
+  const [deleteClassroomEvent] = useDeleteClassroomEventMutation({
+    refetchQueries: ['ClassroomEvents'],
   });
 
   const events = data?.classroomEvents ?? [];
@@ -82,6 +99,32 @@ export default function TeacherCalendarScreen() {
   const goToNextMonth = useCallback(() => {
     setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   }, []);
+
+  const handleDeleteEvent = useCallback(
+    (id: string, title: string) => {
+      Alert.alert('Delete Event', `Delete "${title}"?`, [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const result = await deleteClassroomEvent({ variables: { id } });
+              const payload = result.data?.deleteClassroomEvent;
+              if (payload?.errors?.length) {
+                Alert.alert('Error', payload.errors[0].message);
+              }
+            } catch (err) {
+              const message =
+                err instanceof Error ? err.message : 'Something went wrong.';
+              Alert.alert('Error', message);
+            }
+          },
+        },
+      ]);
+    },
+    [deleteClassroomEvent]
+  );
 
   if (loading && !data) {
     return <LoadingState message="Loading calendar..." />;
@@ -163,24 +206,58 @@ export default function TeacherCalendarScreen() {
           </Text>
         }
         renderItem={({ item }) => (
-          <View style={styles.eventCard} testID={`event-${item.id}`}>
-            <View style={styles.eventHeader}>
-              <Text style={styles.eventTitle}>{item.title}</Text>
-              {item.startTime ? (
-                <Text style={styles.eventTime}>
-                  {item.startTime}
-                  {item.endTime ? ` - ${item.endTime}` : ''}
-                </Text>
+          <Pressable
+            onLongPress={
+              item.isMine
+                ? () => handleDeleteEvent(item.id, item.title)
+                : undefined
+            }
+            testID={`event-${item.id}`}
+          >
+            <View style={styles.eventCard}>
+              <View style={styles.eventHeader}>
+                <Text style={styles.eventTitle}>{item.title}</Text>
+                <View style={styles.eventHeaderRight}>
+                  {item.startTime ? (
+                    <Text style={styles.eventTime}>
+                      {item.startTime}
+                      {item.endTime ? ` - ${item.endTime}` : ''}
+                    </Text>
+                  ) : null}
+                  {item.isMine ? (
+                    <Ionicons
+                      name="trash-outline"
+                      size={16}
+                      color="#E53935"
+                      style={styles.deleteIcon}
+                      testID={`delete-icon-${item.id}`}
+                    />
+                  ) : null}
+                </View>
+              </View>
+              {item.description ? (
+                <Text style={styles.eventDesc}>{item.description}</Text>
               ) : null}
+              <Text style={styles.eventMeta}>
+                {item.classroom.name} -- {item.creatorName}
+              </Text>
             </View>
-            {item.description ? (
-              <Text style={styles.eventDesc}>{item.description}</Text>
-            ) : null}
-            <Text style={styles.eventMeta}>
-              {item.classroom.name} -- {item.creatorName}
-            </Text>
-          </View>
+          </Pressable>
         )}
+      />
+
+      <Pressable
+        style={styles.fab}
+        onPress={() => setModalVisible(true)}
+        testID="create-event-fab"
+      >
+        <Ionicons name="add" size={28} color="#fff" />
+      </Pressable>
+
+      <CreateEventModal
+        visible={modalVisible}
+        selectedDate={selectedDate}
+        onClose={() => setModalVisible(false)}
       />
     </View>
   );
@@ -262,7 +339,7 @@ const styles = StyleSheet.create({
   },
   eventsList: {
     paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingBottom: 96,
   },
   emptyText: {
     fontSize: 14,
@@ -286,6 +363,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  eventHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   eventTitle: {
     fontSize: 15,
     fontWeight: '600',
@@ -298,6 +379,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 8,
   },
+  deleteIcon: {
+    marginLeft: 8,
+  },
   eventDesc: {
     fontSize: 13,
     color: '#666',
@@ -307,5 +391,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 6,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#1976D2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 6,
   },
 });

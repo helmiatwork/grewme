@@ -139,7 +139,7 @@ describe('TeacherMyLeaveScreen', () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId('teacher-my-leave-screen')).toBeTruthy();
+      expect(getByTestId('teacher-my-leave-tab')).toBeTruthy();
     });
 
     expect(getByTestId('leave-balance')).toBeTruthy();
@@ -157,7 +157,7 @@ describe('TeacherMyLeaveScreen', () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId('teacher-my-leave-screen')).toBeTruthy();
+      expect(getByTestId('teacher-my-leave-tab')).toBeTruthy();
     });
 
     expect(getByTestId('leave-item-20')).toBeTruthy();
@@ -174,7 +174,7 @@ describe('TeacherMyLeaveScreen', () => {
     );
 
     await waitFor(() => {
-      expect(getByTestId('teacher-my-leave-screen')).toBeTruthy();
+      expect(getByTestId('teacher-my-leave-tab')).toBeTruthy();
     });
 
     expect(getByTestId('filter-all')).toBeTruthy();

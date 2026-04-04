@@ -42,3 +42,26 @@ mutation DeleteLeaveRequest($leaveRequestId: ID!) {
     }
   }
 }
+
+mutation ReviewLeaveRequest(
+  $leaveRequestId: ID!
+  $decision: LeaveRequestStatusEnum!
+  $rejectionReason: String
+) {
+  reviewLeaveRequest(
+    leaveRequestId: $leaveRequestId
+    decision: $decision
+    rejectionReason: $rejectionReason
+  ) {
+    leaveRequest {
+      id
+      status
+      rejectionReason
+      reviewedAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}

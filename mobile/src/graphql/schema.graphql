@@ -39,6 +39,7 @@ type StudentType {
   name: String!
   avatar: String
   classrooms: [ClassroomType!]!
+  parents: [ParentType!]!
 }
 
 # --- School & Classroom ---
@@ -623,6 +624,26 @@ type DeleteLeaveRequestPayload {
   errors: [UserErrorType!]!
 }
 
+type ReviewLeaveRequestPayload {
+  leaveRequest: LeaveRequestType
+  errors: [UserErrorType!]!
+}
+
+type CreateClassroomEventPayload {
+  classroomEvent: ClassroomEventType
+  errors: [UserErrorType!]!
+}
+
+type DeleteClassroomEventPayload {
+  success: Boolean!
+  errors: [UserErrorType!]!
+}
+
+type CreateConversationPayload {
+  conversation: ConversationType
+  errors: [UserErrorType!]!
+}
+
 # --- Daily Score Inputs & Payloads ---
 
 input CreateDailyScoreInput {
@@ -794,17 +815,33 @@ type Query {
     status: LeaveRequestStatusEnum
   ): [LeaveRequestType!]!
 
-  # Leave Requests (teacher)
-  myTeacherLeaveRequests(status: LeaveRequestStatusEnum): [TeacherLeaveRequestType!]!
+  # Leave Requests (teacher — own leave)
+  myTeacherLeaveRequests(
+    status: LeaveRequestStatusEnum
+  ): [TeacherLeaveRequestType!]!
   myTeacherLeaveBalance: TeacherLeaveBalanceType
+
+  # Leave Requests (teacher — review student leave)
+  leaveRequests(
+    classroomId: ID
+    status: LeaveRequestStatusEnum
+  ): [LeaveRequestType!]!
 
   # Exams
   exam(id: ID!): ExamObjectType
-  classroomExams(classroomId: ID!, status: ClassroomExamStatusEnum): [ClassroomExamType!]!
+  classroomExams(
+    classroomId: ID!
+    status: ClassroomExamStatusEnum
+  ): [ClassroomExamType!]!
   examSubmission(id: ID!): ExamSubmissionType
 
   # Feed
-  feedPosts(classroomIds: [ID!], studentIds: [ID!], first: Int, after: String): FeedPostConnection!
+  feedPosts(
+    classroomIds: [ID!]
+    studentIds: [ID!]
+    first: Int
+    after: String
+  ): FeedPostConnection!
   feedPost(id: ID!): FeedPostType!
 }
 
@@ -824,10 +861,7 @@ type Mutation {
     headCircumferenceCm: Float
     notes: String
   ): CreateHealthCheckupPayload!
-  sendMessage(
-    conversationId: ID!
-    body: String!
-  ): SendMessagePayload!
+  sendMessage(conversationId: ID!, body: String!): SendMessagePayload!
 
   # Data Rights (COPPA)
   exportChildData(studentId: ID!): ExportChildDataPayload!
@@ -843,7 +877,32 @@ type Mutation {
     reason: String!
   ): CreateLeaveRequestPayload!
   deleteLeaveRequest(leaveRequestId: ID!): DeleteLeaveRequestPayload!
-  createTeacherLeaveRequest(input: CreateTeacherLeaveRequestInput!): CreateTeacherLeaveRequestPayload!
+  reviewLeaveRequest(
+    leaveRequestId: ID!
+    decision: LeaveRequestStatusEnum!
+    rejectionReason: String
+  ): ReviewLeaveRequestPayload!
+  createTeacherLeaveRequest(
+    input: CreateTeacherLeaveRequestInput!
+  ): CreateTeacherLeaveRequestPayload!
+
+  # Calendar
+  createClassroomEvent(
+    classroomId: ID!
+    title: String!
+    description: String
+    eventDate: ISO8601Date!
+    startTime: String
+    endTime: String
+  ): CreateClassroomEventPayload!
+  deleteClassroomEvent(id: ID!): DeleteClassroomEventPayload!
+
+  # Conversations
+  createConversation(
+    studentId: ID!
+    parentId: ID
+    teacherId: ID
+  ): CreateConversationPayload!
 
   # Attendance
   bulkRecordAttendance(
@@ -867,7 +926,11 @@ type Mutation {
   gradeExamSubmission(input: GradeSubmissionInput!): GradeExamSubmissionPayload!
 
   # Feed
-  createFeedPost(classroomIds: [ID!]!, body: String!, studentIds: [ID!]): CreateFeedPostPayload!
+  createFeedPost(
+    classroomIds: [ID!]!
+    body: String!
+    studentIds: [ID!]
+  ): CreateFeedPostPayload!
   likeFeedPost(id: ID!): LikeFeedPostPayload!
   commentOnFeedPost(id: ID!, body: String!): CommentOnFeedPostPayload!
   deleteFeedPost(id: ID!): DeleteFeedPostPayload!
