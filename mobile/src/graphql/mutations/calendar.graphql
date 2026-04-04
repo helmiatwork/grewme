@@ -1,0 +1,47 @@
+mutation CreateClassroomEvent(
+  $classroomId: ID!
+  $title: String!
+  $description: String
+  $eventDate: ISO8601Date!
+  $startTime: String
+  $endTime: String
+) {
+  createClassroomEvent(
+    classroomId: $classroomId
+    title: $title
+    description: $description
+    eventDate: $eventDate
+    startTime: $startTime
+    endTime: $endTime
+  ) {
+    classroomEvent {
+      id
+      title
+      description
+      eventDate
+      startTime
+      endTime
+      classroom {
+        id
+        name
+      }
+      creatorName
+      isMine
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+
+mutation DeleteClassroomEvent($id: ID!) {
+  deleteClassroomEvent(id: $id) {
+    success
+    errors {
+      message
+      path
+    }
+  }
+}

@@ -213,6 +213,18 @@ export type ConversationType = {
   unreadCount: Scalars['Int']['output'];
 };
 
+export type CreateClassroomEventPayload = {
+  __typename?: 'CreateClassroomEventPayload';
+  classroomEvent?: Maybe<ClassroomEventType>;
+  errors: Array<UserErrorType>;
+};
+
+export type CreateConversationPayload = {
+  __typename?: 'CreateConversationPayload';
+  conversation?: Maybe<ConversationType>;
+  errors: Array<UserErrorType>;
+};
+
 export type CreateDailyScoreInput = {
   date: Scalars['ISO8601Date']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
@@ -309,6 +321,12 @@ export type DailyScoreTypeEdge = {
   __typename?: 'DailyScoreTypeEdge';
   cursor: Scalars['String']['output'];
   node: DailyScoreType;
+};
+
+export type DeleteClassroomEventPayload = {
+  __typename?: 'DeleteClassroomEventPayload';
+  errors: Array<UserErrorType>;
+  success: Scalars['Boolean']['output'];
 };
 
 export type DeleteFeedCommentPayload = {
@@ -565,12 +583,15 @@ export type Mutation = {
   bulkCreateDailyScores: BulkCreateDailyScoresPayload;
   bulkRecordAttendance: BulkRecordAttendancePayload;
   commentOnFeedPost: CommentOnFeedPostPayload;
+  createClassroomEvent: CreateClassroomEventPayload;
+  createConversation: CreateConversationPayload;
   createDailyScore: CreateDailyScorePayload;
   createExam: CreateExamPayload;
   createFeedPost: CreateFeedPostPayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   createLeaveRequest: CreateLeaveRequestPayload;
   createTeacherLeaveRequest: CreateTeacherLeaveRequestPayload;
+  deleteClassroomEvent: DeleteClassroomEventPayload;
   deleteFeedComment: DeleteFeedCommentPayload;
   deleteFeedPost: DeleteFeedPostPayload;
   deleteLeaveRequest: DeleteLeaveRequestPayload;
@@ -580,6 +601,7 @@ export type Mutation = {
   login: LoginPayload;
   requestAccountDeletion: RequestAccountDeletionPayload;
   requestChildDataDeletion: RequestChildDataDeletionPayload;
+  reviewLeaveRequest: ReviewLeaveRequestPayload;
   sendMessage: SendMessagePayload;
 };
 
@@ -615,6 +637,23 @@ export type MutationBulkRecordAttendanceArgs = {
 export type MutationCommentOnFeedPostArgs = {
   body: Scalars['String']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateClassroomEventArgs = {
+  classroomId: Scalars['ID']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  endTime?: InputMaybe<Scalars['String']['input']>;
+  eventDate: Scalars['ISO8601Date']['input'];
+  startTime?: InputMaybe<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
+};
+
+
+export type MutationCreateConversationArgs = {
+  parentId?: InputMaybe<Scalars['ID']['input']>;
+  studentId: Scalars['ID']['input'];
+  teacherId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -656,6 +695,11 @@ export type MutationCreateLeaveRequestArgs = {
 
 export type MutationCreateTeacherLeaveRequestArgs = {
   input: CreateTeacherLeaveRequestInput;
+};
+
+
+export type MutationDeleteClassroomEventArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -703,6 +747,13 @@ export type MutationRequestAccountDeletionArgs = {
 
 export type MutationRequestChildDataDeletionArgs = {
   studentId: Scalars['ID']['input'];
+};
+
+
+export type MutationReviewLeaveRequestArgs = {
+  decision: LeaveRequestStatusEnum;
+  leaveRequestId: Scalars['ID']['input'];
+  rejectionReason?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -765,6 +816,7 @@ export type Query = {
   feedPost: FeedPostType;
   feedPosts: FeedPostConnection;
   gradeCurriculum?: Maybe<GradeCurriculumType>;
+  leaveRequests: Array<LeaveRequestType>;
   myChildren: Array<StudentType>;
   myTeacherLeaveBalance?: Maybe<TeacherLeaveBalanceType>;
   myTeacherLeaveRequests: Array<TeacherLeaveRequestType>;
@@ -851,6 +903,12 @@ export type QueryFeedPostsArgs = {
 export type QueryGradeCurriculumArgs = {
   academicYearId: Scalars['ID']['input'];
   grade: Scalars['Int']['input'];
+};
+
+
+export type QueryLeaveRequestsArgs = {
+  classroomId?: InputMaybe<Scalars['ID']['input']>;
+  status?: InputMaybe<LeaveRequestStatusEnum>;
 };
 
 
@@ -952,6 +1010,12 @@ export type RequestChildDataDeletionPayload = {
   success?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type ReviewLeaveRequestPayload = {
+  __typename?: 'ReviewLeaveRequestPayload';
+  errors: Array<UserErrorType>;
+  leaveRequest?: Maybe<LeaveRequestType>;
+};
+
 export type RubricCriteriaInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   maxScore?: InputMaybe<Scalars['Int']['input']>;
@@ -1014,6 +1078,7 @@ export type StudentType = {
   classrooms: Array<ClassroomType>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  parents: Array<ParentType>;
 };
 
 export type SubjectCurriculumType = {
@@ -1137,6 +1202,25 @@ export type AwardBehaviorPointMutationVariables = Exact<{
 
 
 export type AwardBehaviorPointMutation = { __typename?: 'Mutation', awardBehaviorPoint: { __typename?: 'AwardBehaviorPointPayload', dailyTotal: number, behaviorPoint?: { __typename?: 'BehaviorPointType', id: string, pointValue: number, awardedAt: any } | null, errors: Array<{ __typename?: 'UserErrorType', message: string }> } };
+
+export type CreateClassroomEventMutationVariables = Exact<{
+  classroomId: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  eventDate: Scalars['ISO8601Date']['input'];
+  startTime?: InputMaybe<Scalars['String']['input']>;
+  endTime?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateClassroomEventMutation = { __typename?: 'Mutation', createClassroomEvent: { __typename?: 'CreateClassroomEventPayload', classroomEvent?: { __typename?: 'ClassroomEventType', id: string, title: string, description?: string | null, eventDate: any, startTime?: string | null, endTime?: string | null, creatorName: string, isMine: boolean, createdAt: any, classroom: { __typename?: 'ClassroomType', id: string, name: string } } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type DeleteClassroomEventMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteClassroomEventMutation = { __typename?: 'Mutation', deleteClassroomEvent: { __typename?: 'DeleteClassroomEventPayload', success: boolean, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
 
 export type CreateDailyScoreMutationVariables = Exact<{
   input: CreateDailyScoreInput;
@@ -1264,6 +1348,24 @@ export type DeleteLeaveRequestMutationVariables = Exact<{
 
 
 export type DeleteLeaveRequestMutation = { __typename?: 'Mutation', deleteLeaveRequest: { __typename?: 'DeleteLeaveRequestPayload', success: boolean, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type ReviewLeaveRequestMutationVariables = Exact<{
+  leaveRequestId: Scalars['ID']['input'];
+  decision: LeaveRequestStatusEnum;
+  rejectionReason?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ReviewLeaveRequestMutation = { __typename?: 'Mutation', reviewLeaveRequest: { __typename?: 'ReviewLeaveRequestPayload', leaveRequest?: { __typename?: 'LeaveRequestType', id: string, status: LeaveRequestStatusEnum, rejectionReason?: string | null, reviewedAt?: any | null } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
+export type CreateConversationMutationVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+  parentId?: InputMaybe<Scalars['ID']['input']>;
+  teacherId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type CreateConversationMutation = { __typename?: 'Mutation', createConversation: { __typename?: 'CreateConversationPayload', conversation?: { __typename?: 'ConversationType', id: string, student: { __typename?: 'StudentType', id: string, name: string }, parent: { __typename?: 'ParentType', id: string, name: string }, teacher: { __typename?: 'TeacherType', id: string, name: string } } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
 
 export type SendMessageMutationVariables = Exact<{
   conversationId: Scalars['ID']['input'];
@@ -1442,6 +1544,14 @@ export type ParentLeaveRequestsQueryVariables = Exact<{
 
 
 export type ParentLeaveRequestsQuery = { __typename?: 'Query', parentLeaveRequests: Array<{ __typename?: 'LeaveRequestType', id: string, requestType: LeaveRequestTypeEnum, startDate: any, endDate: any, reason: string, status: LeaveRequestStatusEnum, rejectionReason?: string | null, reviewedAt?: any | null, daysCount: number, createdAt: any, student: { __typename?: 'StudentType', id: string, name: string } }> };
+
+export type TeacherStudentLeaveRequestsQueryVariables = Exact<{
+  classroomId?: InputMaybe<Scalars['ID']['input']>;
+  status?: InputMaybe<LeaveRequestStatusEnum>;
+}>;
+
+
+export type TeacherStudentLeaveRequestsQuery = { __typename?: 'Query', leaveRequests: Array<{ __typename?: 'LeaveRequestType', id: string, requestType: LeaveRequestTypeEnum, startDate: any, endDate: any, reason: string, status: LeaveRequestStatusEnum, rejectionReason?: string | null, reviewedAt?: any | null, daysCount: number, createdAt: any, student: { __typename?: 'StudentType', id: string, name: string }, parent: { __typename?: 'ParentType', id: string, name: string } }> };
 
 export type ConversationsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1658,6 +1768,106 @@ export function useAwardBehaviorPointMutation(baseOptions?: Apollo.MutationHookO
 export type AwardBehaviorPointMutationHookResult = ReturnType<typeof useAwardBehaviorPointMutation>;
 export type AwardBehaviorPointMutationResult = Apollo.MutationResult<AwardBehaviorPointMutation>;
 export type AwardBehaviorPointMutationOptions = Apollo.BaseMutationOptions<AwardBehaviorPointMutation, AwardBehaviorPointMutationVariables>;
+export const CreateClassroomEventDocument = gql`
+    mutation CreateClassroomEvent($classroomId: ID!, $title: String!, $description: String, $eventDate: ISO8601Date!, $startTime: String, $endTime: String) {
+  createClassroomEvent(
+    classroomId: $classroomId
+    title: $title
+    description: $description
+    eventDate: $eventDate
+    startTime: $startTime
+    endTime: $endTime
+  ) {
+    classroomEvent {
+      id
+      title
+      description
+      eventDate
+      startTime
+      endTime
+      classroom {
+        id
+        name
+      }
+      creatorName
+      isMine
+      createdAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CreateClassroomEventMutationFn = Apollo.MutationFunction<CreateClassroomEventMutation, CreateClassroomEventMutationVariables>;
+
+/**
+ * __useCreateClassroomEventMutation__
+ *
+ * To run a mutation, you first call `useCreateClassroomEventMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateClassroomEventMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createClassroomEventMutation, { data, loading, error }] = useCreateClassroomEventMutation({
+ *   variables: {
+ *      classroomId: // value for 'classroomId'
+ *      title: // value for 'title'
+ *      description: // value for 'description'
+ *      eventDate: // value for 'eventDate'
+ *      startTime: // value for 'startTime'
+ *      endTime: // value for 'endTime'
+ *   },
+ * });
+ */
+export function useCreateClassroomEventMutation(baseOptions?: Apollo.MutationHookOptions<CreateClassroomEventMutation, CreateClassroomEventMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateClassroomEventMutation, CreateClassroomEventMutationVariables>(CreateClassroomEventDocument, options);
+      }
+export type CreateClassroomEventMutationHookResult = ReturnType<typeof useCreateClassroomEventMutation>;
+export type CreateClassroomEventMutationResult = Apollo.MutationResult<CreateClassroomEventMutation>;
+export type CreateClassroomEventMutationOptions = Apollo.BaseMutationOptions<CreateClassroomEventMutation, CreateClassroomEventMutationVariables>;
+export const DeleteClassroomEventDocument = gql`
+    mutation DeleteClassroomEvent($id: ID!) {
+  deleteClassroomEvent(id: $id) {
+    success
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type DeleteClassroomEventMutationFn = Apollo.MutationFunction<DeleteClassroomEventMutation, DeleteClassroomEventMutationVariables>;
+
+/**
+ * __useDeleteClassroomEventMutation__
+ *
+ * To run a mutation, you first call `useDeleteClassroomEventMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteClassroomEventMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteClassroomEventMutation, { data, loading, error }] = useDeleteClassroomEventMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteClassroomEventMutation(baseOptions?: Apollo.MutationHookOptions<DeleteClassroomEventMutation, DeleteClassroomEventMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteClassroomEventMutation, DeleteClassroomEventMutationVariables>(DeleteClassroomEventDocument, options);
+      }
+export type DeleteClassroomEventMutationHookResult = ReturnType<typeof useDeleteClassroomEventMutation>;
+export type DeleteClassroomEventMutationResult = Apollo.MutationResult<DeleteClassroomEventMutation>;
+export type DeleteClassroomEventMutationOptions = Apollo.BaseMutationOptions<DeleteClassroomEventMutation, DeleteClassroomEventMutationVariables>;
 export const CreateDailyScoreDocument = gql`
     mutation CreateDailyScore($input: CreateDailyScoreInput!) {
   createDailyScore(input: $input) {
@@ -2348,6 +2558,111 @@ export function useDeleteLeaveRequestMutation(baseOptions?: Apollo.MutationHookO
 export type DeleteLeaveRequestMutationHookResult = ReturnType<typeof useDeleteLeaveRequestMutation>;
 export type DeleteLeaveRequestMutationResult = Apollo.MutationResult<DeleteLeaveRequestMutation>;
 export type DeleteLeaveRequestMutationOptions = Apollo.BaseMutationOptions<DeleteLeaveRequestMutation, DeleteLeaveRequestMutationVariables>;
+export const ReviewLeaveRequestDocument = gql`
+    mutation ReviewLeaveRequest($leaveRequestId: ID!, $decision: LeaveRequestStatusEnum!, $rejectionReason: String) {
+  reviewLeaveRequest(
+    leaveRequestId: $leaveRequestId
+    decision: $decision
+    rejectionReason: $rejectionReason
+  ) {
+    leaveRequest {
+      id
+      status
+      rejectionReason
+      reviewedAt
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type ReviewLeaveRequestMutationFn = Apollo.MutationFunction<ReviewLeaveRequestMutation, ReviewLeaveRequestMutationVariables>;
+
+/**
+ * __useReviewLeaveRequestMutation__
+ *
+ * To run a mutation, you first call `useReviewLeaveRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReviewLeaveRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [reviewLeaveRequestMutation, { data, loading, error }] = useReviewLeaveRequestMutation({
+ *   variables: {
+ *      leaveRequestId: // value for 'leaveRequestId'
+ *      decision: // value for 'decision'
+ *      rejectionReason: // value for 'rejectionReason'
+ *   },
+ * });
+ */
+export function useReviewLeaveRequestMutation(baseOptions?: Apollo.MutationHookOptions<ReviewLeaveRequestMutation, ReviewLeaveRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ReviewLeaveRequestMutation, ReviewLeaveRequestMutationVariables>(ReviewLeaveRequestDocument, options);
+      }
+export type ReviewLeaveRequestMutationHookResult = ReturnType<typeof useReviewLeaveRequestMutation>;
+export type ReviewLeaveRequestMutationResult = Apollo.MutationResult<ReviewLeaveRequestMutation>;
+export type ReviewLeaveRequestMutationOptions = Apollo.BaseMutationOptions<ReviewLeaveRequestMutation, ReviewLeaveRequestMutationVariables>;
+export const CreateConversationDocument = gql`
+    mutation CreateConversation($studentId: ID!, $parentId: ID, $teacherId: ID) {
+  createConversation(
+    studentId: $studentId
+    parentId: $parentId
+    teacherId: $teacherId
+  ) {
+    conversation {
+      id
+      student {
+        id
+        name
+      }
+      parent {
+        id
+        name
+      }
+      teacher {
+        id
+        name
+      }
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CreateConversationMutationFn = Apollo.MutationFunction<CreateConversationMutation, CreateConversationMutationVariables>;
+
+/**
+ * __useCreateConversationMutation__
+ *
+ * To run a mutation, you first call `useCreateConversationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateConversationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createConversationMutation, { data, loading, error }] = useCreateConversationMutation({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *      parentId: // value for 'parentId'
+ *      teacherId: // value for 'teacherId'
+ *   },
+ * });
+ */
+export function useCreateConversationMutation(baseOptions?: Apollo.MutationHookOptions<CreateConversationMutation, CreateConversationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateConversationMutation, CreateConversationMutationVariables>(CreateConversationDocument, options);
+      }
+export type CreateConversationMutationHookResult = ReturnType<typeof useCreateConversationMutation>;
+export type CreateConversationMutationResult = Apollo.MutationResult<CreateConversationMutation>;
+export type CreateConversationMutationOptions = Apollo.BaseMutationOptions<CreateConversationMutation, CreateConversationMutationVariables>;
 export const SendMessageDocument = gql`
     mutation SendMessage($conversationId: ID!, $body: String!) {
   sendMessage(conversationId: $conversationId, body: $body) {
@@ -3673,6 +3988,67 @@ export type ParentLeaveRequestsQueryHookResult = ReturnType<typeof useParentLeav
 export type ParentLeaveRequestsLazyQueryHookResult = ReturnType<typeof useParentLeaveRequestsLazyQuery>;
 export type ParentLeaveRequestsSuspenseQueryHookResult = ReturnType<typeof useParentLeaveRequestsSuspenseQuery>;
 export type ParentLeaveRequestsQueryResult = Apollo.QueryResult<ParentLeaveRequestsQuery, ParentLeaveRequestsQueryVariables>;
+export const TeacherStudentLeaveRequestsDocument = gql`
+    query TeacherStudentLeaveRequests($classroomId: ID, $status: LeaveRequestStatusEnum) {
+  leaveRequests(classroomId: $classroomId, status: $status) {
+    id
+    requestType
+    startDate
+    endDate
+    reason
+    status
+    rejectionReason
+    reviewedAt
+    student {
+      id
+      name
+    }
+    parent {
+      id
+      name
+    }
+    daysCount
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useTeacherStudentLeaveRequestsQuery__
+ *
+ * To run a query within a React component, call `useTeacherStudentLeaveRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTeacherStudentLeaveRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTeacherStudentLeaveRequestsQuery({
+ *   variables: {
+ *      classroomId: // value for 'classroomId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useTeacherStudentLeaveRequestsQuery(baseOptions?: Apollo.QueryHookOptions<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>(TeacherStudentLeaveRequestsDocument, options);
+      }
+export function useTeacherStudentLeaveRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>(TeacherStudentLeaveRequestsDocument, options);
+        }
+// @ts-ignore
+export function useTeacherStudentLeaveRequestsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>): Apollo.UseSuspenseQueryResult<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>;
+export function useTeacherStudentLeaveRequestsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>): Apollo.UseSuspenseQueryResult<TeacherStudentLeaveRequestsQuery | undefined, TeacherStudentLeaveRequestsQueryVariables>;
+export function useTeacherStudentLeaveRequestsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>(TeacherStudentLeaveRequestsDocument, options);
+        }
+export type TeacherStudentLeaveRequestsQueryHookResult = ReturnType<typeof useTeacherStudentLeaveRequestsQuery>;
+export type TeacherStudentLeaveRequestsLazyQueryHookResult = ReturnType<typeof useTeacherStudentLeaveRequestsLazyQuery>;
+export type TeacherStudentLeaveRequestsSuspenseQueryHookResult = ReturnType<typeof useTeacherStudentLeaveRequestsSuspenseQuery>;
+export type TeacherStudentLeaveRequestsQueryResult = Apollo.QueryResult<TeacherStudentLeaveRequestsQuery, TeacherStudentLeaveRequestsQueryVariables>;
 export const ConversationsDocument = gql`
     query Conversations {
   conversations {

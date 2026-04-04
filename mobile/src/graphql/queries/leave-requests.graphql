@@ -16,3 +16,29 @@ query ParentLeaveRequests($studentId: ID, $status: LeaveRequestStatusEnum) {
     createdAt
   }
 }
+
+query TeacherStudentLeaveRequests(
+  $classroomId: ID
+  $status: LeaveRequestStatusEnum
+) {
+  leaveRequests(classroomId: $classroomId, status: $status) {
+    id
+    requestType
+    startDate
+    endDate
+    reason
+    status
+    rejectionReason
+    reviewedAt
+    student {
+      id
+      name
+    }
+    parent {
+      id
+      name
+    }
+    daysCount
+    createdAt
+  }
+}
