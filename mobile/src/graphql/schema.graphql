@@ -489,6 +489,42 @@ enum LeaveRequestStatusEnum {
   REJECTED
 }
 
+enum TeacherLeaveRequestTypeEnum {
+  ANNUAL
+  SICK
+  PERSONAL
+}
+
+enum HalfDaySessionEnum {
+  MORNING
+  AFTERNOON
+}
+
+type TeacherLeaveRequestType {
+  id: ID!
+  requestType: String!
+  startDate: ISO8601Date!
+  endDate: ISO8601Date!
+  reason: String!
+  status: String!
+  rejectionReason: String
+  reviewedAt: ISO8601DateTime
+  halfDaySession: String
+  daysCount: Float!
+  createdAt: ISO8601DateTime!
+}
+
+type TeacherLeaveBalanceType {
+  id: ID!
+  maxAnnualLeave: Int!
+  maxSickLeave: Int!
+  usedAnnual: Float!
+  usedSick: Float!
+  usedPersonal: Float!
+  remainingAnnual: Float!
+  remainingSick: Float!
+}
+
 type LeaveRequestType {
   id: ID!
   requestType: LeaveRequestTypeEnum!
@@ -566,6 +602,19 @@ type RequestAccountDeletionPayload {
 
 type CreateLeaveRequestPayload {
   leaveRequest: LeaveRequestType
+  errors: [UserErrorType!]!
+}
+
+input CreateTeacherLeaveRequestInput {
+  requestType: TeacherLeaveRequestTypeEnum!
+  startDate: ISO8601Date!
+  endDate: ISO8601Date!
+  reason: String!
+  halfDaySession: HalfDaySessionEnum
+}
+
+type CreateTeacherLeaveRequestPayload {
+  teacherLeaveRequest: TeacherLeaveRequestType
   errors: [UserErrorType!]!
 }
 
@@ -745,6 +794,10 @@ type Query {
     status: LeaveRequestStatusEnum
   ): [LeaveRequestType!]!
 
+  # Leave Requests (teacher)
+  myTeacherLeaveRequests(status: LeaveRequestStatusEnum): [TeacherLeaveRequestType!]!
+  myTeacherLeaveBalance: TeacherLeaveBalanceType
+
   # Exams
   exam(id: ID!): ExamObjectType
   classroomExams(classroomId: ID!, status: ClassroomExamStatusEnum): [ClassroomExamType!]!
@@ -790,6 +843,7 @@ type Mutation {
     reason: String!
   ): CreateLeaveRequestPayload!
   deleteLeaveRequest(leaveRequestId: ID!): DeleteLeaveRequestPayload!
+  createTeacherLeaveRequest(input: CreateTeacherLeaveRequestInput!): CreateTeacherLeaveRequestPayload!
 
   # Attendance
   bulkRecordAttendance(

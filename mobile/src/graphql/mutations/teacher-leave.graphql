@@ -1,0 +1,12 @@
+mutation CreateTeacherLeaveRequest($input: CreateTeacherLeaveRequestInput!) {
+  createTeacherLeaveRequest(input: $input) {
+    teacherLeaveRequest {
+      id
+      status
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
