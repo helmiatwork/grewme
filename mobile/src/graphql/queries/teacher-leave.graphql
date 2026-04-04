@@ -1,0 +1,28 @@
+query MyTeacherLeaveRequests($status: LeaveRequestStatusEnum) {
+  myTeacherLeaveRequests(status: $status) {
+    id
+    requestType
+    startDate
+    endDate
+    reason
+    status
+    rejectionReason
+    reviewedAt
+    halfDaySession
+    daysCount
+    createdAt
+  }
+}
+
+query MyTeacherLeaveBalance {
+  myTeacherLeaveBalance {
+    id
+    maxAnnualLeave
+    maxSickLeave
+    usedAnnual
+    usedSick
+    usedPersonal
+    remainingAnnual
+    remainingSick
+  }
+}

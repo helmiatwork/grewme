@@ -262,6 +262,20 @@ export type CreateLeaveRequestPayload = {
   leaveRequest?: Maybe<LeaveRequestType>;
 };
 
+export type CreateTeacherLeaveRequestInput = {
+  endDate: Scalars['ISO8601Date']['input'];
+  halfDaySession?: InputMaybe<HalfDaySessionEnum>;
+  reason: Scalars['String']['input'];
+  requestType: TeacherLeaveRequestTypeEnum;
+  startDate: Scalars['ISO8601Date']['input'];
+};
+
+export type CreateTeacherLeaveRequestPayload = {
+  __typename?: 'CreateTeacherLeaveRequestPayload';
+  errors: Array<UserErrorType>;
+  teacherLeaveRequest?: Maybe<TeacherLeaveRequestType>;
+};
+
 export type CurriculumLearningObjectiveType = {
   __typename?: 'CurriculumLearningObjectiveType';
   createdAt: Scalars['ISO8601DateTime']['output'];
@@ -459,6 +473,11 @@ export type GradeSubmissionInput = {
   teacherNotes?: InputMaybe<Scalars['String']['input']>;
 };
 
+export enum HalfDaySessionEnum {
+  Afternoon = 'AFTERNOON',
+  Morning = 'MORNING'
+}
+
 export type HealthCheckupType = {
   __typename?: 'HealthCheckupType';
   bmi?: Maybe<Scalars['Float']['output']>;
@@ -551,6 +570,7 @@ export type Mutation = {
   createFeedPost: CreateFeedPostPayload;
   createHealthCheckup: CreateHealthCheckupPayload;
   createLeaveRequest: CreateLeaveRequestPayload;
+  createTeacherLeaveRequest: CreateTeacherLeaveRequestPayload;
   deleteFeedComment: DeleteFeedCommentPayload;
   deleteFeedPost: DeleteFeedPostPayload;
   deleteLeaveRequest: DeleteLeaveRequestPayload;
@@ -631,6 +651,11 @@ export type MutationCreateLeaveRequestArgs = {
   requestType: LeaveRequestTypeEnum;
   startDate: Scalars['ISO8601Date']['input'];
   studentId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateTeacherLeaveRequestArgs = {
+  input: CreateTeacherLeaveRequestInput;
 };
 
 
@@ -741,6 +766,8 @@ export type Query = {
   feedPosts: FeedPostConnection;
   gradeCurriculum?: Maybe<GradeCurriculumType>;
   myChildren: Array<StudentType>;
+  myTeacherLeaveBalance?: Maybe<TeacherLeaveBalanceType>;
+  myTeacherLeaveRequests: Array<TeacherLeaveRequestType>;
   parentLeaveRequests: Array<LeaveRequestType>;
   studentAttendance: Array<AttendanceType>;
   studentBehaviorHistory: Array<BehaviorPointType>;
@@ -824,6 +851,11 @@ export type QueryFeedPostsArgs = {
 export type QueryGradeCurriculumArgs = {
   academicYearId: Scalars['ID']['input'];
   grade: Scalars['Int']['input'];
+};
+
+
+export type QueryMyTeacherLeaveRequestsArgs = {
+  status?: InputMaybe<LeaveRequestStatusEnum>;
 };
 
 
@@ -999,6 +1031,39 @@ export type SubjectMasteryType = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
 };
+
+export type TeacherLeaveBalanceType = {
+  __typename?: 'TeacherLeaveBalanceType';
+  id: Scalars['ID']['output'];
+  maxAnnualLeave: Scalars['Int']['output'];
+  maxSickLeave: Scalars['Int']['output'];
+  remainingAnnual: Scalars['Float']['output'];
+  remainingSick: Scalars['Float']['output'];
+  usedAnnual: Scalars['Float']['output'];
+  usedPersonal: Scalars['Float']['output'];
+  usedSick: Scalars['Float']['output'];
+};
+
+export type TeacherLeaveRequestType = {
+  __typename?: 'TeacherLeaveRequestType';
+  createdAt: Scalars['ISO8601DateTime']['output'];
+  daysCount: Scalars['Float']['output'];
+  endDate: Scalars['ISO8601Date']['output'];
+  halfDaySession?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  reason: Scalars['String']['output'];
+  rejectionReason?: Maybe<Scalars['String']['output']>;
+  requestType: Scalars['String']['output'];
+  reviewedAt?: Maybe<Scalars['ISO8601DateTime']['output']>;
+  startDate: Scalars['ISO8601Date']['output'];
+  status: Scalars['String']['output'];
+};
+
+export enum TeacherLeaveRequestTypeEnum {
+  Annual = 'ANNUAL',
+  Personal = 'PERSONAL',
+  Sick = 'SICK'
+}
 
 export type TeacherMiniType = {
   __typename?: 'TeacherMiniType';
@@ -1208,6 +1273,13 @@ export type SendMessageMutationVariables = Exact<{
 
 export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'SendMessagePayload', message?: { __typename?: 'MessageType', id: string, body: string, senderName: string, senderType: string, senderId: string, mine: boolean, createdAt: any, attachments: Array<{ __typename?: 'MediaAttachmentType', url: string, filename: string, contentType: string }> } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
 
+export type CreateTeacherLeaveRequestMutationVariables = Exact<{
+  input: CreateTeacherLeaveRequestInput;
+}>;
+
+
+export type CreateTeacherLeaveRequestMutation = { __typename?: 'Mutation', createTeacherLeaveRequest: { __typename?: 'CreateTeacherLeaveRequestPayload', teacherLeaveRequest?: { __typename?: 'TeacherLeaveRequestType', id: string, status: string } | null, errors: Array<{ __typename?: 'UserErrorType', message: string, path?: Array<string> | null }> } };
+
 export type StudentAttendanceQueryVariables = Exact<{
   studentId: Scalars['ID']['input'];
   startDate?: InputMaybe<Scalars['ISO8601Date']['input']>;
@@ -1412,6 +1484,18 @@ export type ExamSubmissionDetailQueryVariables = Exact<{
 
 
 export type ExamSubmissionDetailQuery = { __typename?: 'Query', examSubmission?: { __typename?: 'ExamSubmissionType', id: string, status: ExamSubmissionStatusEnum, score?: number | null, passed?: boolean | null, startedAt?: any | null, submittedAt?: any | null, gradedAt?: any | null, teacherNotes?: string | null, student: { __typename?: 'StudentType', id: string, name: string }, classroomExam: { __typename?: 'ClassroomExamType', id: string, exam: { __typename?: 'ExamObjectType', id: string, title: string, examType: ExamTypeEnum, maxScore?: number | null, examQuestions: Array<{ __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, position: number, correctAnswer?: string | null }>, rubricCriteria: Array<{ __typename?: 'RubricCriteriaType', id: string, name: string, description?: string | null, maxScore: number, position: number }> } }, examAnswers: Array<{ __typename?: 'ExamAnswerType', id: string, selectedAnswer?: string | null, correct?: boolean | null, pointsAwarded: number, examQuestion: { __typename?: 'ExamQuestionType', id: string, questionText?: string | null, points: number, correctAnswer?: string | null } }>, rubricScores: Array<{ __typename?: 'RubricScoreType', id: string, score: number, feedback?: string | null, rubricCriteria: { __typename?: 'RubricCriteriaType', id: string, name: string, maxScore: number } }> } | null };
+
+export type MyTeacherLeaveRequestsQueryVariables = Exact<{
+  status?: InputMaybe<LeaveRequestStatusEnum>;
+}>;
+
+
+export type MyTeacherLeaveRequestsQuery = { __typename?: 'Query', myTeacherLeaveRequests: Array<{ __typename?: 'TeacherLeaveRequestType', id: string, requestType: string, startDate: any, endDate: any, reason: string, status: string, rejectionReason?: string | null, reviewedAt?: any | null, halfDaySession?: string | null, daysCount: number, createdAt: any }> };
+
+export type MyTeacherLeaveBalanceQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyTeacherLeaveBalanceQuery = { __typename?: 'Query', myTeacherLeaveBalance?: { __typename?: 'TeacherLeaveBalanceType', id: string, maxAnnualLeave: number, maxSickLeave: number, usedAnnual: number, usedSick: number, usedPersonal: number, remainingAnnual: number, remainingSick: number } | null };
 
 export type TeacherStudentDetailQueryVariables = Exact<{
   studentId: Scalars['ID']['input'];
@@ -2315,6 +2399,46 @@ export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<
 export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
 export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
 export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
+export const CreateTeacherLeaveRequestDocument = gql`
+    mutation CreateTeacherLeaveRequest($input: CreateTeacherLeaveRequestInput!) {
+  createTeacherLeaveRequest(input: $input) {
+    teacherLeaveRequest {
+      id
+      status
+    }
+    errors {
+      message
+      path
+    }
+  }
+}
+    `;
+export type CreateTeacherLeaveRequestMutationFn = Apollo.MutationFunction<CreateTeacherLeaveRequestMutation, CreateTeacherLeaveRequestMutationVariables>;
+
+/**
+ * __useCreateTeacherLeaveRequestMutation__
+ *
+ * To run a mutation, you first call `useCreateTeacherLeaveRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTeacherLeaveRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTeacherLeaveRequestMutation, { data, loading, error }] = useCreateTeacherLeaveRequestMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateTeacherLeaveRequestMutation(baseOptions?: Apollo.MutationHookOptions<CreateTeacherLeaveRequestMutation, CreateTeacherLeaveRequestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTeacherLeaveRequestMutation, CreateTeacherLeaveRequestMutationVariables>(CreateTeacherLeaveRequestDocument, options);
+      }
+export type CreateTeacherLeaveRequestMutationHookResult = ReturnType<typeof useCreateTeacherLeaveRequestMutation>;
+export type CreateTeacherLeaveRequestMutationResult = Apollo.MutationResult<CreateTeacherLeaveRequestMutation>;
+export type CreateTeacherLeaveRequestMutationOptions = Apollo.BaseMutationOptions<CreateTeacherLeaveRequestMutation, CreateTeacherLeaveRequestMutationVariables>;
 export const StudentAttendanceDocument = gql`
     query StudentAttendance($studentId: ID!, $startDate: ISO8601Date, $endDate: ISO8601Date) {
   studentAttendance(
@@ -3988,6 +4112,108 @@ export type ExamSubmissionDetailQueryHookResult = ReturnType<typeof useExamSubmi
 export type ExamSubmissionDetailLazyQueryHookResult = ReturnType<typeof useExamSubmissionDetailLazyQuery>;
 export type ExamSubmissionDetailSuspenseQueryHookResult = ReturnType<typeof useExamSubmissionDetailSuspenseQuery>;
 export type ExamSubmissionDetailQueryResult = Apollo.QueryResult<ExamSubmissionDetailQuery, ExamSubmissionDetailQueryVariables>;
+export const MyTeacherLeaveRequestsDocument = gql`
+    query MyTeacherLeaveRequests($status: LeaveRequestStatusEnum) {
+  myTeacherLeaveRequests(status: $status) {
+    id
+    requestType
+    startDate
+    endDate
+    reason
+    status
+    rejectionReason
+    reviewedAt
+    halfDaySession
+    daysCount
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useMyTeacherLeaveRequestsQuery__
+ *
+ * To run a query within a React component, call `useMyTeacherLeaveRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyTeacherLeaveRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyTeacherLeaveRequestsQuery({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useMyTeacherLeaveRequestsQuery(baseOptions?: Apollo.QueryHookOptions<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>(MyTeacherLeaveRequestsDocument, options);
+      }
+export function useMyTeacherLeaveRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>(MyTeacherLeaveRequestsDocument, options);
+        }
+// @ts-ignore
+export function useMyTeacherLeaveRequestsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>): Apollo.UseSuspenseQueryResult<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>;
+export function useMyTeacherLeaveRequestsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>): Apollo.UseSuspenseQueryResult<MyTeacherLeaveRequestsQuery | undefined, MyTeacherLeaveRequestsQueryVariables>;
+export function useMyTeacherLeaveRequestsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>(MyTeacherLeaveRequestsDocument, options);
+        }
+export type MyTeacherLeaveRequestsQueryHookResult = ReturnType<typeof useMyTeacherLeaveRequestsQuery>;
+export type MyTeacherLeaveRequestsLazyQueryHookResult = ReturnType<typeof useMyTeacherLeaveRequestsLazyQuery>;
+export type MyTeacherLeaveRequestsSuspenseQueryHookResult = ReturnType<typeof useMyTeacherLeaveRequestsSuspenseQuery>;
+export type MyTeacherLeaveRequestsQueryResult = Apollo.QueryResult<MyTeacherLeaveRequestsQuery, MyTeacherLeaveRequestsQueryVariables>;
+export const MyTeacherLeaveBalanceDocument = gql`
+    query MyTeacherLeaveBalance {
+  myTeacherLeaveBalance {
+    id
+    maxAnnualLeave
+    maxSickLeave
+    usedAnnual
+    usedSick
+    usedPersonal
+    remainingAnnual
+    remainingSick
+  }
+}
+    `;
+
+/**
+ * __useMyTeacherLeaveBalanceQuery__
+ *
+ * To run a query within a React component, call `useMyTeacherLeaveBalanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyTeacherLeaveBalanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyTeacherLeaveBalanceQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyTeacherLeaveBalanceQuery(baseOptions?: Apollo.QueryHookOptions<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>(MyTeacherLeaveBalanceDocument, options);
+      }
+export function useMyTeacherLeaveBalanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>(MyTeacherLeaveBalanceDocument, options);
+        }
+// @ts-ignore
+export function useMyTeacherLeaveBalanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>): Apollo.UseSuspenseQueryResult<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>;
+export function useMyTeacherLeaveBalanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>): Apollo.UseSuspenseQueryResult<MyTeacherLeaveBalanceQuery | undefined, MyTeacherLeaveBalanceQueryVariables>;
+export function useMyTeacherLeaveBalanceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>(MyTeacherLeaveBalanceDocument, options);
+        }
+export type MyTeacherLeaveBalanceQueryHookResult = ReturnType<typeof useMyTeacherLeaveBalanceQuery>;
+export type MyTeacherLeaveBalanceLazyQueryHookResult = ReturnType<typeof useMyTeacherLeaveBalanceLazyQuery>;
+export type MyTeacherLeaveBalanceSuspenseQueryHookResult = ReturnType<typeof useMyTeacherLeaveBalanceSuspenseQuery>;
+export type MyTeacherLeaveBalanceQueryResult = Apollo.QueryResult<MyTeacherLeaveBalanceQuery, MyTeacherLeaveBalanceQueryVariables>;
 export const TeacherStudentDetailDocument = gql`
     query TeacherStudentDetail($studentId: ID!) {
   studentRadar(studentId: $studentId) {
